@@ -1,0 +1,62 @@
+<%- include ('../partials/header') %>
+
+<link rel="stylesheet" href="/css/style.css">
+
+<main>
+
+    <%- include ('../partials/message') %>
+
+    <!-- <div class="logo" style="position:absolute; top:10px; left:10px" data-bs-toggle="tooltip" title="Some text" data-bs-custom-class="custom-tooltip">
+        <img src="/img/brain.svg" style="width:40px;"><span style="padding-left:4px; font-weight: bold;color:#f289ca">lists</span>
+    </div> -->
+
+    <div class="logo" style="position:absolute; top:10px; left:10px">
+        <img src="/img/brain.svg" style="width:40px;"><span style="padding-left:4px; font-weight: bold;color:#f289ca">lists</span>
+    </div>
+
+    <a href='/auth' style="text-decoration:none;color:black;">
+        <button href="/auth" class="btn rounded-0 pull-right" style="border-color:#f289ca;background-color:#ffe6ee;position:absolute; top:10px; right:10px;font-size:12px;color:#f289ca"><img src="/img/google.png" style="width:25px;padding-right:6px">sign in</button>
+    </a>
+
+
+    <!-- <div class="text-center">
+    <p>
+        <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+            ?
+        </a>
+       
+    </p>
+      <div class="collapse" id="collapseExample" style="width:50px">
+        
+          Some placeholder content for the collapse component. This panel is hidden by default but revealed when the user activates the relevant trigger.
+      </div>
+
+    </div> -->
+
+
+    <div class="text-center" style="font-weight:bold; color:#f289ca;padding-top:100px;">
+    <p><span style="font-size:19px">keep track of everything.</span><br>
+        create simple and intuitive lists with useful features to save anything you want to remember.
+    </p>
+</div>
+
+
+    
+
+
+
+    
+
+      <script>
+        document.addEventListener("DOMContentLoaded", function(){
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function(element){
+                return new bootstrap.Tooltip(element);
+            });
+        });
+        </script>
+</main>
+
+<%- include ('../partials/footer') %>
+
+

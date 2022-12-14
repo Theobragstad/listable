@@ -1,0 +1,99 @@
+<%- include ('../partials/header') %>
+<%- include ('../partials/menu') %>
+
+<main>
+    <div class="text-center" style="padding-top:5vh">
+        <h4>TV Show Search</h4>
+        <div class="input-group mb-3 justify-content-center text-center">
+            <form action="/search" method="POST">
+                <div class="form-group mb-3" style="width:25vw">
+                    <input type="text" class="form-control text-center" name="q" id="q" placeholder="Enter the name of a TV show" required>
+                </div>
+
+                <button class="btn rounded-pill" style="background-color:#ecf8f8;color:#1fbebe;">Search</button>
+            </form>  
+        </div>
+
+        <div style="padding-bottom:5vh">
+            <%- include ('../partials/message') %>
+
+            <% if(item.length > 0) { %>
+                <% if(item[0].show.image && item[0].show.image.medium) { %>
+                    <img src="<%= item[0].show.image.medium %>" style="border-radius:10%;"><br><br>
+                <% } else { %>
+                    <h4 style="color:#9c9cac">No image available.</h4>
+                <% } %>
+
+                <% if(item[0].show.name && item[0].show.officialSite) { %>
+                    <h4><a style="text-decoration: none;" href="<%= item[0].show.officialSite %>"><%= item[0].show.name %></a></h4>
+                <% } else if(item[0].show.name) { %>
+                    <h4><%= item[0].show.name %></h4>
+                <% } else { %>
+                    <h4 style="color:#9c9cac">No show name available.</h4>
+                <% } %>
+                
+                <% if(item[0].show.rating.average) { %>
+                    <h6>Average rating: <%= item[0].show.rating.average %></h6>
+                <% } else { %>
+                    <h6 style="color:#9c9cac">No average rating available.</h6>
+                <% } %>
+                
+                <% if(item[0].show.genres && item[0].show.genres.length !== 0) { %>
+                    <h6>
+                        <% item[0].show.genres.forEach(function(genre) { %>
+                            <span><%= genre %> </span>
+                        <% }); %>
+                    </h6>
+                <% } else { %>
+                    <h6 style="color:#9c9cac">No genre info available.</h6>
+                <% } %>
+
+                <% if(item[0].show.summary) { %>
+                    <br>
+                    <div class="text-center" style="padding-left:30vw;padding-right:30vw">
+                        <%= item[0].show.summary.replace(/<\/?[^>]+(>|$)/g, "") %>
+                    </div>
+                <% } else { %>
+                    <p style="color:#9c9cac">No summary available.</p>
+                <% } %>
+                
+
+                <% if(item[0].show.name) { %>
+                    <div class="text-center" style="padding-top:5vh;">
+                        <button class="btn rounded-pill" style="background-color:#e8fcec;color:#17d475;" data-bs-toggle="modal" data-bs-target="#addReviewModal">Add review</button>
+                    </div>
+
+                    <form action="/addReview" method="POST">
+                        <div class="modal fade" id="addReviewModal" tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header text-center">
+                                        <h1 class="modal-title fs-3">Add review</h1>
+                                        <button type="reset" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                        <div class="modal-body">
+                                            <div class="form-floating mb-3">
+                                                <input type="text" class="form-control" name="showName" id="showName" value="<%= item[0].show.name %>" readonly>
+                                                <label for="name">TV show name</label>
+                                            </div>
+                                            
+                                            <div class="form-floating mb-3">
+                                                <textarea class="form-control" name="review" id="review" maxlength="500" rows="10" style="height:100%;" required></textarea>
+                                                <label for="review">Review</label>
+                                            </div>
+                                        </div>
+                                    <div class="modal-footer">
+                                        <button type="reset" class="btn rounded-pill" style="background-color:#dedee3; color:#9c9cac" data-bs-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn rounded-pill" style="background-color:#e8fcec; color:#17d475">Submit review</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                <% } %>
+            <% } %>
+        </div>
+    </div>
+</main>
+
+<%- include ('../partials/footer') %>

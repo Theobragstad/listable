@@ -1,0 +1,26 @@
+<%- include ('../partials/header') %>
+
+
+<main>
+
+    <div class="logo" style="position:absolute; top:10px; left:10px">
+        <img src="/img/brain.svg" style="width:40px;"><span style="padding-left:4px; font-weight: bold;color:#f289ca">lists</span>
+    </div>
+
+
+    <button class="btn rounded-0 pull-right " style="border-color:#f289ca;background-color:#ffe6ee;position:absolute; top:10px; right:50px;font-size:12px" disabled><%= user.name.givenName %></button> 
+    <!-- <a href="http://<%= hostUrl %>/auth/signout" class="btn rounded-0 pull-right"style="position:absolute;top:10px; right:5px;border-color:#000000;background-color:#ececec;font-size:11px">←</a> -->
+    <a href="/logout" class="btn rounded-0 pull-right"style="position:absolute;top:10px; right:5px;border-color:#000000;background-color:#ececec;font-size:11px">←</a>
+
+    <div class="text-center" style="padding-top:50px;color:#f289ca">
+        <h6>your lists</h6>
+    </div>
+
+
+    <%= user.id%>
+    
+</main>
+
+<%- include ('../partials/footer') %>
+
+

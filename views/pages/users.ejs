@@ -1,0 +1,18 @@
+<%- include ('../partials/header') %>
+
+<main>
+
+    <% if(rows) { %>
+        <% rows.forEach(function(user){ %>
+            <h6><%= user.userid %></h6>
+        <% }); %>
+    <% } else { %>
+        <h6>no users</h6>
+    <% } %>
+
+    
+</main>
+
+<%- include ('../partials/footer') %>
+
+
