@@ -1,7 +1,12 @@
 <% if (locals.message) { %>
     <div class="text-center" style="padding-top:2vh;font-size:.75vw;">
-        <button class="btn rounded-0" style="border-color:#f289ca;background-color:#ffe6ee;font-size:12px;color:#f289ca" disabled>
+        <button class="btn message" style="border-color:#f289ca;background-color:#ffe6ee;font-size:12px;color:#f289ca;border-radius:0" disabled>
             <%= message %> 
         </button>
     </div>
 <% } %>
+
+
+<script>
+    setTimeout(function() {bootstrap.Alert.getOrCreateInstance(document.querySelector(".btn.message")).close();}, 2000)
+</script>

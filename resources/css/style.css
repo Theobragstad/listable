@@ -1,4 +1,63 @@
 
-.custom-tooltip {
-    --bs-tooltip-bg: #f289ca;
+.modal .modal-content {
+    transform: scale(0.5);
+    transition: all 0.4s;
+}
+
+.modal.show .modal-content {
+    opacity: 1;
+    transform: scale(1);    
+}
+
+.modal-dialog{
+    position: relative;
+    display: table; /* This is important */ 
+    overflow-y: auto;    
+    overflow-x: auto;
+    width: auto;
+    min-width: 350px;   
+}
+
+
+.search-hover {
+    /* border: 1px solid #ccc;
+    outline: none;
+    background-size: 22px;
+    background-position: 13px;
+    border-radius: 10px;
+    width: 50px;
+    height: 50px;
+    padding: 25px;
+    transition: all 0.5s; */
+    border: 1px solid #ccc;
+    width: 25px;
+    height: 25px;
+    padding: 7px;
+    transition: all 0.5s;
   }
+  .search-hover:hover {
+    width: 200px;
+    padding-left: 5px;
+    font-size:15px;
+  }
+
+
+  input#search {
+    background-image: url('../img/search.png');
+    background-size:contain;
+    background-repeat: no-repeat;
+    text-indent: 20px;
+    /* Extra Styling */
+    padding: 5px 3px;
+    transition:0.3s;
+    border-color:#f289ca;
+    background-color:#ffe6ee;
+    border-radius: 0;
+}
+input#search:focus {
+    background-image:none;
+    text-indent:0px;
+    border-color:#f289ca;
+    background-color:#ffe6ee;
+    border-radius: 0;
+}
