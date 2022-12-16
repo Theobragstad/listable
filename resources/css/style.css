@@ -15,7 +15,7 @@
     overflow-y: auto;    
     overflow-x: auto;
     width: auto;
-    min-width: 350px;   
+    min-width: 350px;  
 }
 
 
@@ -31,17 +31,21 @@
     transition: all 0.5s; */
     border: 1px solid #ccc;
     width: 25px;
-    height: 25px;
+    height: 22px;
     padding: 7px;
     transition: all 0.5s;
+
   }
   .search-hover:hover {
     width: 200px;
     padding-left: 5px;
-    font-size:15px;
+    font-size:12px;
+    background-image: url('../img/searchPink.png') !important;
+
+    
   }
 
-
+  
   input#search {
     background-image: url('../img/search.png');
     background-size:contain;
@@ -50,14 +54,50 @@
     /* Extra Styling */
     padding: 5px 3px;
     transition:0.3s;
-    border-color:#f289ca;
-    background-color:#ffe6ee;
-    border-radius: 0;
+    border-color:#000000;background-color:#ffe6ee;
+    border-radius: 10px;
 }
 input#search:focus {
-    background-image:none;
+    background-image:none !important;
     text-indent:0px;
-    border-color:#f289ca;
-    background-color:#ffe6ee;
-    border-radius: 0;
+    border-color:#000000;background-color:#ffe6ee;
+
+    border-radius: 10px;
 }
+
+
+.btn.rounded-10.pull-right.logout:hover {
+    color:#f289ca;
+}
+
+.zoom {
+    /* padding: 50px;
+    background-color: green; */
+    transition: transform .2s; /* Animation */
+    /* width: 200px;
+    height: 200px;
+    margin: 0 auto; */
+  }
+  
+  .zoom:hover {
+    transform: scale(1.5); /* (150% zoom - Note: if the zoom is too large, it will go outside of the viewport) */
+    border-radius: 10px;
+    
+  }
+
+
+
+  
+  .signin:hover {
+   
+  font-weight:bold;
+     /* (150% zoom - Note: if the zoom is too large, it will go outside of the viewport) */
+  }
+
+
+
+  .custom-tooltip {
+    --bs-tooltip-bg: #f289ca;
+    max-width: 125px;
+    font-size:12px;
+  }

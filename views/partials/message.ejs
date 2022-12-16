@@ -1,12 +1,25 @@
 <% if (locals.message) { %>
     <div class="text-center" style="padding-top:2vh;font-size:.75vw;">
-        <button class="btn message" style="border-color:#f289ca;background-color:#ffe6ee;font-size:12px;color:#f289ca;border-radius:0" disabled>
+        <% if(locals.error) { %>
+        <button class="btn message" style="font-size:12px;border-radius:10;background-color:#ffe6ee; color:#ff0000;border-color:#ff0000;" disabled>
             <%= message %> 
         </button>
+        <% } else { %>
+            <button class="btn message" style="font-size:12px;border-radius:10;background-color:#e8fcec;color:#17d475;border-color:#17d475;" disabled>
+                <%= message %> 
+            </button>
+            <% } %>
     </div>
 <% } %>
 
 
 <script>
-    setTimeout(function() {bootstrap.Alert.getOrCreateInstance(document.querySelector(".btn.message")).close();}, 2000)
+    var message = document.querySelector(".btn.message");
+if (message !== null) {
+
+    setTimeout(function() {bootstrap.Alert.getOrCreateInstance(message).close();}, 3500)
+}
 </script>
+
+
+

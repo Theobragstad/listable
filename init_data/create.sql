@@ -4,10 +4,11 @@ CREATE TABLE users (
 
 CREATE TABLE lists (
     listId SERIAL PRIMARY KEY,
-    list TEXT NOT NULL
+    title VARCHAR(34) NOT NULL,
+    list VARCHAR(500) NOT NULL
 );
 
-CREATE TABLE usersToLists (
-    userId VARCHAR(50) NOT NULL REFERENCES users(UserId),
-    listId INT NOT NULL REFERENCES lists(listId)
+CREATE TABLE listsToUsers (
+    listId INT NOT NULL REFERENCES lists(listId),
+    userId VARCHAR(50) NOT NULL REFERENCES users(UserId)
 );

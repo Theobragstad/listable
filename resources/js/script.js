@@ -1,25 +1,34 @@
-// var textarea = document.getElementById("textarea");
-// var limit = 80; //height limit
+var bullet = "\u2022";
+var bulletWithSpace = `${bullet} `;
+var enter = 13;
 
-// textarea.oninput = function() {
-//   textarea.style.height = "";
-//   textarea.style.height = Math.min(textarea.scrollHeight, limit) + "px";
-// };
+var subBullet = "\u26AC";
+var subBulletWithSpace = `${subBullet} `;
+var tab = 9;
 
-let previousLength = 0;
 
-const handleInput = (event) => {
-  const bullet = "\u2022";
-  const newLength = event.target.value.length;
-  const characterCode = event.target.value.substr(-1).charCodeAt(0);
-
-  if (newLength > previousLength) {
-    if (characterCode === 10) {
-      event.target.value = `${event.target.value}${bullet} `;
-    } else if (newLength === 1) {
-      event.target.value = `${bullet} ${event.target.value}`;
-    }
-  }
+var handleInput = (event) => {
+  // var { keyCode, target } = event;
+  // var { selectionStart, value } = target;
   
-  previousLength = newLength;
+  // if (keyCode === enter) {
+  //   target.value = [...value]
+  //     .map((c, i) => i === selectionStart - 1
+  //       ? `\n${bulletWithSpace}`
+  //       : c
+  //     )
+  //     .join('');
+      
+  //   target.selectionStart = selectionStart+bulletWithSpace.length;
+  //   target.selectionEnd = selectionStart+bulletWithSpace.length;
+  // }
+  // if (value[0] !== bullet) {
+  //   target.value = `${bulletWithSpace}${value}`;
+  // }  
 }
+
+
+
+
+
+
