@@ -4,8 +4,9 @@ CREATE TABLE users (
 
 CREATE TABLE lists (
     listId SERIAL PRIMARY KEY,
-    title VARCHAR(34) NOT NULL,
-    list VARCHAR(500) NOT NULL
+    title VARCHAR(25) NOT NULL,
+    list TEXT NOT NULL,
+    trash BOOLEAN NOT NULL
 );
 
 CREATE TABLE listsToUsers (

@@ -117,8 +117,13 @@ app.get('/lists', function(req, res) {
     db.any(`SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}');`)
     .then((lists) => {
         if(req.query.add) {
-            const message = (req.query.add == 'success') ? 'added new list' : 'unable to add new list';
-            const error = (req.query.add == 'success') ? false : true;
+            var message = (req.query.add == 'success') ? 'added new list' : 'unable to add new list';
+            var error = (req.query.add == 'success') ? false : true;
+            return res.render('pages/lists', {error, lists, givenName: req.session.user.givenName, message});
+        }
+        else if(req.query.delete) {
+            var message = (req.query.delete == 'success') ? 'deleted list' : 'unable to delete list';
+            var error = (req.query.delete == 'success') ? false : true;
             return res.render('pages/lists', {error, lists, givenName: req.session.user.givenName, message});
         }
         else {
@@ -182,9 +187,6 @@ app.post('/search', function(req, res) {
 app.post('/addList', function(req, res) {
     db.any(`INSERT INTO lists (title, list) VALUES ('${req.body.title}', '${req.body.list}') RETURNING listId;`)
         .then((listId) => {
-            console.log(listId);
-            console.log(listId[0].listid);
-            console.log(req.session.user.givenName);
             db.any(`INSERT INTO listsToUsers (listId, userId) VALUES (${listId[0].listid}, '${req.session.user.id}');`)
                 .then(() => {
                     return res.redirect('/lists?add=success');
@@ -199,6 +201,26 @@ app.post('/addList', function(req, res) {
             return res.redirect('/lists?add=failure');
         });
 });
+
+app.get('/horiz', function(req, res) {
+return res.render('pages/horizontal');
+
+
+});
+
+app.post('/deleteList', function(req, res) {
+    db.any(`DELETE FROM listsToUsers WHERE listId = ${req.body.listId};DELETE FROM lists WHERE listId = ${req.body.listId};`)
+        .then(() => {
+            return res.redirect('/lists?delete=success');
+        })
+        .catch((error) => {
+            console.log(error);
+            return res.redirect('/lists?delete=failure');
+        });
+    
+    
+});
+
 
 
 
