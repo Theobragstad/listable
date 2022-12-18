@@ -71,16 +71,33 @@
     <div class="row" style="overflow:auto;padding-top:50px;padding-left:20px;display:block">
       <div class="d-flex" >
     <% lists.forEach(function(list){ %>
+      <!-- THIS IS A TEST -->
+      <button data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid%>" data-toggle="modal" class="btn rounded-10 zoom" style="border-color:#f289ca;background-color:#ffe6ee;padding: .25rem .4rem;line-height: .75;">
+
       
-      <div class="col card card-body m-2" style="min-width: 250px;overflow-x:scroll;">   
+      <div id="<%= list.listid %>" class="col card card-body m-2" style="min-width: 250px;overflow-x:scroll;background-color:#<%= list.color %>;">   
        
-        <div class="row" style="font-weight:bold;padding-left:10px"><%= list.title %> 
+        <div class="row" style="font-weight:bold;padding-left:10px"><%= list.title %>  
+
+
+          
+            
           <span class="col">
+
+            
+           
           <form action="/deleteList" method="POST">
             <input type="number" name="listId" value=<%= list.listid %> hidden>
-            <button class="btn rounded-10 zoom" style="position:absolute;right:10px;border-color:#fb6f92;background-color:#ffe5ec;padding: 0;line-height: .25;width:20px"><img src="/img/trash.png" style="width:10px" onmouseover=hover(this) onmouseout=unhover(this)></button>
+            <button class="btn rounded-10 zoom" style="position:absolute;right:10px;border-color:#fb6f92;background-color:#ffe5ec;padding: 0;line-height: .25;width:20px"><img src="/img/trash.png" style="width:10px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')"></button>
           </form>
+          
         </span>
+
+        <div class="col"><button onclick="setSelectedColor('<%= list.color %>')" type="button" class="btn rounded-10 zoom" data-id="<%= list.listid %>" data-bs-toggle="modal" data-bs-target="#listColors" style="position:absolute;right:50px;border-color:#fb6f92;padding: 0;line-height: .25;width:20px">
+          <img src="/img/palette.png" style="width:20px" onmouseover="hover(this, 'paletteColors')" onmouseout="unhover(this, 'palette')">
+        </button>
+      </div>
+        
 
         </div>        
         <br>
@@ -89,9 +106,23 @@
       </div>
 
 
+
+      <div class="modal"  id="editList<%= list.listid%>" tabindex="-1" aria-labelledby="editList<%= list.listid%>" aria-hidden="true" >
+        <div class="modal-dialog "style="" >
+          <div class="modal-content rounded-10">
+            <%= list.title%>
+            <br>
+            <%= list.list %>
+              </div>
       
+          </div>
+          
+        </div>
+
+
       
-     
+      <!-- THIS IS A TEST -->
+    </button>
         
     <% }); %>
     <div style="padding-right:20px"></div>
@@ -107,7 +138,76 @@
 <% } %>
 <!-- </div> -->
 
-  
+<div class="modal fade" id="listColors" tabindex="-1" aria-labelledby="listColors" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- <div id="modalListId" value="1"></div> -->
+
+      <form action="/changeListColor" method="POST">
+        <input id="modalListId" name="listId" value="" hidden>
+        <button class="btn"  name="color" value="ffffff" style="padding-right:0"><img id="ffffff" src="/img/colors/white.png" style="width:20px"></button>
+        <button class="btn" name="color"  value="fdf5c1" style="padding-right:0"><img id="fdf5c1" src="/img/colors/yellow.png" style="width:20px"></button>
+        <button class="btn" name="color" value="f7cdc2" style="padding-right:0"><img id="f7cdc2" src="/img/colors/orange.png" style="width:20px"></button>
+      <button class="btn" name="color" value="cafbc8" style="padding-right:0"><img id="cafbc8" src="/img/colors/green.png" style="width:20px"></button>
+      <button class="btn" name="color" value="bdf6d9" style="padding-right:0"><img id="bdf6d9" src="/img/colors/greenBlue.png" style="width:20px"></button>
+      <button class="btn" name="color" value="bae6fc" style="padding-right:0"><img id="bae6fc" src="/img/colors/lightBlue.png" style="width:20px"></button>
+      <button class="btn" name="color" value="b4c9fa" style="padding-right:0"><img id="b4c9fa" src="/img/colors/lavender.png" style="width:20px"></button>
+      <button class="btn"  name="color" value="f4c3fb" style="padding-right:0"><img id="f4c3fb" src="/img/colors/pink.png" style="width:20px"></button>
+      <button class="btn"name="color" value="d0adfa"  ><img id="d0adfa" src="/img/colors/purple.png" style="width:20px"></button>
+      </form>
+
+      <!-- <div class="btn-group">
+
+
+      <button class="btn" onclick="changeListColor('#ffffff', 'whiteSelected', '')" style="padding-right:0"><img id="whiteSelected" src="/img/colors/white.png" style="width:20px"></button>
+      <button class="btn" onclick="changeListColor('#fdf5c1', 'yellowSelected', '')" style="padding-right:0"><img id="yellowSelected" src="/img/colors/yellow.png" style="width:20px"></button>
+      <button class="btn" onclick="changeListColor('#f7cdc2', 'orangeSelected', '')" style="padding-right:0"><img id="orangeSelected" src="/img/colors/orange.png" style="width:20px"></button>
+      <button class="btn" onclick="changeListColor('#cafbc8', 'greenSelected', '')" style="padding-right:0"><img id="greenSelected" src="/img/colors/green.png" style="width:20px"></button>
+      <button class="btn" onclick="changeListColor('#bdf6d9', 'greenBlueSelected', '')" style="padding-right:0"><img id="greenBlueSelected" src="/img/colors/greenBlue.png" style="width:20px"></button>
+      <button class="btn" onclick="changeListColor('#bae6fc', 'lightBlueSelected', '')" style="padding-right:0"><img id="lightBlueSelected" src="/img/colors/lightBlue.png" style="width:20px"></button>
+      <button class="btn" onclick="changeListColor('#b4c9fa', 'lavenderSelected', '')" style="padding-right:0"><img id="lavenderSelected" src="/img/colors/lavender.png" style="width:20px"></button>
+      <button class="btn" onclick="changeListColor('#f4c3fb', 'pinkSelected', '')" style="padding-right:0"><img id="pinkSelected" src="/img/colors/pink.png" style="width:20px"></button>
+      <button class="btn" onclick="changeListColor('#d0adfa', 'purpleSelected', '')"><img id="purpleSelected" src="/img/colors/purple.png" style="width:20px"></button>
+ 
+ 
+ 
+    </div> -->
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 </main>
 
@@ -115,12 +215,42 @@
 
   
 <script>
-  function hover(element) {
-  element.setAttribute('src', '/img/trashPink.png');
+
+document.getElementById('listColors').addEventListener('show.bs.modal', (e) => {
+    // console.log(e.relatedTarget);
+    console.log(e.relatedTarget.dataset.id);
+
+    // var element = document.createElement("div");
+    // element.innerHTML = e.relatedTarget.dataset.id;
+    // document.getElementById('listColorsContent').appendChild(element);  
+    // document.getElementById('modalListId').innerHTML = e.relatedTarget.dataset.id;
+
+    document.getElementById('modalListId').value = e.relatedTarget.dataset.id;
+    console.log(document.getElementById('modalListId').value);
+
+
+
+});
+
+
+function setSelectedColor(color) {
+  var imgs = ['white','yellow','orange','green','greenBlue','lightBlue','lavender','pink','purple'];
+        var ids = ['ffffff','fdf5c1','f7cdc2','cafbc8','bdf6d9','bae6fc','b4c9fa','f4c3fb','d0adfa']; 
+
+        for(var i = 0; i < 9; i++) {
+            document.getElementById(ids[i]).src='/img/colors/'+imgs[i]+'.png';
+        }
+        
+  document.getElementById(color).src = '/img/colors/'+color+'Selected.png';
 }
 
-function unhover(element) {
-  element.setAttribute('src', '/img/trash.png');
+
+  function hover(element, src) {
+  element.setAttribute('src', '/img/'+src+'.png');
+}
+
+function unhover(element, src) {
+  element.setAttribute('src', '/img/'+src+'.png');
 }
 
   tinymce.init({
@@ -138,6 +268,29 @@ function unhover(element) {
       { value: 'Email', title: 'Email' },
     ]
   });
+
+  function changeListColor(val, id, listId){
+    var targetId = document.getElementById('modalListId').value;
+    console.log(targetId);
+    var list = document.getElementById(targetId).style.backgroundColor = val;
+
+        // var list = document.getElementById(listId);
+        // list.style.backgroundColor = val;
+
+        // document.body.style.backgroundColor = val;
+
+
+
+        
+        var imgs = ['white','yellow','orange','green','greenBlue','lightBlue','lavender','pink','purple'];
+        var ids = ['whiteSelected','yellowSelected','orangeSelected','greenSelected','greenBlueSelected','lightBlueSelected','lavenderSelected','pinkSelected','purpleSelected']; 
+
+        for(var i = 0; i < 9; i++) {
+            document.getElementById(ids[i]).src='/img/colors/'+imgs[i]+'.png';
+        }
+
+        document.getElementById(id).src='/img/colors/'+id+'.png';
+    }
 </script>
 <!-- <script>tinymce.init({
   selector: 'textarea',  // change this value according to your HTML

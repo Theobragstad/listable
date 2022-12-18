@@ -20,7 +20,7 @@
             <div class="card card-body m-2" style="min-width: 300px;">Card</div>
         </div>
     </div> -->
-    <div class="" style="overflow:auto;">
+    <!-- <div class="" style="overflow:auto;">
         <div class="d-flex" >
             <div class="card card-body m-2" style="max-width: 300px;">Card</div>
             <div class="card card-body m-2" style="max-width: 300px;">Card</div>
@@ -30,8 +30,64 @@
             <div class="card card-body m-2" style="max-width: 300px;">Card</div>
             <div class="card card-body m-2" style="max-width: 300px;">Card</div>
         </div>
-    </div>
+    </div> -->
 
+
+    <%= color%>
+    <br>
+    <%= id %>
+<!-- Button trigger modal -->
+<button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#listColors">
+    <img src="/img/palette.png" style="width:20px">
+  </button>
+  
+  <!-- Modal -->
+  <div class="modal fade" id="listColors" tabindex="-1" aria-labelledby="listColors" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        
+        <div class="btn-group">
+
+        <button class="btn" onclick="changeListColor('#ffffff', 'whiteSelected')" style="padding-right:0"><img id="whiteSelected" src="/img/colors/white.png" style="width:20px"></button>
+        <button class="btn" onclick="changeListColor('#fdf5c1', 'yellowSelected')" style="padding-right:0"><img id="yellowSelected" src="/img/colors/yellow.png" style="width:20px"></button>
+        <button class="btn" onclick="changeListColor('#f7cdc2', 'orangeSelected')" style="padding-right:0"><img id="orangeSelected" src="/img/colors/orange.png" style="width:20px"></button>
+        <button class="btn" onclick="changeListColor('#cafbc8', 'greenSelected')" style="padding-right:0"><img id="greenSelected" src="/img/colors/green.png" style="width:20px"></button>
+        <button class="btn" onclick="changeListColor('#bdf6d9', 'greenBlueSelected')" style="padding-right:0"><img id="greenBlueSelected" src="/img/colors/greenBlue.png" style="width:20px"></button>
+        <button class="btn" onclick="changeListColor('#bae6fc', 'lightBlueSelected')" style="padding-right:0"><img id="lightBlueSelected" src="/img/colors/lightBlue.png" style="width:20px"></button>
+        <button class="btn" onclick="changeListColor('#b4c9fa', 'lavenderSelected')" style="padding-right:0"><img id="lavenderSelected" src="/img/colors/lavender.png" style="width:20px"></button>
+        <button class="btn" onclick="changeListColor('#f4c3fb', 'pinkSelected')" style="padding-right:0"><img id="pinkSelected" src="/img/colors/pink.png" style="width:20px"></button>
+        <button class="btn" onclick="changeListColor('#d0adfa', 'purpleSelected')"><img id="purpleSelected" src="/img/colors/purple.png" style="width:20px"></button>
+    </div>
+        
+      </div>
+    </div>
+  </div>
+
+
+   
+  
+   
+
+    
+<script>
+    function changeListColor(val, id){
+        console.log(val);
+        var element = document.body;
+        element.style.backgroundColor = val;
+
+        
+        var imgs = ['white','yellow','orange','green','greenBlue','lightBlue','lavender','pink','purple'];
+        var ids = ['whiteSelected','yellowSelected','orangeSelected','greenSelected','greenBlueSelected','lightBlueSelected','lavenderSelected','pinkSelected','purpleSelected']; 
+
+        for(var i = 0; i < 9; i++) {
+            document.getElementById(ids[i]).src='/img/colors/'+imgs[i]+'.png';
+        }
+
+        document.getElementById(id).src='/img/colors/'+id+'.png';
+    }
+</script>
+
+   
 
 
 </main>

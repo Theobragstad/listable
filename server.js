@@ -114,7 +114,7 @@ const auth = (req, res, next) => {
 
   
 app.get('/lists', function(req, res) {
-    db.any(`SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}');`)
+    db.any(`SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') ORDER BY listId DESC;`)
     .then((lists) => {
         if(req.query.add) {
             var message = (req.query.add == 'success') ? 'added new list' : 'unable to add new list';
@@ -185,7 +185,7 @@ app.post('/search', function(req, res) {
 
 
 app.post('/addList', function(req, res) {
-    db.any(`INSERT INTO lists (title, list) VALUES ('${req.body.title}', '${req.body.list}') RETURNING listId;`)
+    db.any(`INSERT INTO lists (title, list, color) VALUES ('${req.body.title}', '${req.body.list}', 'ffffff') RETURNING listId;`)
         .then((listId) => {
             db.any(`INSERT INTO listsToUsers (listId, userId) VALUES (${listId[0].listid}, '${req.session.user.id}');`)
                 .then(() => {
@@ -207,6 +207,22 @@ return res.render('pages/horizontal');
 
 
 });
+
+app.post('/changeListColor', function(req, res) {
+    db.any(`UPDATE lists SET color = '${req.body.color}' WHERE listId = ${req.body.listId};`)
+        .then(() => {
+            // return res.render('pages/horizontal', {color: req.body.color, id: req.body.listId});
+            return res.redirect('/lists?changeColor=success');
+        })
+        .catch((error) => {
+            console.log(error);
+            return res.redirect('/lists?changeColor=failure');
+        });
+    
+    
+});
+
+
 
 app.post('/deleteList', function(req, res) {
     db.any(`DELETE FROM listsToUsers WHERE listId = ${req.body.listId};DELETE FROM lists WHERE listId = ${req.body.listId};`)
