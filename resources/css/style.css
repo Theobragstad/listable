@@ -48,7 +48,7 @@
  
 
   
-  input#search {
+  input#q {
     background-image: url('../img/search.png');
     background-size:contain;
     background-repeat: no-repeat;
@@ -59,7 +59,7 @@
     border-color:#000000;background-color:#ffe6ee;
     border-radius: 10px;
 }
-input#search:focus {
+input#q:focus {
     background-image:none !important;
     text-indent:0px;
     border-color:#000000;background-color:#ffe6ee;

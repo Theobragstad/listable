@@ -172,14 +172,15 @@ app.get('/logout', function (req, res, next) {
 
 
 app.post('/search', function(req, res) {
-    db.any(`SELECT * FROM lists WHERE title LIKE ${q} OR list LIKE ${q};`)
+    var q = req.body.q;
+    db.any(`SELECT * FROM lists WHERE title LIKE '%${q}%' OR LOWER(title) LIKE '%${q}%' OR list LIKE '%${q}%' OR LOWER(list) LIKE '%${q}%' AND listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}');`)
         .then((lists) => {
-            return res.render('', {lists});
+            return res.render('pages/lists', {lists, givenName: req.session.user.givenName, message: 'results for ' + q});
 
         })
         .catch((error) => {
             console.log(error);
-            return res.render('', {lists: [], error: true, message: 'search error'});
+            return res.render('pages/lists', {error: true, lists: [], givenName: req.session.user.givenName, message: 'search error'});
         });
 });
 
@@ -236,6 +237,33 @@ app.post('/deleteList', function(req, res) {
     
     
 });
+
+app.post('/updateList', function(req, res) {
+    db.any(`UPDATE lists SET title = '${req.body.title}', list = '${req.body.list}' WHERE listId = ${req.body.listId};`)
+        .then(() => {
+            return res.redirect('/lists?update=success');
+        })
+        .catch((error) => {
+            console.log(error);
+            return res.redirect('/lists?update=failure');
+        });
+    
+    
+});
+
+// app.post('/search', function(req, res) {
+//     db.any(`SELECT * FROM lists WHERE title LIKE ${} OR list LIKE ${} AND listId IN(SELECT listId FROM listsToUsers WHERE);`)
+//         .then(() => {
+//             return res.redirect('/lists?update=success');
+//         })
+//         .catch((error) => {
+//             console.log(error);
+//             return res.redirect('/lists?update=failure');
+//         });
+    
+    
+// });
+
 
 
 

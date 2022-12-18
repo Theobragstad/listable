@@ -9,9 +9,10 @@
 
 <main>
 
-    <div class="logo" style="position:absolute; top:10px; left:10px">
+   <a href="/lists"> <div class="logo" style="position:absolute; top:10px; left:10px" >
         <img class="zoom" src="/img/brain.svg" style="width:40px;"><span style="padding-left:4px; font-weight: bold;color:#f289ca">lists</span>
     </div>
+  </a>
 
 
 
@@ -25,7 +26,9 @@
       
         <h6>your lists</h6>
         <div style="padding-top:5px;padding-bottom:5px">
-          <input type="text" id="search" name="search" class="search-hover zoom" placeholder="search your lists">
+          <form action="/search" method="POST">
+          <input type="text" id="q" name="q" class="search-hover zoom" placeholder="search by title or content">
+        </form>
 
       </div>
       <div style="padding-top:10px;">
@@ -72,10 +75,11 @@
       <div class="d-flex" >
     <% lists.forEach(function(list){ %>
       <!-- THIS IS A TEST -->
-      <button data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid%>" data-toggle="modal" class="btn rounded-10 zoom" style="border-color:#f289ca;background-color:#ffe6ee;padding: .25rem .4rem;line-height: .75;">
+      <!-- <div data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid%>" data-toggle="modal" class="btn rounded-10 zoom" style="border-color:#f289ca;background-color:#ffe6ee;padding: .25rem .4rem;line-height: .75;"> -->
+        <!-- <button data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid%>" data-toggle="modal" class="btn rounded-10 zoom" style="border-color:#f289ca;background-color:#ffe6ee;padding: .25rem .4rem;line-height: .75;"> -->
 
       
-      <div id="<%= list.listid %>" class="col card card-body m-2" style="min-width: 250px;overflow-x:scroll;background-color:#<%= list.color %>;">   
+      <div data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid%>" data-toggle="modal" id="<%= list.listid %>" class="col card card-body m-2" style="min-width: 250px;overflow-x:scroll;background-color:#<%= list.color %>;">   
        
         <div class="row" style="font-weight:bold;padding-left:10px"><%= list.title %>  
 
@@ -110,10 +114,28 @@
       <div class="modal"  id="editList<%= list.listid%>" tabindex="-1" aria-labelledby="editList<%= list.listid%>" aria-hidden="true" >
         <div class="modal-dialog "style="" >
           <div class="modal-content rounded-10">
-            <%= list.title%>
+            <!-- <input style="font-weight:bold;padding-left: 10px;padding-top: 10px;" value="">
             <br>
-            <%= list.list %>
-              </div>
+             -->
+
+
+
+              <form action="/updateList" method="POST">
+      <input class="form-control" type="text" name="listId" value="<%= list.listid %>" hidden>
+
+                  <input tabindex="-1" class="form-control rounded-10 text-center" type="text" maxlength="25" name="title" value="<%= list.title%>" required>
+      
+          <div class="text-center" style="padding-bottom:4px">
+              <button class="btn rounded-10 " style="border-color:#17d475;background-color:#e8fcec;padding: .25rem .4rem;line-height: .75;">Update</button>
+            </div>
+              <!-- <textarea  name="list"  id="textarea" class="form-control rounded-0" rows="27" ></textarea> -->
+              <textarea name="list"  id="textarea" class="form-control rounded-10"> <%- list.list %>
+              
+             </textarea>
+      
+                  <!-- <textarea  name="list" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}" onkeyup="handleInput(event)"  id="textarea" class="form-control rounded-0" rows="27" required></textarea> -->
+              </form>
+                </div>
       
           </div>
           
@@ -122,7 +144,7 @@
 
       
       <!-- THIS IS A TEST -->
-    </button>
+    <!-- </button> -->
         
     <% }); %>
     <div style="padding-right:20px"></div>
