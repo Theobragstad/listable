@@ -4,7 +4,7 @@ CREATE TABLE users (
 
 CREATE TABLE lists (
     listId SERIAL PRIMARY KEY,
-    title VARCHAR(25) NOT NULL,
+    title TEXT NOT NULL,
     list TEXT NOT NULL,
     color VARCHAR(6) NOT NULL,
     trash BOOLEAN NOT NULL

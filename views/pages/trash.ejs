@@ -25,7 +25,7 @@
 
     <div class="text-center" style="padding-top:50px;color:#f289ca">
       
-        <h4>trash</h4>
+        <h4 class="site-title" >trash</h4>
         <p style="font-size:12px"><%=lists.length %> lists</p>
         <!-- <div style="padding-top:5px;padding-bottom:5px">
           <form action="/search" method="POST">
@@ -44,7 +44,44 @@
          class="btn" style="position:absolute;right:43px;font-size:12px;border-radius:10;background-color:#ffe6ee;color:#f289ca;border-color:#f289ca">
                 Empty
         </button>
+
+        <form action="/restoreAll" method="POST">
+        <button      title="Restore all" 
+         class="btn" style="position:absolute;right:120px;font-size:12px;border-radius:10;background-color:#e8fcec;color:#17d475;border-color:#17d475">
+                Restore
+        </button>
+    </form>
         <% } %>
+
+
+        <div style="padding-left:44px;">
+            <button disabled id="numSelectedLists" class="btn" style="font-size:12px;border-radius:10;background-color:#e8fcec;color:#17d475;border-color:#17d475;display: none;padding-left:20px">
+              <button onclick="unselectAll()" title="Unselect all" id="unselectAll" class="btn" style="padding:0;position:absolute;top:115px;left:47px;display: none;z-index: 2;"><img src="/img/x.png" style="width:10px" onmouseover="hover(this, 'pinkX')" onmouseout="unhover(this, 'x')"></button>
+        
+            </button>  
+          </div>
+        
+        
+        
+          <!-- TEST -->
+          <div style="padding-top:10px;padding-left:44px;">
+            <button data-id="" data-bs-toggle="modal" data-bs-target="#confirmPermanentlyDeleteSelected" href="#confirmPermanentlyDeleteSelected" data-toggle="modal"
+            title="Permanently delete selected" id="delSelectedLists" name="listIds" class="btn rounded-10 zoom" style="border-color:#fb6f92;background-color:#ffe5ec;padding: 0;line-height: .25;width:20px;display: none;"><img src="/img/trash.png" style="width:15px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')"></button>
+
+          <!-- <div style="padding-left:30px;"> -->
+
+          <form style="display:inline" action="/restoreSelectedLists" method="POST">
+            <button id="restoreSelectedLists" title="Restore selected" class="btn rounded-10 zoom" name="listIds" style="position:absolute;top:163px;left:73px;border-color:#17d475;background-color:#e8fcec;padding: 0;line-height: .25;width:20px;display:none"><img src="/img/restore.png" style="width:15px" onmouseover="hover(this, 'restorePink')" onmouseout="unhover(this, 'restore')"></button>
+          </form>
+          
+          <!-- </div> -->
+
+
+          
+        </div>
+
+
+          
 
       
 
@@ -84,18 +121,19 @@
       <!-- THIS IS A TEST -->
       <!-- <div data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid%>" data-toggle="modal" class="btn rounded-10 zoom" style="border-color:#f289ca;background-color:#ffe6ee;padding: .25rem .4rem;line-height: .75;"> -->
         <!-- <button data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid%>" data-toggle="modal" class="btn rounded-10 zoom" style="border-color:#f289ca;background-color:#ffe6ee;padding: .25rem .4rem;line-height: .75;"> -->
+        
+    <button title="Select list" id="" value=<%= list.listid %> class="btn rounded-10 zoom" style="padding:0;position:relative;left:26px;top:10px;z-index: 2;line-height: .25;width:15px;height:15px"><img class="listSelector" src="/img/colors/white.png" style="width:15px" onclick="changeImage(this, 'colors/white', 'colors/ffffffSelected')"></button>
 
-      
       <div title="Lists in trash cannot be edited" data-bs-toggle="" data-bs-target="#editList<%= list.listid%>" type="" href="#editList<%= list.listid%>" data-toggle="modal" id="<%= list.listid %>" class="col card card-body m-2" style="min-width: 250px;overflow-x:scroll;background-color:#<%= list.color %>;">   
        
         <div class="row" style="font-weight:bold;padding-left:10px"><%= list.title %>  
 
 
-          
+
             
           <span class="col">
 
-            
+
            
           <form action="/restoreList" method="POST">
             <input type="number" name="listId" value=<%= list.listid %> hidden>
@@ -211,50 +249,101 @@
 
 
 <div class="modal" id="confirmEmpty" tabindex="-1" aria-labelledby="confirmEmpty" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <h6 style="color:#f289ca;text-align: center;padding-top:10px">This action cannot be undone. Are you sure?</h6>
+    <div class="modal-dialog ">
+
+        <div class="modal-content  mx-auto" style="max-width:93px;">
+
+            <button class="btn rounded-10" data-bs-dismiss="modal"  style="background:#e8fcec;color:#17d475;border-color: #17d475;">Cancel</button>
+            <form action="/emptyTrash" method="POST" style="padding-top:10px">
+    
+            <button  class="btn rounded-10" style="background:#ffe5ec;color:#fb6f92;border-color: #fb6f92;">Continue</button>
+        </form>
+       
 
             
             
-            <div class="btn-group" style="padding-left:100px;padding-bottom: 10px;">
+            <!-- <div class="btn-group" style="padding-left:100px;padding-bottom: 10px;">
                 <div style="padding-right:10px">
-            <button class="card" data-bs-dismiss="modal"  style="background:#ececec;color:black;font-weight:bold;">Cancel</button>
+            <button class="card" data-bs-dismiss="modal"  style="background:#e8fcec;color:#17d475;border-color: #17d475;">Cancel</button>
         </div>
         <div style="padding-left:10px">
             <form action="/emptyTrash" method="POST" >
 
-            <button  class="card" style="background:#17d475;color:white;font-weight:bold;">Continue</button>
+            <button  class="card" style="background:#ffe5ec;color:#fb6f92;border-color: #fb6f92;">Continue</button>
         </form>
 
             </div>
-        </div>
+        </div> -->
         
       </div>
     </div>
   </div>
 
 
+  <div class="modal" id="confirmPermanentlyDeleteSelected" tabindex="-1" aria-labelledby="confirmPermanentlyDeleteSelected" aria-hidden="true">
+    <div class="modal-dialog" >
+      <div class="modal-content  mx-auto" style="max-width:93px;">
 
-  <div class="modal" id="confirmPermanentDelete" tabindex="-1" aria-labelledby="confirmPermanentDelete" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <h6 style="color:#f289ca;text-align: center;padding-top:10px">This action cannot be undone. Are you sure?</h6>
+        <button class="btn rounded-10" data-bs-dismiss="modal"  style="background:#e8fcec;color:#17d475;border-color: #17d475;">Cancel</button>
+        <form action="/permanentlyDeleteSelected" method="POST" style="padding-top:10px">
+            <input id="modalListIds" name="listIds" value="" hidden>
 
-            
+        <button  class="btn rounded-10" style="background:#ffe5ec;color:#fb6f92;border-color: #fb6f92;">Continue</button>
+    </form>
+        
+
+<!--             
             
             <div class="btn-group" style="padding-left:100px;padding-bottom: 10px;">
                 <div style="padding-right:10px">
-            <button class="card" data-bs-dismiss="modal"  style="background:#ececec;color:black;font-weight:bold;">Cancel</button>
+            <button class="card" data-bs-dismiss="modal"  style="background:#e8fcec;color:#17d475;border-color: #17d475;">Cancel</button>
+        </div>
+        <div style="padding-left:10px">
+            <form action="/permanentlyDeleteSelected" method="POST" >
+                <input id="modalListIds" name="listIds" value="" hidden>
+
+            <button  class="card" style="background:#ffe5ec;color:#fb6f92;border-color: #fb6f92;">Continue</button>
+        </form>
+
+            </div>
+        </div> -->
+        
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal" id="confirmPermanentDelete" tabindex="-1" aria-labelledby="confirmPermanentDelete" aria-hidden="true">
+    <div class="modal-dialog">
+
+        <div class="modal-content  mx-auto" style="max-width:93px;">
+
+            <button class="btn rounded-10" data-bs-dismiss="modal"  style="background:#e8fcec;color:#17d475;border-color: #17d475;">Cancel</button>
+            <form action="/permanentlyDeleteList" method="POST" style="padding-top:10px">
+                <input id="modalListId" name="listId" value="" hidden>
+    
+            <button  class="btn rounded-10" style="background:#ffe5ec;color:#fb6f92;border-color: #fb6f92;">Continue</button>
+        </form>
+            
+
+        
+       
+        
+
+            
+            
+            <!-- <div class="btn-group" style="padding-left:100px;padding-bottom: 10px;">
+                <div style="padding-right:10px">
+            <button class="card" data-bs-dismiss="modal"  style="background:#e8fcec;color:#17d475;border-color: #17d475;">Cancel</button>
         </div>
         <div style="padding-left:10px">
             <form action="/permanentlyDeleteList" method="POST" >
                 <input id="modalListId" name="listId" value="" hidden>
-                <button  class="card" style="background:#17d475;color:white;font-weight:bold;">Continue</button>
+                <button  class="card" style="background:#ffe5ec;color:#fb6f92;border-color: #fb6f92;">Continue</button>
         </form>
 
             </div>
-        </div>
+        </div> -->
         
       </div>
     </div>
@@ -309,6 +398,26 @@ document.getElementById('confirmPermanentDelete').addEventListener('show.bs.moda
 
 
 });
+
+
+
+
+
+document.getElementById('confirmPermanentlyDeleteSelected').addEventListener('show.bs.modal', (e) => {
+    // console.log(e.relatedTarget);
+    // console.log(e.relatedTarget.dataset.id);
+
+    // var element = document.createElement("div");
+    // element.innerHTML = e.relatedTarget.dataset.id;
+    // document.getElementById('listColorsContent').appendChild(element);  
+    // document.getElementById('modalListId').innerHTML = e.relatedTarget.dataset.id;
+
+    document.getElementById('modalListIds').value = e.relatedTarget.dataset.id;
+    // console.log(document.getElementById('modalListId').value);
+
+});
+
+
 
 
 function setSelectedColor(color) {
@@ -369,6 +478,151 @@ function unhover(element, src) {
 
 //         document.getElementById(id).src='/img/colors/'+id+'.png';
 //     }
+
+
+function changeImage(element, img1, img2) {
+  if(element.getAttribute('src') == '/img/'+img1+'.png') {
+    element.setAttribute('src', '/img/'+img2+'.png');
+  }
+  else {
+    element.setAttribute('src', '/img/'+img1+'.png');
+  }  
+
+  countSelectedLists();
+}
+
+function countSelectedLists() {
+  const elements = document.getElementsByClassName('listSelector');
+  
+  var n = 0;
+  var selectedListIds = [];
+  for(var i = 0; i < elements.length; i++) {
+    // console.log(elements[i].src)
+    // console.log(window.location.origin+'/img/colors/ffffffSelected.png');
+    if(elements[i].src == window.location.origin+'/img/colors/ffffffSelected.png') {
+      n++;
+      // console.log(elements[i].parentElement.value);
+      selectedListIds.push(elements[i].parentElement.value);
+    }
+  }
+
+  // console.log('num selected: '+n);
+  // for(var i=0; i < selectedListIds.length;i++) {
+  //   console.log(selectedListIds[i]);
+  // }
+
+
+  if(n >0) {
+document.getElementById('numSelectedLists').innerHTML = n+' selected';
+document.getElementById('numSelectedLists').style.display = 'block';
+
+document.getElementById('delSelectedLists').style.display = 'block';
+
+// document.getElementById('delSelectedLists').value = selectedListIds;
+document.getElementById('delSelectedLists').setAttribute('data-id' , selectedListIds); 
+
+
+document.getElementById('restoreSelectedLists').style.display = 'block';
+document.getElementById('restoreSelectedLists').value = selectedListIds;
+
+
+console.log(document.getElementById('delSelectedLists').value);
+
+document.getElementById('unselectAll').style.display = 'block';
+
+
+
+
+  } else {
+    document.getElementById('numSelectedLists').style.display = 'none';
+    // document.getElementById('numSelectedLists').innerHTML = '';
+
+    document.getElementById('delSelectedLists').style.display = 'none';
+
+    document.getElementById('unselectAll').style.display = 'none';
+    
+
+
+
+  }
+  
+}
+
+function unselectAll() {
+  var selected = document.querySelectorAll('[src="/img/colors/ffffffSelected.png"]');
+
+  // console.log(selected[0].src);
+
+  for(var i = 0; i < selected.length; i++) {
+    selected[i].src = '/img/colors/white.png';
+  }
+
+  countSelectedLists();
+  
+  
+}
+
+
+
+document.addEventListener("keydown", function(e) {
+
+if(!e.metaKey || e.metaKey && e.keyCode == 82 || e.metaKey && e.keyCode == 87) {
+  return true;
+}
+e.preventDefault();
+
+var selectedListIds = [];
+
+
+if(e.metaKey && e.keyCode == 65) {
+  console.log('cmd a')
+
+  const elements = document.getElementsByClassName('listSelector');
+
+for(var i = 0; i < elements.length; i++) {
+  // console.log(elements[i].src)
+  // console.log(window.location.origin+'/img/colors/ffffffSelected.png');
+  if(elements[i].src !== window.location.origin+'/img/colors/ffffffSelected.png') {
+    // console.log(elements[i].parentElement.value);
+    elements[i].src = '/img/colors/ffffffSelected.png';
+  }
+  selectedListIds.push(elements[i].parentElement.value);
+
+} 
+
+console.log(selectedListIds)
+
+}
+
+
+
+if(selectedListIds.length > 0) {
+document.getElementById('numSelectedLists').innerHTML = selectedListIds.length+' selected';
+document.getElementById('numSelectedLists').style.display = 'block';
+
+document.getElementById('delSelectedLists').style.display = 'block';
+
+//
+// document.getElementById('delSelectedLists').value = selectedListIds;
+document.getElementById('delSelectedLists').setAttribute('data-id' , selectedListIds); 
+
+
+document.getElementById('restoreSelectedLists').style.display = 'block';
+document.getElementById('restoreSelectedLists').value = selectedListIds;
+
+document.getElementById('unselectAll').style.display = 'block';
+
+
+
+console.log(document.getElementById('delSelectedLists').value);
+}
+
+// if (e.keyCode >= 65 && e.keyCode <= 90) {
+//   var char = (e.metaKey ? '⌘-' : '') + String.fromCharCode(e.keyCode)
+//   // document.getElementById('keydown').innerHTML += '<kbd>' + char + '</kbd>'
+  
+// }
+})
 </script>
 <!-- <script>tinymce.init({
   selector: 'textarea',  // change this value according to your HTML
