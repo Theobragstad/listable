@@ -10,21 +10,22 @@
 <main>
 
    <a href="/lists"> <div class="logo" style="position:absolute; top:10px; left:10px" >
-        <img class="zoom" src="/img/brain.svg" style="width:40px;"><span style="padding-left:4px; font-weight: bold;color:#f289ca">lists</span>
+        <img class="zoom" src="/img/brain.svg" style="width:60px;"><span style="padding-left:4px; font-weight: bold;color:#f289ca">lists</span>
     </div>
   </a>
 
-
-
+  <a href="/trash">
+  <button title="View trash" class="btn rounded-10 zoom" style="position:absolute;right:200px;top:17px;border-color:#fb6f92;background-color:#ffe5ec;padding: 0;line-height: 1.25;width:30px"><img src="/img/trash.png" style="width:10px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')"></button>
+</a>
     <button class="btn rounded-10 pull-right name" style="border-color:#f289ca;background-color:#ffe6ee;position:absolute; top:10px; right:50px;font-size:12px" disabled><%= givenName %></button> 
-    <a href="/logout" class="btn rounded-10 pull-right logout"style="position:absolute;top:10px; right:5px;border-color:#000000;background-color:#ececec;font-size:11px">←</a>
+    <a title="Log out" href="/logout" class="btn rounded-10 pull-right logout"style="position:absolute;top:10px; right:5px;border-color:#000000;background-color:#ececec;font-size:11px">←</a>
 
 
     <%- include ('../partials/message') %>
 
     <div class="text-center" style="padding-top:50px;color:#f289ca">
       
-        <h6>your lists</h6>
+        <h4>your lists</h4>
         <div style="padding-top:5px;padding-bottom:5px">
           <form action="/search" method="POST">
           <input type="text" id="q" name="q" class="search-hover zoom" placeholder="search by title or content">
@@ -32,9 +33,34 @@
 
       </div>
       <div style="padding-top:10px;">
-        <button data-bs-toggle="modal" data-bs-target="#exampleModal" type="button" href="#addListModal" data-toggle="modal" class="btn rounded-10 zoom" style="border-color:#f289ca;background-color:#ffe6ee;padding: .25rem .4rem;line-height: .75;">+</button>
+        <button title="New list" data-bs-toggle="modal" data-bs-target="#exampleModal" type="button" href="#addListModal" data-toggle="modal" class="btn rounded-10 zoom" style="border-color:#f289ca;background-color:#ffe6ee;padding: .25rem .4rem;line-height: .75;">+</button>
       </div>
-      </div>
+
+
+      <% if(lists.length == 1) { %>
+        <p id="listCount" style="font-size:12px;padding-top:16px">1 list</p>
+      <% } else { %>
+        <p id="listCount" style="font-size:12px;padding-top:16px"><%= lists.length %> lists</p>
+      <% } %>
+
+      
+<div style="padding-left:44px;">
+    <button disabled id="numSelectedLists" class="btn" style="font-size:12px;border-radius:10;background-color:#e8fcec;color:#17d475;border-color:#17d475;display: none;padding-left:20px">
+      <button onclick="unselectAll()" title="Unselect all" id="unselectAll" class="btn" style="padding:0;position:absolute;top:199px;left:45px;display: none;z-index: 2;"><img src="/img/x.png" style="width:10px" onmouseover="hover(this, 'pinkX')" onmouseout="unhover(this, 'x')"></button>
+
+    </button>  
+  </div>
+
+
+
+  <!-- TEST -->
+  <div style="padding-top:10px;padding-left:44px;">
+    <form action="/deleteSelectedLists" method="POST">
+    <button id="delSelectedLists" name="listIds" class="btn rounded-10 zoom" style="border-color:#fb6f92;background-color:#ffe5ec;padding: 0;line-height: .25;width:20px;display: none;"><img src="/img/trash.png" style="width:15px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')"></button>
+  </form>
+  </div>
+    
+    </div>
 
 
 
@@ -50,7 +76,7 @@
         <form action="/addList" method="POST">
 
 
-            <input  tabindex="-1" class="form-control rounded-10 text-center" type="text" maxlength="25" name="title" value="new list" required>
+            <input    tabindex="-1" class="form-control rounded-10 text-center" type="text" maxlength="25" name="title" placeholder="Add a title...">
 
     <div class="text-center" style="padding-bottom:4px">
         <button class="btn rounded-10 " style="border-color:#17d475;background-color:#e8fcec;padding: .25rem .4rem;line-height: .75;">Save</button>
@@ -70,16 +96,19 @@
   </div>
 
 <!-- <div class="text-center" style="padding-top:20px"> -->
-  <% if(lists.length > 0) { %>
     <div class="row" style="overflow:auto;padding-top:50px;padding-left:20px;display:block">
       <div class="d-flex" >
-    <% lists.forEach(function(list){ %>
+    <% lists.forEach(function(list) { %>
       <!-- THIS IS A TEST -->
       <!-- <div data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid%>" data-toggle="modal" class="btn rounded-10 zoom" style="border-color:#f289ca;background-color:#ffe6ee;padding: .25rem .4rem;line-height: .75;"> -->
         <!-- <button data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid%>" data-toggle="modal" class="btn rounded-10 zoom" style="border-color:#f289ca;background-color:#ffe6ee;padding: .25rem .4rem;line-height: .75;"> -->
 
-      
-      <div data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid%>" data-toggle="modal" id="<%= list.listid %>" class="col card card-body m-2" style="min-width: 250px;overflow-x:scroll;background-color:#<%= list.color %>;">   
+          <div>
+            <!-- <input type="number" name="listIdSelected"  hidden> -->
+          
+          <button title="Select list" id="" value=<%= list.listid %> class="btn rounded-10 zoom" style="position:relative;left:20px;z-index: 2;line-height: .25;width:15px;padding: 0;"><img class="listSelector" src="/img/colors/white.png" style="width:15px" onclick="changeImage(this, 'colors/white', 'colors/ffffffSelected')"></button>
+  </div>
+      <div title="Edit list" data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid%>" data-toggle="modal" id="<%= list.listid %>" class="col card card-body m-2" style="min-width: 250px;overflow-x:scroll;background-color:#<%= list.color %>;">   
        
         <div class="row" style="font-weight:bold;padding-left:10px"><%= list.title %>  
 
@@ -89,15 +118,16 @@
           <span class="col">
 
             
-           
+           <div style="z-index:10">
           <form action="/deleteList" method="POST">
             <input type="number" name="listId" value=<%= list.listid %> hidden>
-            <button class="btn rounded-10 zoom" style="position:absolute;right:10px;border-color:#fb6f92;background-color:#ffe5ec;padding: 0;line-height: .25;width:20px"><img src="/img/trash.png" style="width:10px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')"></button>
+            <button title="Delete list" class="btn rounded-10 zoom" style="position:absolute;right:10px;border-color:#fb6f92;background-color:#ffe5ec;padding: 0;line-height: .25;width:20px"><img src="/img/trash.png" data-bs-dismiss="modal" style="width:15px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')"></button>
           </form>
+        </div>
           
         </span>
 
-        <div class="col"><button onclick="setSelectedColor('<%= list.color %>')" type="button" class="btn rounded-10 zoom" data-id="<%= list.listid %>" data-bs-toggle="modal" data-bs-target="#listColors" style="position:absolute;right:50px;border-color:#fb6f92;padding: 0;line-height: .25;width:20px">
+        <div class="col"><button title="Change color" onclick="setSelectedColor('<%= list.color %>')" type="button" class="btn rounded-10 zoom" data-id="<%= list.listid %>" data-bs-toggle="modal" data-bs-target="#listColors" style="position:absolute;right:50px;border-color:#fb6f92;padding: 0;line-height: .25;width:20px">
           <img src="/img/palette.png" style="width:20px" onmouseover="hover(this, 'paletteColors')" onmouseout="unhover(this, 'palette')">
         </button>
       </div>
@@ -123,7 +153,7 @@
               <form action="/updateList" method="POST">
       <input class="form-control" type="text" name="listId" value="<%= list.listid %>" hidden>
 
-                  <input tabindex="-1" class="form-control rounded-10 text-center" type="text" maxlength="25" name="title" value="<%= list.title%>" required>
+                  <input tabindex="-1" class="form-control rounded-10 text-center" type="text" maxlength="25" name="title" value="<%= list.title%>">
       
           <div class="text-center" style="padding-bottom:4px">
               <button class="btn rounded-10 " style="border-color:#17d475;background-color:#e8fcec;padding: .25rem .4rem;line-height: .75;">Update</button>
@@ -145,19 +175,31 @@
       
       <!-- THIS IS A TEST -->
     <!-- </button> -->
-        
     <% }); %>
     <div style="padding-right:20px"></div>
   </div>
 </div>
-<% } else { %>
+
+<!-- TEST -->
+
+<!-- <input id="n" value="<%=  %>" hidden> -->
+
+<% if(search && lists.length == 0){ %>
+  <div class="text-center" style="padding-top:100px">
+
+    <h6>no search results</h6>
+    <img style="width:100px" src="/img/noResults.png">
+
+  </div>
+<% } else if(lists.length == 0) { %>
   <div class="text-center" style="padding-top:100px">
 
     <h6>no lists</h6>
     <img style="width:100px" src="/img/palmTree.png">
 
   </div>
-<% } %>
+
+  <% } %>
 <!-- </div> -->
 
 <div class="modal fade" id="listColors" tabindex="-1" aria-labelledby="listColors" aria-hidden="true">
@@ -240,7 +282,7 @@
 
 document.getElementById('listColors').addEventListener('show.bs.modal', (e) => {
     // console.log(e.relatedTarget);
-    console.log(e.relatedTarget.dataset.id);
+    // console.log(e.relatedTarget.dataset.id);
 
     // var element = document.createElement("div");
     // element.innerHTML = e.relatedTarget.dataset.id;
@@ -248,7 +290,7 @@ document.getElementById('listColors').addEventListener('show.bs.modal', (e) => {
     // document.getElementById('modalListId').innerHTML = e.relatedTarget.dataset.id;
 
     document.getElementById('modalListId').value = e.relatedTarget.dataset.id;
-    console.log(document.getElementById('modalListId').value);
+    // console.log(document.getElementById('modalListId').value);
 
 
 
@@ -267,6 +309,98 @@ function setSelectedColor(color) {
 }
 
 
+function setListCount(n) {
+  var element = document.getElementById('listCount');
+  if(n == 0) {
+    element.innerHTML = n+' lists';
+  }
+  else if(n == 1) {
+    element.innerHTML = n+' list';
+  } else if(n > 1){
+    element.innerHTML = n+' lists';
+  }
+  else {
+    element.innerHTML = '';
+  }
+}
+
+
+function changeImage(element, img1, img2) {
+  if(element.getAttribute('src') == '/img/'+img1+'.png') {
+    element.setAttribute('src', '/img/'+img2+'.png');
+  }
+  else {
+    element.setAttribute('src', '/img/'+img1+'.png');
+  }  
+
+  countSelectedLists();
+}
+
+function countSelectedLists() {
+  const elements = document.getElementsByClassName('listSelector');
+  
+  var n = 0;
+  var selectedListIds = [];
+  for(var i = 0; i < elements.length; i++) {
+    // console.log(elements[i].src)
+    // console.log(window.location.origin+'/img/colors/ffffffSelected.png');
+    if(elements[i].src == window.location.origin+'/img/colors/ffffffSelected.png') {
+      n++;
+      // console.log(elements[i].parentElement.value);
+      selectedListIds.push(elements[i].parentElement.value);
+    }
+  }
+
+  // console.log('num selected: '+n);
+  // for(var i=0; i < selectedListIds.length;i++) {
+  //   console.log(selectedListIds[i]);
+  // }
+
+
+  if(n >0) {
+document.getElementById('numSelectedLists').innerHTML = n+' selected';
+document.getElementById('numSelectedLists').style.display = 'block';
+
+document.getElementById('delSelectedLists').style.display = 'block';
+document.getElementById('delSelectedLists').value = selectedListIds;
+
+
+console.log(document.getElementById('delSelectedLists').value);
+
+document.getElementById('unselectAll').style.display = 'block';
+
+
+
+
+  } else {
+    document.getElementById('numSelectedLists').style.display = 'none';
+    // document.getElementById('numSelectedLists').innerHTML = '';
+
+    document.getElementById('delSelectedLists').style.display = 'none';
+
+    document.getElementById('unselectAll').style.display = 'none';
+    
+
+
+
+  }
+  
+}
+
+function unselectAll() {
+  var selected = document.querySelectorAll('[src="/img/colors/ffffffSelected.png"]');
+
+  // console.log(selected[0].src);
+
+  for(var i = 0; i < selected.length; i++) {
+    selected[i].src = '/img/colors/white.png';
+  }
+
+  countSelectedLists();
+  
+  
+}
+
   function hover(element, src) {
   element.setAttribute('src', '/img/'+src+'.png');
 }
@@ -274,6 +408,15 @@ function setSelectedColor(color) {
 function unhover(element, src) {
   element.setAttribute('src', '/img/'+src+'.png');
 }
+
+// var nSelected = 0;
+// for(var i = 0; i < lists.length; i++) {
+//       if(document.getElementById('listSelector').src='/img/colors/ffffffSelected.png') {
+//         nSelected++;
+//       }
+// }
+
+// console.log(nSelected);
 
   tinymce.init({
     selector: 'textarea',
@@ -293,7 +436,7 @@ function unhover(element, src) {
 
   function changeListColor(val, id, listId){
     var targetId = document.getElementById('modalListId').value;
-    console.log(targetId);
+    // console.log(targetId);
     var list = document.getElementById(targetId).style.backgroundColor = val;
 
         // var list = document.getElementById(listId);
@@ -313,6 +456,92 @@ function unhover(element, src) {
 
         document.getElementById(id).src='/img/colors/'+id+'.png';
     }
+
+
+
+
+
+
+
+
+    document.addEventListener("keydown", function(e) {
+
+  if(!e.metaKey || e.metaKey && e.keyCode == 82 || e.metaKey && e.keyCode == 87) {
+    return true;
+  }
+  e.preventDefault();
+
+  var selectedListIds = [];
+
+
+  if(e.metaKey && e.keyCode == 65) {
+    console.log('cmd a')
+
+    const elements = document.getElementsByClassName('listSelector');
+  
+  for(var i = 0; i < elements.length; i++) {
+    // console.log(elements[i].src)
+    // console.log(window.location.origin+'/img/colors/ffffffSelected.png');
+    if(elements[i].src !== window.location.origin+'/img/colors/ffffffSelected.png') {
+      // console.log(elements[i].parentElement.value);
+      elements[i].src = '/img/colors/ffffffSelected.png';
+    }
+    selectedListIds.push(elements[i].parentElement.value);
+
+  } 
+
+  console.log(selectedListIds)
+
+}
+  
+
+
+  if(selectedListIds.length > 0) {
+  document.getElementById('numSelectedLists').innerHTML = selectedListIds.length+' selected';
+document.getElementById('numSelectedLists').style.display = 'block';
+
+document.getElementById('delSelectedLists').style.display = 'block';
+document.getElementById('delSelectedLists').value = selectedListIds;
+
+
+console.log(document.getElementById('delSelectedLists').value);
+  }
+  
+  // if (e.keyCode >= 65 && e.keyCode <= 90) {
+  //   var char = (e.metaKey ? '⌘-' : '') + String.fromCharCode(e.keyCode)
+  //   // document.getElementById('keydown').innerHTML += '<kbd>' + char + '</kbd>'
+    
+  // }
+})
+
+
+// window.onload = function() {
+//   var element = document.getElementById('n');
+//   console.log(element);
+
+//   var val = element.value;
+//   console.log(val);
+//   setListCount(val);
+// };
+
+
+// window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+//     const newColorScheme = event.matches ? "dark" : "light";
+// });
+
+// if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+//     // dark mode
+//     // document.body.backgroundColor = 'black';
+//     console.log('dark mode is on');
+//     document.body.style.backgroundColor = "black";
+
+// }
+// else {
+//   console.log('dark mode is off');
+// }
+
+
+
 </script>
 <!-- <script>tinymce.init({
   selector: 'textarea',  // change this value according to your HTML

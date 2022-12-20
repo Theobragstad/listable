@@ -114,25 +114,25 @@ const auth = (req, res, next) => {
 
   
 app.get('/lists', function(req, res) {
-    db.any(`SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') ORDER BY listId DESC;`)
+    db.any(`SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') AND trash = FALSE ORDER BY listId DESC;`)
     .then((lists) => {
         if(req.query.add) {
             var message = (req.query.add == 'success') ? 'added new list' : 'unable to add new list';
             var error = (req.query.add == 'success') ? false : true;
-            return res.render('pages/lists', {error, lists, givenName: req.session.user.givenName, message});
+            return res.render('pages/lists', {search: false, error, lists, givenName: req.session.user.givenName, message});
         }
         else if(req.query.delete) {
             var message = (req.query.delete == 'success') ? 'deleted list' : 'unable to delete list';
             var error = (req.query.delete == 'success') ? false : true;
-            return res.render('pages/lists', {error, lists, givenName: req.session.user.givenName, message});
+            return res.render('pages/lists', {search: false, error, lists, givenName: req.session.user.givenName, message});
         }
         else {
-            return res.render('pages/lists', {lists, givenName: req.session.user.givenName});
+            return res.render('pages/lists', {search: false, lists, givenName: req.session.user.givenName});
         }
     })
     .catch((error) => {
         console.log(error);
-        return res.render('pages/lists', {error: true, lists: [], message: 'error getting lists', givenName: req.session.user.givenName});
+        return res.render('pages/lists', {search: false, error: true, lists: [], message: 'error getting lists', givenName: req.session.user.givenName});
     });
 });
 
@@ -173,20 +173,68 @@ app.get('/logout', function (req, res, next) {
 
 app.post('/search', function(req, res) {
     var q = req.body.q;
-    db.any(`SELECT * FROM lists WHERE title LIKE '%${q}%' OR LOWER(title) LIKE '%${q}%' OR list LIKE '%${q}%' OR LOWER(list) LIKE '%${q}%' AND listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}');`)
+    db.any(`SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') AND trash = FALSE AND (title LIKE '%${q}%' OR LOWER(title) LIKE '%${q}%' OR list LIKE '%${q}%' OR LOWER(list) LIKE '%${q}%');`)
         .then((lists) => {
-            return res.render('pages/lists', {lists, givenName: req.session.user.givenName, message: 'results for ' + q});
+            return res.render('pages/lists', {search: true, lists, givenName: req.session.user.givenName, message: `results for '` + q + `'`});
 
         })
         .catch((error) => {
             console.log(error);
-            return res.render('pages/lists', {error: true, lists: [], givenName: req.session.user.givenName, message: 'search error'});
+            return res.render('pages/lists', {search: true, error: true, lists: [], givenName: req.session.user.givenName, message: 'search error'});
+        });
+});
+
+
+
+
+app.post('/permanentlyDeleteList', function(req, res) {
+    db.any(`DELETE FROM listsToUsers WHERE listId = ${req.body.listId}; DELETE FROM lists WHERE listId = ${req.body.listId};`)
+        .then(() => {
+            return res.redirect('/trash?permanentlyDeleted=success');
+
+        })
+        .catch((error) => {
+            console.log(error);
+            return res.redirect('/trash?permanentlyDeleted=failure');
+        });
+});
+
+
+app.post('/emptyTrash', function(req, res) {
+    db.any(`DELETE FROM listsToUsers WHERE userId = '${req.session.user.id}' AND listId IN(SELECT listId FROM lists WHERE trash = TRUE) RETURNING listId;`)
+        .then((ids) => {
+            var array = [];
+            for(var i = 0; i < ids.length; i++) {
+                array.push(ids[i].listid);
+            }
+
+        
+
+
+            db.any(`DELETE FROM lists WHERE trash = TRUE AND listId IN(${array});`)
+                .then(() => {
+                    return res.redirect('/trash?empty=success');
+                    // return res.render('pages/trash', {lists: [], error: false, message: 'emptied trash', givenName: req.session.user.givenName})
+                })
+                .catch((error) => {
+                    console.log(error);
+                    return res.redirect('/trash?empty=failure');
+                    // return res.render('pages/trash', {lists: [], error: true, message: 'unable to empty trash', givenName: req.session.user.givenName})
+                });
+
+        })
+        .catch((error) => {
+            console.log(error);
+            return res.redirect('/trash?empty=failure');
+            // return res.render('pages/trash', {lists: [], error: true, message: 'unable to empty trash', givenName: req.session.user.givenName}) 
         });
 });
 
 
 app.post('/addList', function(req, res) {
-    db.any(`INSERT INTO lists (title, list, color) VALUES ('${req.body.title}', '${req.body.list}', 'ffffff') RETURNING listId;`)
+    var title = (!req.body.title) ? 'new list' : req.body.title;
+
+    db.any(`INSERT INTO lists (title, list, color, trash) VALUES ('${title}', '${req.body.list}', 'ffffff', FALSE) RETURNING listId;`)
         .then((listId) => {
             db.any(`INSERT INTO listsToUsers (listId, userId) VALUES (${listId[0].listid}, '${req.session.user.id}');`)
                 .then(() => {
@@ -226,7 +274,8 @@ app.post('/changeListColor', function(req, res) {
 
 
 app.post('/deleteList', function(req, res) {
-    db.any(`DELETE FROM listsToUsers WHERE listId = ${req.body.listId};DELETE FROM lists WHERE listId = ${req.body.listId};`)
+    // db.any(`DELETE FROM listsToUsers WHERE listId = ${req.body.listId};DELETE FROM lists WHERE listId = ${req.body.listId};`)
+    db.any(`UPDATE lists SET trash = TRUE WHERE listId = ${req.body.listId};`)
         .then(() => {
             return res.redirect('/lists?delete=success');
         })
@@ -238,8 +287,35 @@ app.post('/deleteList', function(req, res) {
     
 });
 
+
+app.post('/deleteSelectedLists', function(req, res) {
+    console.log(req.body.listIds);
+    var array = req.body.listIds.split(',');
+    // console.log(array);
+    var result = array.map(function (x) { 
+        return parseInt(x, 10); 
+      });
+      
+    // console.log(result);
+
+    db.any(`UPDATE lists SET trash = TRUE WHERE listId IN(${result});`)
+        .then(() => {
+            return res.redirect('/lists?deleteSelected=success');
+        })
+        .catch((error) => {
+            console.log(error);
+            return res.redirect('/lists?deleteSelected=failure');
+        });
+
+    // return res.redirect('/lists');
+    
+    
+});
+
 app.post('/updateList', function(req, res) {
-    db.any(`UPDATE lists SET title = '${req.body.title}', list = '${req.body.list}' WHERE listId = ${req.body.listId};`)
+    var title = (!req.body.title) ? 'edited list' : req.body.title;
+
+    db.any(`UPDATE lists SET title = '${title}', list = '${req.body.list}' WHERE listId = ${req.body.listId};`)
         .then(() => {
             return res.redirect('/lists?update=success');
         })
@@ -251,6 +327,34 @@ app.post('/updateList', function(req, res) {
     
 });
 
+
+app.get('/trash', function(req, res) {
+    db.any(`SELECT * FROM lists WHERE trash = TRUE AND listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}');`)
+        .then((lists) => {
+            return res.render('pages/trash', {lists, givenName: req.session.user.givenName});
+        })
+        .catch((error) => {
+            console.log(error);
+            return res.render('pages/trash', {lists: [], givenName: req.session.user.givenName, error: true, message: 'error loading trash'});
+        });
+    
+    
+});
+
+
+
+app.post('/restoreList', function(req, res) {
+    db.any(`UPDATE lists SET trash = FALSE WHERE listId = ${req.body.listId};`)
+        .then((lists) => {
+            return res.redirect('/lists?restore=success');
+        })
+        .catch((error) => {
+            console.log(error);
+            return res.redirect('/lists?restore=failure');
+        });
+    
+    
+});
 // app.post('/search', function(req, res) {
 //     db.any(`SELECT * FROM lists WHERE title LIKE ${} OR list LIKE ${} AND listId IN(SELECT listId FROM listsToUsers WHERE);`)
 //         .then(() => {
@@ -269,7 +373,7 @@ app.post('/updateList', function(req, res) {
 
 
 app.use((req, res, next) => {
-    res.status(404).send('404');
+    res.status(404).send("404 <br> <img src='/img/lost.png' style='width:100px'>");
 })
   
 app.listen(3000);

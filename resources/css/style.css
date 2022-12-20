@@ -110,5 +110,26 @@ input#q:focus {
 
 
 
+  /* Style rules for dark mode */
+@media (prefers-color-scheme: dark) {
+    body {
+      background-color: #121212;
+      /* filter: brightness(50%); */
+      /* color: white; */
+    }
+
+    /* div.col.card.card-body.m-2 {
+       filter: brightness(50%);
+    } */
+  }
+  /* Style rules for light mode */
+  @media (prefers-color-scheme: light) {
+    body {
+      background-color: white;
+      /* color: black; */
+    }
+  }
+
+
   
   
