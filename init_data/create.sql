@@ -7,7 +7,8 @@ CREATE TABLE lists (
     title TEXT NOT NULL,
     list TEXT NOT NULL,
     color VARCHAR(6) NOT NULL,
-    trash BOOLEAN NOT NULL
+    trash BOOLEAN NOT NULL,
+    archive BOOLEAN NOT NULL
 );
 
 CREATE TABLE listsToUsers (

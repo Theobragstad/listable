@@ -14,8 +14,13 @@
     </div>
   </a>
 
+
+  <a href="/archive">
+    <button title="Open archive" class="btn rounded-10 zoom" style="position:absolute;right:250px;top:17px;border-color:#b24bf3;background-color:#e6d4ff;padding: 0;line-height: 1.25;width:30px"><img src="/img/archive.png" style="width:20px" onmouseover="hover(this, 'archivePink')" onmouseout="unhover(this, 'archive')"></button>
+  </a>
+
   <a href="/trash">
-  <button title="Open trash" class="btn rounded-10 zoom" style="position:absolute;right:200px;top:17px;border-color:#fb6f92;background-color:#ffe5ec;padding: 0;line-height: 1.25;width:30px"><img src="/img/trash.png" style="width:10px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')"></button>
+  <button title="Open trash" class="btn rounded-10 zoom" style="position:absolute;right:200px;top:17px;border-color:#fb6f92;background-color:#ffe5ec;padding: 0;line-height: 1.25;width:30px"><img src="/img/trash.png" style="width:20px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')"></button>
 </a>
     <button class="btn rounded-10 pull-right name" style="border-color:#f289ca;background-color:#ffe6ee;position:absolute; top:10px; right:50px;font-size:12px" disabled><%= givenName %></button> 
     <a title="Log out" href="/logout" class="btn rounded-10 pull-right logout"style="position:absolute;top:10px; right:5px;border-color:#000000;background-color:#ececec;font-size:11px">←</a>
@@ -150,6 +155,16 @@
       </button>
     </form>
     </div>
+
+    <div class="col">
+      <form action="/archiveList" method="POST">
+        <input type="number" name="listId" value=<%= list.listid %> hidden>
+        
+      <button title="Archive" class="btn rounded-10 zoom"  style="position:absolute;right:110px;border-color:#fb6f92;padding: 0;line-height: .25;width:20px">
+      <img src="/img/archive.png" style="width:20px" onmouseover="hover(this, 'archivePink')" onmouseout="unhover(this, 'archive')">
+    </button>
+  </form>
+  </div>
         
 
         </div>        
@@ -240,22 +255,7 @@
       <button class="btn"name="color" value="d0adfa"  ><img id="d0adfa" src="/img/colors/purple.png" style="width:20px"></button>
       </form>
 
-      <!-- <div class="btn-group">
-
-
-      <button class="btn" onclick="changeListColor('#ffffff', 'whiteSelected', '')" style="padding-right:0"><img id="whiteSelected" src="/img/colors/white.png" style="width:20px"></button>
-      <button class="btn" onclick="changeListColor('#fdf5c1', 'yellowSelected', '')" style="padding-right:0"><img id="yellowSelected" src="/img/colors/yellow.png" style="width:20px"></button>
-      <button class="btn" onclick="changeListColor('#f7cdc2', 'orangeSelected', '')" style="padding-right:0"><img id="orangeSelected" src="/img/colors/orange.png" style="width:20px"></button>
-      <button class="btn" onclick="changeListColor('#cafbc8', 'greenSelected', '')" style="padding-right:0"><img id="greenSelected" src="/img/colors/green.png" style="width:20px"></button>
-      <button class="btn" onclick="changeListColor('#bdf6d9', 'greenBlueSelected', '')" style="padding-right:0"><img id="greenBlueSelected" src="/img/colors/greenBlue.png" style="width:20px"></button>
-      <button class="btn" onclick="changeListColor('#bae6fc', 'lightBlueSelected', '')" style="padding-right:0"><img id="lightBlueSelected" src="/img/colors/lightBlue.png" style="width:20px"></button>
-      <button class="btn" onclick="changeListColor('#b4c9fa', 'lavenderSelected', '')" style="padding-right:0"><img id="lavenderSelected" src="/img/colors/lavender.png" style="width:20px"></button>
-      <button class="btn" onclick="changeListColor('#f4c3fb', 'pinkSelected', '')" style="padding-right:0"><img id="pinkSelected" src="/img/colors/pink.png" style="width:20px"></button>
-      <button class="btn" onclick="changeListColor('#d0adfa', 'purpleSelected', '')"><img id="purpleSelected" src="/img/colors/purple.png" style="width:20px"></button>
- 
- 
- 
-    </div> -->
+   
       
     </div>
   </div>

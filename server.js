@@ -125,14 +125,15 @@ const auth = (req, res, next) => {
 
 
 app.get('/lists', function(req, res) {
-    db.any(`SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') AND trash = FALSE ORDER BY listId DESC;`)
+    db.any(`SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') AND trash = FALSE AND archive = FALSE ORDER BY listId DESC;`)
     .then((lists) => {
         const successMessages = ['added new list', 'updated list', 'changed list color', 'deleted list',
                                 'deleted selected lists', 'restored list', 'restored selected lists', 'restored all lists',
-                                 'copied list'];
+                                 'copied list', 'archived list', 'unarchived list', 'created unarchived copy'];
         
         const errorMessages = ['error adding new list', 'error updating list', 'error changing list color', 'error deleting list', 'error deleting selected lists',
-    'error restoring list', 'error restoring selected lists', 'error restoring all lists', 'error copying list'];
+                            'error restoring list', 'error restoring selected lists', 'error restoring all lists', 'error copying list', 'error archiving list', 'error unarchiving list',
+                                    'error copying archived list'];
         var error = 0;
         var message = '';
 
@@ -195,6 +196,26 @@ app.get('/lists', function(req, res) {
         else if(req.query.copy) {
             message = (req.query.copy == 'success') ? successMessages[8] : errorMessages[8];
             error = (req.query.copy == 'success') ? 0 : 1;
+
+            // var message = (req.query.copy == 'success') ? 'copied list' : 'error copying list';
+            // var error = (req.query.copy == 'success') ? false : true;
+        }
+        else if(req.query.archive) {
+            message = (req.query.archive == 'success') ? successMessages[9] : errorMessages[9];
+            error = (req.query.archive == 'success') ? 0 : 1;
+            // var message = (req.query.copy == 'success') ? 'copied list' : 'error copying list';
+            // var error = (req.query.copy == 'success') ? false : true;
+        }
+        else if(req.query.unarchive) {
+            message = (req.query.unarchive == 'success') ? successMessages[10] : errorMessages[10];
+            error = (req.query.unarchive == 'success') ? 0 : 1;
+            // var message = (req.query.copy == 'success') ? 'copied list' : 'error copying list';
+            // var error = (req.query.copy == 'success') ? false : true;
+        }
+        else if(req.query.copyArchived) {
+            message = (req.query.copyArchived == 'success') ? successMessages[11] : errorMessages[11];
+            error = (req.query.copyArchived == 'success') ? 0 : 1;
+
             // var message = (req.query.copy == 'success') ? 'copied list' : 'error copying list';
             // var error = (req.query.copy == 'success') ? false : true;
         }
@@ -313,7 +334,7 @@ app.post('/emptyTrash', function(req, res) {
 app.post('/addList', function(req, res) {
     var title = (!req.body.title) ? '' : req.body.title;
 
-    db.any(`INSERT INTO lists (title, list, color, trash) VALUES ('${title.replace(/'/g, "''")}', '${req.body.list.replace(/'/g, "''")}', 'ffffff', FALSE) RETURNING listId;`)
+    db.any(`INSERT INTO lists (title, list, color, trash, archive) VALUES ('${title.replace(/'/g, "''")}', '${req.body.list.replace(/'/g, "''")}', 'ffffff', FALSE, FALSE) RETURNING listId;`)
         .then((listId) => {
             db.any(`INSERT INTO listsToUsers (listId, userId) VALUES (${listId[0].listid}, '${req.session.user.id}');`)
                 .then(() => {
@@ -339,6 +360,9 @@ return res.render('pages/horizontal');
 app.post('/changeListColor', function(req, res) {
     db.any(`UPDATE lists SET color = '${req.body.color}' WHERE listId = ${req.body.listId};`)
         .then(() => {
+            if(req.query.archived && req.query.archived == 'true') {
+                return res.redirect('/archive?changeColor=success');
+            }
             // return res.render('pages/horizontal', {color: req.body.color, id: req.body.listId});
             return res.redirect('/lists?changeColor=success');
         })
@@ -356,11 +380,28 @@ app.post('/deleteList', function(req, res) {
     // db.any(`DELETE FROM listsToUsers WHERE listId = ${req.body.listId};DELETE FROM lists WHERE listId = ${req.body.listId};`)
     db.any(`UPDATE lists SET trash = TRUE WHERE listId = ${req.body.listId};`)
         .then(() => {
+            if(req.query.archived && req.query.archived == 'true') {
+                return res.redirect('/archive?delete=success');
+            }
             return res.redirect('/lists?delete=success');
         })
         .catch((error) => {
             console.log(error);
             return res.redirect('/lists?delete=failure');
+        });
+    
+    
+});
+
+app.post('/unarchiveList', function(req, res) {
+    // db.any(`DELETE FROM listsToUsers WHERE listId = ${req.body.listId};DELETE FROM lists WHERE listId = ${req.body.listId};`)
+    db.any(`UPDATE lists SET archive = FALSE WHERE listId = ${req.body.listId};`)
+        .then(() => {
+            return res.redirect('/lists?unarchive=success');
+        })
+        .catch((error) => {
+            console.log(error);
+            return res.redirect('/lists?unarchive=failure');
         });
     
     
@@ -414,6 +455,9 @@ app.post('/updateList', function(req, res) {
 
     db.any(`UPDATE lists SET title = '${req.body.title.replace(/'/g, "''")}', list = '${req.body.list.replace(/'/g, "''")}' WHERE listId = ${req.body.listId};`)
         .then(() => {
+            if(req.query.archived && req.query.archived == 'true') {
+                return res.redirect('/archive?update=success');
+            }
             return res.redirect('/lists?update=success');
         })
         .catch((error) => {
@@ -493,10 +537,15 @@ app.post('/restoreAll', function(req, res) {
 
 
 app.post('/copy', function(req, res) {
-    db.any(`INSERT INTO lists (title, list, color, trash) VALUES ('${req.body.title.replace(/'/g, "''")}', '${req.body.list.replace(/'/g, "''")}', '${req.body.color}', FALSE) RETURNING listId;`)
+
+
+    db.any(`INSERT INTO lists (title, list, color, trash, archive) VALUES ('${req.body.title.replace(/'/g, "''")}', '${req.body.list.replace(/'/g, "''")}', '${req.body.color}', FALSE, FALSE) RETURNING listId;`)
     .then((listId) => {
         db.any(`INSERT INTO listsToUsers (listId, userId) VALUES (${listId[0].listid}, '${req.session.user.id}');`)
             .then(() => {
+                if(req.query.archived && req.query.archived == 'true') {
+                    return res.redirect('/lists?copyArchived=success');
+                }
                 return res.redirect('/lists?copy=success');
             })
             .catch((error) => {
@@ -542,6 +591,58 @@ app.post('/restoreSelectedLists', function(req, res) {
     
 // });
 
+
+app.get('/archive', (req , res) => {
+
+    
+    db.any(`SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') AND archive = TRUE AND trash = FALSE;`)
+        .then((lists) => {
+            const successMessages = ['changed list color', 'updated list', 'deleted list'];
+            const errorMessages = ['error changing list color', 'error updating list', 'error deleting list'];
+            var error = 0;
+            var message = '';
+
+            if(req.query.changeColor) {
+                message = (req.query.changeColor == 'success') ? successMessages[0] : errorMessages[0];
+                error = (req.query.changeColor == 'success') ? 0 : 1;
+            // var message = (req.query.permanentlyDeleted == 'success') ? 'permanently deleted list' : 'error permanently deleting list';
+            // var error = (req.query.permanentlyDeleted == 'success') ? false : true;
+            }
+            else if(req.query.update) {
+                message = (req.query.update == 'success') ? successMessages[1] : errorMessages[1];
+                error = (req.query.update == 'success') ? 0 : 1;
+            // var message = (req.query.permanentlyDeleted == 'success') ? 'permanently deleted list' : 'error permanently deleting list';
+            // var error = (req.query.permanentlyDeleted == 'success') ? false : true;
+            }
+            else if(req.query.delete) {
+                message = (req.query.delete == 'success') ? successMessages[2] : errorMessages[2];
+                error = (req.query.delete == 'success') ? 0 : 1;
+            // var message = (req.query.permanentlyDeleted == 'success') ? 'permanently deleted list' : 'error permanently deleting list';
+            // var error = (req.query.permanentlyDeleted == 'success') ? false : true;
+            }
+
+            return res.render('pages/archive', {lists, error, message, givenName: req.session.user.givenName});
+        })
+        .catch((error) => {
+            console.log(error);
+            return res.render('pages/archive', {lists: [], error: true, message: 'error loading archive', givenName: req.session.user.givenName});
+        });
+});
+
+app.post('/archiveList', function(req, res) {
+    // var title = (!req.body.title) ? 'edited list' : req.body.title;
+
+    db.any(`UPDATE lists SET archive = TRUE WHERE listId = ${req.body.listId};`)
+        .then(() => {
+            return res.redirect('/lists?archive=success');
+        })
+        .catch((error) => {
+            console.log(error);
+            return res.redirect('/lists?archive=failure');
+        });
+    
+    
+});
 
 
 
