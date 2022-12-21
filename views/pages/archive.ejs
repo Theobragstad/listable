@@ -9,24 +9,23 @@
 
 <main>
 
-   <a title="Your lists" href="/lists"> <div class="logo" style="position:absolute; top:10px; left:10px" >
-        <img class="zoom" src="/img/brain.svg" style="width:40px;"><span style="padding-left:4px; font-weight: bold;color:#f289ca">lists</span>
-    </div>
-  </a>
-
-  <!-- <a href="/trash">
-  <button class="btn rounded-10 zoom" style="position:absolute;right:200px;top:17px;border-color:#fb6f92;background-color:#ffe5ec;padding: 0;line-height: 1.25;width:30px"><img src="/img/trash.png" style="width:10px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')"></button>
-</a> -->
-    <button class="btn rounded-10 pull-right name" style="border-color:#f289ca;background-color:#ffe6ee;position:absolute; top:10px; right:50px;font-size:12px" disabled><%= givenName %></button> 
-    <a href="/logout" class="btn rounded-10 pull-right logout"style="position:absolute;top:10px; right:5px;border-color:#000000;background-color:#ececec;font-size:11px">←</a>
-
-
-    <%- include ('../partials/message') %>
+  <%- include ('../partials/menu') %>
 
     <div class="text-center" style="padding-top:50px;color:#f289ca">
       
         <h4 class="site-title" >archive</h4>
-        <p style="font-size:12px"><%=lists.length %> lists</p>
+        <div style="padding-top:5px;padding-bottom:5px">
+          <form action="/search?archive=true" method="POST">
+          <input type="text" id="q" name="q" class="search-hover zoom" placeholder="search archive by title or content">
+        </form>
+
+      </div>
+
+        <% if(lists.length == 1) { %>
+          <p id="listCount" style="font-size:12px;padding-top:16px">1 list</p>
+        <% } else { %>
+          <p id="listCount" style="font-size:12px;padding-top:16px"><%= lists.length %> lists</p>
+        <% } %>
         <!-- <div style="padding-top:5px;padding-bottom:5px">
           <form action="/search" method="POST">
           <input type="text" id="q" name="q" class="search-hover zoom" placeholder="search by title or content">
@@ -110,7 +109,7 @@
         
     <button title="Select list" id="" value=<%= list.listid %> class="btn rounded-10 zoom" style="padding:0;position:relative;left:26px;top:10px;z-index: 2;line-height: .25;width:15px;height:15px"><img class="listSelector" src="/img/colors/white.png" style="width:15px" onclick="changeImage(this, 'colors/white', 'colors/ffffffSelected')"></button>
 
-      <div title="Edit list" data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="" href="#editList<%= list.listid%>" data-toggle="modal" id="<%= list.listid %>" class="col card card-body m-2" style="min-width: 250px;overflow-x:scroll;background-color:#<%= list.color %>;">   
+      <div title="Edit list" data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="" href="#editList<%= list.listid%>" data-toggle="modal" id="<%= list.listid %>" class="col card card-body m-2 zoomSmall" style="min-width: 250px;overflow-x:scroll;background-color:#<%= list.color %>;">   
        
         <div class="row" style="font-weight:bold;padding-left:10px"><%= list.title %>  
 
@@ -136,6 +135,8 @@
      
            <div class="col">
              <form action="/copy?archived=true" method="POST">
+              <input class="timeInput" class="form-control" name="now" hidden>
+
                <input class="form-control" type="text" name="title" value="<%= list.title %>" hidden>
                <input class="form-control" type="text" name="list" value="<%= list.list %>" hidden>
                <input class="form-control" type="text" name="color" value="<%= list.color %>" hidden>
@@ -143,7 +144,7 @@
      
      
              <button title="Copy" class="btn rounded-10 zoom"  style="position:absolute;right:80px;border-color:#fb6f92;padding: 0;line-height: .25;width:20px">
-             <img src="/img/copy.png" style="width:20px" onmouseover="hover(this, 'copyPink')" onmouseout="unhover(this, 'copy')">
+             <img src="/img/copy.png" style="width:20px" onmouseover="hover(this, 'copyBlue')" onmouseout="unhover(this, 'copy')">
            </button>
          </form>
          </div>
@@ -177,6 +178,8 @@
 
 
               <form action="/updateList?archived=true" method="POST">
+                <input class="timeInput" class="form-control" name="now" hidden>
+
       <input class="form-control" type="text" name="listId" value="<%= list.listid %>" hidden>
 
                   <input tabindex="-1" class="form-control rounded-10 text-center" type="text" maxlength="20" name="title" value="<%= list.title%>">
@@ -191,6 +194,15 @@
       
                   <!-- <textarea  name="list" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}" onkeyup="handleInput(event)"  id="textarea" class="form-control rounded-0" rows="27" required></textarea> -->
               </form>
+
+
+
+              <div data-bs-toggle="tooltip" data-bs-custom-class="timeTooltip" class="createTime" id="createTime<%= list.listid%>" data-value="<%= list.createdatetime %>" style="text-align:center;padding-top:5px;font-size:12px;font-weight: bold;">
+                    
+                <button class="editTime btn" id="editTime<%= list.listid%>" data-value="<%= list.editdatetime %>" style="text-align:center;padding-top:5px;font-size:12px;font-weight: bold;"></button>
+
+              
+              </div>
                 </div>
       
           </div>
@@ -211,14 +223,24 @@
 
 <!-- TEST -->
 
- <% if (lists.length == 0) {%>
+
+
+<% if(search && lists.length == 0){ %>
+  <div class="text-center" style="padding-top:100px">
+
+    <h6>no search results</h6>
+    <img style="width:100px" src="/img/noResults.png">
+
+  </div>
+<% } else if(lists.length == 0) { %>
   <div class="text-center" style="padding-top:100px">
 
     <h6>no lists in archive</h6>
     <img style="width:100px" src="/img/camping.png">
 
   </div>
-<% } %>
+
+  <% } %>
 <!-- </div> -->
 
 <!-- <div class="modal fade" id="listColors" tabindex="-1" aria-labelledby="listColors" aria-hidden="true">
@@ -309,22 +331,30 @@
 
   <div class="modal fade" id="listColors" tabindex="-1" aria-labelledby="listColors" aria-hidden="true">
     <div class="modal-dialog">
-      <div class="modal-content">
-  
+      <div class="modal-content mx-auto" style="width:202px">
+
         <!-- <div id="modalListId" value="1"></div> -->
   
-        <form action="/changeListColor?archived=true" method="POST">
+        <form action="/changeListColor" method="POST">
           <input id="modalListId" name="listId" value="" hidden>
           <button class="btn"  name="color" value="ffffff" style="padding-right:0"><img id="ffffff" src="/img/colors/white.png" style="width:20px"></button>
           <button class="btn" name="color"  value="fdf5c1" style="padding-right:0"><img id="fdf5c1" src="/img/colors/yellow.png" style="width:20px"></button>
-          <button class="btn" name="color" value="f7cdc2" style="padding-right:0"><img id="f7cdc2" src="/img/colors/orange.png" style="width:20px"></button>
-        <button class="btn" name="color" value="cafbc8" style="padding-right:0"><img id="cafbc8" src="/img/colors/green.png" style="width:20px"></button>
-        <button class="btn" name="color" value="bdf6d9" style="padding-right:0"><img id="bdf6d9" src="/img/colors/greenBlue.png" style="width:20px"></button>
-        <button class="btn" name="color" value="bae6fc" style="padding-right:0"><img id="bae6fc" src="/img/colors/lightBlue.png" style="width:20px"></button>
+          <button class="btn" name="color" value="bae6fc" style="padding-right:0"><img id="bae6fc" src="/img/colors/lightBlue.png" style="width:20px"></button>
+  
+          <button class="btn" name="color" value="cafbc8" style="padding-right:0"><img id="cafbc8" src="/img/colors/green.png" style="width:20px"></button>
+          <button class="btn"  name="color" value="f4c3fb" style="padding-right:0"><img id="f4c3fb" src="/img/colors/pink.png" style="width:20px"></button>
+        
+        <button class="btn"name="color" value="dddddd"  style="padding-right:0"><img id="dddddd" src="/img/colors/grey.png" style="width:20px"></button>
+  
+        <button class="btn" name="color" value="f7cdc2" style="padding-right:0"><img id="f7cdc2" src="/img/colors/orange.png" style="width:20px"></button>
+  
         <button class="btn" name="color" value="b4c9fa" style="padding-right:0"><img id="b4c9fa" src="/img/colors/lavender.png" style="width:20px"></button>
-        <button class="btn"  name="color" value="f4c3fb" style="padding-right:0"><img id="f4c3fb" src="/img/colors/pink.png" style="width:20px"></button>
+        <button class="btn" name="color" value="bdf6d9" style="padding-right:0"><img id="bdf6d9" src="/img/colors/greenBlue.png" style="width:20px"></button>
+  
         <button class="btn"name="color" value="d0adfa"  ><img id="d0adfa" src="/img/colors/purple.png" style="width:20px"></button>
-        </form>
+       
+      </form>
+  
   
      
         
@@ -399,12 +429,16 @@ function setSelectedColor(color) {
 }
 
 
-  function hover(element, src) {
+function hover(element, src) {
   element.setAttribute('src', '/img/'+src+'.png');
+ if(src !== 'paletteColors') {
+  stopModals();
+ }
 }
 
 function unhover(element, src) {
   element.setAttribute('src', '/img/'+src+'.png');
+  startModals();
 }
 
   tinymce.init({
@@ -620,6 +654,268 @@ console.log(document.getElementById('delSelectedLists').value);
   
 // }
 })
+
+
+
+
+function setEditTimes() {
+  const elements = document.getElementsByClassName('editTime');
+  // var elements = document.querySelectorAll('[var="editTime"]');
+
+
+  for(var i = 0; i < elements.length; i++) {
+    
+    // console.log(elements[i].id);
+    // console.log(elements[i].dataset.value);
+   
+    setTimeEdited(elements[i].dataset.value, elements[i].id);
+
+  }
+}
+
+
+function setCreateTimes() {
+  const elements = document.getElementsByClassName('createTime');
+  // var elements = document.querySelectorAll('[var="editTime"]');
+
+
+
+
+
+  for(var i = 0; i < elements.length; i++) {
+    
+    // console.log(elements[i].id);
+    // console.log(elements[i].dataset.value);
+   
+    setTimeCreated(elements[i].dataset.value, elements[i].id);
+
+  }
+}
+
+
+function setTimeEdited(editDateTime, divId) {
+  var now = new Date();
+  var nowYear = parseInt(now.getFullYear());
+  var nowMonth = parseInt(now.getMonth()+1);
+  var nowDate = parseInt(now.getDate());
+
+
+
+  var thenYear = parseInt(editDateTime.substring(6,10));
+  var thenMonth = parseInt(editDateTime.substring(0,2));
+  var thenDate = parseInt(editDateTime.substring(3,5));
+  var thenHour = parseInt(editDateTime.substring(11,13));
+  var thenMin = parseInt(editDateTime.substring(14));
+
+
+  var ampm = 'AM';
+
+  if(thenHour >= 12) {
+    ampm = 'PM';
+
+    if(thenHour > 12) {
+        thenHour -= 12;
+
+    }
+  }
+
+  if(thenHour == 0) {
+    thenHour = 12;
+  }
+
+  var thenMinutesFormatted = (thenMin < 10) ? '0' + thenMin : thenMin;
+      
+  var thenTime = thenHour + ':' + thenMinutesFormatted + ' ' + ampm;
+
+
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const thenMonthAbbr = months[thenMonth-1];
+
+  var thenDateFormatted = (thenDate < 10) ? '0' + thenDate : thenDate;
+  
+
+  if(nowYear > thenYear) {
+    var message = 'Edited ' + thenMonthAbbr + ' ' + thenDateFormatted + ' ' + thenYear;
+    document.getElementById(divId).innerHTML = message;
+  }
+  else if(nowYear == thenYear && nowMonth == thenMonth && nowDate == thenDate) {
+      var message = 'Edited ' + thenTime;
+      document.getElementById(divId).innerHTML = message;
+  }
+  else if(nowYear == thenYear && nowMonth == thenMonth && nowDate == (thenDate+1)) {
+      var message = 'Edited yesterday, ' + thenTime;
+      document.getElementById(divId).innerHTML = message;
+  }
+  else if(nowYear == thenYear && nowMonth >= thenMonth && nowDate > (thenDate+1)) {
+      var message = 'Edited ' + thenMonthAbbr + ' ' + thenDateFormatted;
+      document.getElementById(divId).innerHTML = message;
+  }
+  else {
+      var message = 'Edited: error';
+      document.getElementById(divId).innerHTML = message;
+  }
+}
+
+
+function setTimeCreated(createDateTime, divId) {
+  var now = new Date();
+  var nowYear = parseInt(now.getFullYear());
+  var nowMonth = parseInt(now.getMonth()+1);
+  var nowDate = parseInt(now.getDate());
+
+
+
+  var thenYear = parseInt(createDateTime.substring(6,10));
+  var thenMonth = parseInt(createDateTime.substring(0,2));
+  var thenDate = parseInt(createDateTime.substring(3,5));
+  var thenHour = parseInt(createDateTime.substring(11,13));
+  var thenMin = parseInt(createDateTime.substring(14));
+
+
+  var ampm = 'AM';
+
+  if(thenHour >= 12) {
+    ampm = 'PM';
+
+    if(thenHour > 12) {
+        thenHour -= 12;
+
+    }
+  }
+
+  if(thenHour == 0) {
+    thenHour = 12;
+  }
+
+  var thenMinutesFormatted = (thenMin < 10) ? '0' + thenMin : thenMin;
+      
+  var thenTime = thenHour + ':' + thenMinutesFormatted + ' ' + ampm;
+
+
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const thenMonthAbbr = months[thenMonth-1];
+
+  var thenDateFormatted = (thenDate < 10) ? '0' + thenDate : thenDate;
+
+  if(nowYear > thenYear) {
+    var message = 'Created ' + thenMonthAbbr + ' ' + thenDateFormatted + ' ' + thenYear;
+    // document.getElementById(divId).setAttribute('data-bs-title', message);
+  }
+  else if(nowYear == thenYear && nowMonth == thenMonth && nowDate == thenDate) {
+      var message = 'Created ' + thenTime;
+      // document.getElementById(divId).innerHTML = message;
+  }
+  else if(nowYear == thenYear && nowMonth == thenMonth && nowDate == (thenDate+1)) {
+      var message = 'Created yesterday, ' + thenTime;
+      // document.getElementById(divId).innerHTML = message;
+  }
+  else if(nowYear == thenYear && nowMonth >= thenMonth && nowDate > (thenDate+1)) {
+      var message = 'Created ' + thenMonthAbbr + ' ' + thenDateFormatted;
+      // document.getElementById(divId).innerHTML = message;
+  }
+  else {
+      var message = 'Created: error';
+      // document.getElementById(divId).innerHTML = message;
+  }
+
+  document.getElementById(divId).setAttribute('data-bs-title', message);
+}
+
+
+
+setEditTimes();
+setCreateTimes();
+setInputTimes();
+
+setInterval(setEditTimes, 3000);
+setInterval(setCreateTimes, 3000);
+setInterval(setInputTimes, 3000);
+
+
+
+
+
+
+function setInputTimes() {
+  const elements = document.getElementsByClassName('timeInput');
+  // var elements = document.querySelectorAll('[var="editTime"]');
+
+
+  for(var i = 0; i < elements.length; i++) {
+    
+    // console.log(elements[i].id);
+    // console.log(elements[i].dataset.value);
+   
+    // setTimeEdited(elements[i].dataset.value, elements[i].id);
+
+    elements[i].value = getNowFormatted();
+    // console.log(elements[i].value);
+
+
+  }
+}
+
+
+
+function getNowFormatted() {
+    var now = new Date();
+
+    // console.log(now);
+
+    var nowYear = now.getFullYear();
+    var nowMonth = parseInt(now.getMonth()+1);
+    var nowDate = now.getDate();
+    var nowHours = now.getHours();
+    var nowMinutes = now.getMinutes();
+
+    var monthFormatted = (nowMonth < 10) ? '0' + nowMonth : nowMonth;
+    var dateFormatted = (nowDate < 10) ? '0' + nowDate : nowDate;
+    var hoursFormatted = (nowHours < 10) ? '0' + nowHours : nowHours;
+    var minutesFormatted = (nowMinutes < 10) ? '0' + nowMinutes : nowMinutes;
+
+    var nowFormatted = monthFormatted + '-' + dateFormatted + '-' + nowYear + ',' + hoursFormatted + ':' + minutesFormatted;
+    
+    console.log(nowFormatted);
+
+    return nowFormatted;
+}
+
+
+document.addEventListener("DOMContentLoaded", function(){
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function(element){
+                return new bootstrap.Tooltip(element);
+            });
+        });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        function stopModals() {
+  var modalBtns = document.querySelectorAll('[data-bs-toggle="modal"]');
+  for(var i = 0; i < modalBtns.length; i++) {
+    modalBtns[i].setAttribute('data-bs-toggle', '');
+  }
+
+}
+
+function startModals() {
+  var modalBtns = document.querySelectorAll('[data-bs-toggle=""]');
+  for(var i = 0; i < modalBtns.length; i++) {
+    modalBtns[i].setAttribute('data-bs-toggle', 'modal');
+  }
+
+}
 </script>
 <!-- <script>tinymce.init({
   selector: 'textarea',  // change this value according to your HTML

@@ -9,31 +9,15 @@
 
 <main>
 
-   <a href="/lists"> <div class="logo" style="position:absolute; top:10px; left:10px" >
-        <img class="zoom" src="/img/brain.svg" style="width:60px;"><span style="padding-left:4px; font-weight: bold;color:#f289ca">lists</span>
-    </div>
-  </a>
+  <%- include ('../partials/menu') %>
 
-
-  <a href="/archive">
-    <button title="Open archive" class="btn rounded-10 zoom" style="position:absolute;right:250px;top:17px;border-color:#b24bf3;background-color:#e6d4ff;padding: 0;line-height: 1.25;width:30px"><img src="/img/archive.png" style="width:20px" onmouseover="hover(this, 'archivePink')" onmouseout="unhover(this, 'archive')"></button>
-  </a>
-
-  <a href="/trash">
-  <button title="Open trash" class="btn rounded-10 zoom" style="position:absolute;right:200px;top:17px;border-color:#fb6f92;background-color:#ffe5ec;padding: 0;line-height: 1.25;width:30px"><img src="/img/trash.png" style="width:20px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')"></button>
-</a>
-    <button class="btn rounded-10 pull-right name" style="border-color:#f289ca;background-color:#ffe6ee;position:absolute; top:10px; right:50px;font-size:12px" disabled><%= givenName %></button> 
-    <a title="Log out" href="/logout" class="btn rounded-10 pull-right logout"style="position:absolute;top:10px; right:5px;border-color:#000000;background-color:#ececec;font-size:11px">←</a>
-
-
-    <%- include ('../partials/message') %>
 
     <div class="text-center" style="padding-top:50px;color:#f289ca">
       
         <h4 class="site-title">your lists</h4>
         <div style="padding-top:5px;padding-bottom:5px">
           <form action="/search" method="POST">
-          <input type="text" id="q" name="q" class="search-hover zoom" placeholder="search by title or content">
+          <input type="text" id="q" name="q" class="search-hover zoom" placeholder="search all by title or content">
         </form>
 
       </div>
@@ -79,9 +63,9 @@
     <div class="modal-dialog "style="" >
       <div class="modal-content rounded-10">
         <form action="/addList" method="POST">
+            <input class="timeInput" class="form-control" name="now" hidden>
 
-
-            <input    tabindex="-1" class="form-control rounded-10 text-center" type="text" maxlength="20" name="title" placeholder="Add a title...">
+            <input    tabindex="-1" class="form-control rounded-10 text-center" type="text" maxlength="50" name="title" placeholder="Add a title...">
 
     <div class="text-center" style="padding-bottom:4px">
         <button class="btn rounded-10 " style="border-color:#17d475;background-color:#e8fcec;padding: .25rem .4rem;line-height: .75;">Save</button>
@@ -100,23 +84,26 @@
     </div>
   </div>
 
-<!-- <div class="text-center" style="padding-top:20px"> -->
     <div class="row" style="overflow:auto;padding-top:50px;padding-left:20px;display:block">
+
       <div class="d-flex" >
+        <% let count = 1 %> 
     <% lists.forEach(function(list) { %>
       <!-- THIS IS A TEST -->
       <!-- <div data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid%>" data-toggle="modal" class="btn rounded-10 zoom" style="border-color:#f289ca;background-color:#ffe6ee;padding: .25rem .4rem;line-height: .75;"> -->
         <!-- <button data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid%>" data-toggle="modal" class="btn rounded-10 zoom" style="border-color:#f289ca;background-color:#ffe6ee;padding: .25rem .4rem;line-height: .75;"> -->
+
+          
 
           <div>
             <!-- <input type="number" name="listIdSelected"  hidden> -->
           
           <button title="Select list" id="" value=<%= list.listid %> class="btn rounded-10 zoom" style="position:relative;left:26px;top:5px;z-index: 2;line-height: .25;width:15px;padding: 0;"><img class="listSelector" src="/img/colors/white.png" style="width:15px" onclick="changeImage(this, 'colors/white', 'colors/ffffffSelected')"></button>
   </div>
-      <div title="Edit list" data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid%>" data-toggle="modal" id="<%= list.listid %>" class="col card card-body m-2" style="min-width: 400px;overflow-x:scroll;background-color:#<%= list.color %>;">   
+      <div title="Edit list" data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid%>" data-toggle="modal" id="<%= list.listid %>" class="col card card-body m-2 zoomSmall" style="min-width: 400px;overflow-x:scroll;background-color:#<%= list.color %>;">   
        
         <div class="row" style="font-weight:bold;padding-left:10px">
-          <div style="width:280px;text-overflow:ellipsis;
+          <div style="width:60%;text-overflow:ellipsis;
           white-space: nowrap;
           overflow: hidden; ">
           
@@ -126,7 +113,7 @@
 
           
             
-          <span class="col">
+          <!-- <span class="col"> -->
 
             
            <div style="z-index:10">
@@ -136,7 +123,7 @@
           </form>
         </div>
           
-        </span>
+        <!-- </span> -->
 
         <div class="col"><button title="Change color" onclick="setSelectedColor('<%= list.color %>')" type="button" class="btn rounded-10 zoom" data-id="<%= list.listid %>" data-bs-toggle="modal" data-bs-target="#listColors" style="position:absolute;right:50px;border-color:#fb6f92;padding: 0;line-height: .25;width:20px">
           <img src="/img/palette.png" style="width:20px" onmouseover="hover(this, 'paletteColors')" onmouseout="unhover(this, 'palette')">
@@ -145,13 +132,15 @@
 
       <div class="col">
         <form action="/copy" method="POST">
+          <input class="timeInput" class="form-control" name="now" hidden>
+
           <input class="form-control" type="text" name="title" value="<%= list.title %>" hidden>
           <input class="form-control" type="text" name="list" value="<%= list.list %>" hidden>
           <input class="form-control" type="text" name="color" value="<%= list.color %>" hidden>
 
 
         <button title="Copy" class="btn rounded-10 zoom"  style="position:absolute;right:80px;border-color:#fb6f92;padding: 0;line-height: .25;width:20px">
-        <img src="/img/copy.png" style="width:20px" onmouseover="hover(this, 'copyPink')" onmouseout="unhover(this, 'copy')">
+        <img src="/img/copy.png" style="width:20px" onmouseover="hover(this, 'copyBlue')" onmouseout="unhover(this, 'copy')">
       </button>
     </form>
     </div>
@@ -161,7 +150,7 @@
         <input type="number" name="listId" value=<%= list.listid %> hidden>
         
       <button title="Archive" class="btn rounded-10 zoom"  style="position:absolute;right:110px;border-color:#fb6f92;padding: 0;line-height: .25;width:20px">
-      <img src="/img/archive.png" style="width:20px" onmouseover="hover(this, 'archivePink')" onmouseout="unhover(this, 'archive')">
+      <img src="/img/archive.png" style="width:20px" onmouseover="hover(this, 'archiveGreen')" onmouseout="unhover(this, 'archive')">
     </button>
   </form>
   </div>
@@ -185,9 +174,11 @@
 
 
               <form action="/updateList" method="POST">
+                <input class="timeInput" class="form-control" name="now" hidden>
+
       <input class="form-control" type="text" name="listId" value="<%= list.listid %>" hidden>
 
-                  <input tabindex="-1" class="form-control rounded-10 text-center" type="text" maxlength="20" name="title" value="<%= list.title%>">
+                  <input tabindex="-1" class="form-control rounded-10 text-center" type="text" maxlength="50" name="title" value="<%= list.title%>">
       
           <div class="text-center" style="padding-bottom:4px">
               <button class="btn rounded-10 " style="border-color:#17d475;background-color:#e8fcec;padding: .25rem .4rem;line-height: .75;">Update</button>
@@ -199,6 +190,18 @@
       
                   <!-- <textarea  name="list" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}" onkeyup="handleInput(event)"  id="textarea" class="form-control rounded-0" rows="27" required></textarea> -->
               </form>
+
+
+                  <div data-bs-toggle="tooltip" data-bs-custom-class="timeTooltip" class="createTime" id="createTime<%= list.listid%>" data-value="<%= list.createdatetime %>" style="text-align:center;padding-top:5px;font-size:12px;font-weight: bold;">
+                    
+                    <button class="editTime btn" id="editTime<%= list.listid%>" data-value="<%= list.editdatetime %>" style="text-align:center;padding-top:5px;font-size:12px;font-weight: bold;"></button>
+
+                  
+                  </div>
+
+
+                 
+
                 </div>
       
           </div>
@@ -238,7 +241,7 @@
 
 <div class="modal fade" id="listColors" tabindex="-1" aria-labelledby="listColors" aria-hidden="true">
   <div class="modal-dialog">
-    <div class="modal-content">
+    <div class="modal-content mx-auto" style="width:202px">
 
       <!-- <div id="modalListId" value="1"></div> -->
 
@@ -246,14 +249,21 @@
         <input id="modalListId" name="listId" value="" hidden>
         <button class="btn"  name="color" value="ffffff" style="padding-right:0"><img id="ffffff" src="/img/colors/white.png" style="width:20px"></button>
         <button class="btn" name="color"  value="fdf5c1" style="padding-right:0"><img id="fdf5c1" src="/img/colors/yellow.png" style="width:20px"></button>
-        <button class="btn" name="color" value="f7cdc2" style="padding-right:0"><img id="f7cdc2" src="/img/colors/orange.png" style="width:20px"></button>
-      <button class="btn" name="color" value="cafbc8" style="padding-right:0"><img id="cafbc8" src="/img/colors/green.png" style="width:20px"></button>
-      <button class="btn" name="color" value="bdf6d9" style="padding-right:0"><img id="bdf6d9" src="/img/colors/greenBlue.png" style="width:20px"></button>
-      <button class="btn" name="color" value="bae6fc" style="padding-right:0"><img id="bae6fc" src="/img/colors/lightBlue.png" style="width:20px"></button>
+        <button class="btn" name="color" value="bae6fc" style="padding-right:0"><img id="bae6fc" src="/img/colors/lightBlue.png" style="width:20px"></button>
+
+        <button class="btn" name="color" value="cafbc8" style="padding-right:0"><img id="cafbc8" src="/img/colors/green.png" style="width:20px"></button>
+        <button class="btn"  name="color" value="f4c3fb" style="padding-right:0"><img id="f4c3fb" src="/img/colors/pink.png" style="width:20px"></button>
+      
+      <button class="btn"name="color" value="dddddd"  style="padding-right:0"><img id="dddddd" src="/img/colors/grey.png" style="width:20px"></button>
+
+      <button class="btn" name="color" value="f7cdc2" style="padding-right:0"><img id="f7cdc2" src="/img/colors/orange.png" style="width:20px"></button>
+
       <button class="btn" name="color" value="b4c9fa" style="padding-right:0"><img id="b4c9fa" src="/img/colors/lavender.png" style="width:20px"></button>
-      <button class="btn"  name="color" value="f4c3fb" style="padding-right:0"><img id="f4c3fb" src="/img/colors/pink.png" style="width:20px"></button>
+      <button class="btn" name="color" value="bdf6d9" style="padding-right:0"><img id="bdf6d9" src="/img/colors/greenBlue.png" style="width:20px"></button>
+
       <button class="btn"name="color" value="d0adfa"  ><img id="d0adfa" src="/img/colors/purple.png" style="width:20px"></button>
-      </form>
+     
+    </form>
 
    
       
@@ -271,6 +281,7 @@
 
 
 
+<!-- <button onclick="setEditTimes()"> call</button> -->
 
 
 
@@ -317,10 +328,10 @@ document.getElementById('listColors').addEventListener('show.bs.modal', (e) => {
 
 
 function setSelectedColor(color) {
-  var imgs = ['white','yellow','orange','green','greenBlue','lightBlue','lavender','pink','purple'];
-        var ids = ['ffffff','fdf5c1','f7cdc2','cafbc8','bdf6d9','bae6fc','b4c9fa','f4c3fb','d0adfa']; 
+  var imgs = ['white','yellow','orange','green','greenBlue','lightBlue','lavender','pink','purple', 'grey'];
+        var ids = ['ffffff','fdf5c1','f7cdc2','cafbc8','bdf6d9','bae6fc','b4c9fa','f4c3fb','d0adfa', 'eeeeee']; 
 
-        for(var i = 0; i < 9; i++) {
+        for(var i = 0; i < imgs.length; i++) {
             document.getElementById(ids[i]).src='/img/colors/'+imgs[i]+'.png';
         }
         
@@ -422,10 +433,14 @@ function unselectAll() {
 
   function hover(element, src) {
   element.setAttribute('src', '/img/'+src+'.png');
+ if(src !== 'paletteColors') {
+  stopModals();
+ }
 }
 
 function unhover(element, src) {
   element.setAttribute('src', '/img/'+src+'.png');
+  startModals();
 }
 
 // var nSelected = 0;
@@ -564,6 +579,269 @@ console.log(document.getElementById('delSelectedLists').value);
 
 
 
+
+function setEditTimes() {
+  const elements = document.getElementsByClassName('editTime');
+  // var elements = document.querySelectorAll('[var="editTime"]');
+
+
+  for(var i = 0; i < elements.length; i++) {
+    
+    // console.log(elements[i].id);
+    // console.log(elements[i].dataset.value);
+   
+    setTimeEdited(elements[i].dataset.value, elements[i].id);
+
+  }
+}
+
+
+function setCreateTimes() {
+  const elements = document.getElementsByClassName('createTime');
+  // var elements = document.querySelectorAll('[var="editTime"]');
+
+
+
+
+
+  for(var i = 0; i < elements.length; i++) {
+    
+    // console.log(elements[i].id);
+    // console.log(elements[i].dataset.value);
+   
+    setTimeCreated(elements[i].dataset.value, elements[i].id);
+
+  }
+}
+
+
+function setTimeEdited(editDateTime, divId) {
+  var now = new Date();
+  var nowYear = parseInt(now.getFullYear());
+  var nowMonth = parseInt(now.getMonth()+1);
+  var nowDate = parseInt(now.getDate());
+
+
+
+  var thenYear = parseInt(editDateTime.substring(6,10));
+  var thenMonth = parseInt(editDateTime.substring(0,2));
+  var thenDate = parseInt(editDateTime.substring(3,5));
+  var thenHour = parseInt(editDateTime.substring(11,13));
+  var thenMin = parseInt(editDateTime.substring(14));
+
+
+  var ampm = 'AM';
+
+  if(thenHour >= 12) {
+    ampm = 'PM';
+
+    if(thenHour > 12) {
+        thenHour -= 12;
+
+    }
+  }
+
+  if(thenHour == 0) {
+    thenHour = 12;
+  }
+
+  var thenMinutesFormatted = (thenMin < 10) ? '0' + thenMin : thenMin;
+      
+  var thenTime = thenHour + ':' + thenMinutesFormatted + ' ' + ampm;
+
+
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const thenMonthAbbr = months[thenMonth-1];
+
+  var thenDateFormatted = (thenDate < 10) ? '0' + thenDate : thenDate;
+  
+
+  if(nowYear > thenYear) {
+    var message = 'Edited ' + thenMonthAbbr + ' ' + thenDateFormatted + ' ' + thenYear;
+    document.getElementById(divId).innerHTML = message;
+  }
+  else if(nowYear == thenYear && nowMonth == thenMonth && nowDate == thenDate) {
+      var message = 'Edited ' + thenTime;
+      document.getElementById(divId).innerHTML = message;
+  }
+  else if(nowYear == thenYear && nowMonth == thenMonth && nowDate == (thenDate+1)) {
+      var message = 'Edited yesterday, ' + thenTime;
+      document.getElementById(divId).innerHTML = message;
+  }
+  else if(nowYear == thenYear && nowMonth >= thenMonth && nowDate > (thenDate+1)) {
+      var message = 'Edited ' + thenMonthAbbr + ' ' + thenDateFormatted;
+      document.getElementById(divId).innerHTML = message;
+  }
+  else {
+      var message = 'Edited: error';
+      document.getElementById(divId).innerHTML = message;
+  }
+}
+
+
+function setTimeCreated(createDateTime, divId) {
+  var now = new Date();
+  var nowYear = parseInt(now.getFullYear());
+  var nowMonth = parseInt(now.getMonth()+1);
+  var nowDate = parseInt(now.getDate());
+
+
+
+  var thenYear = parseInt(createDateTime.substring(6,10));
+  var thenMonth = parseInt(createDateTime.substring(0,2));
+  var thenDate = parseInt(createDateTime.substring(3,5));
+  var thenHour = parseInt(createDateTime.substring(11,13));
+  var thenMin = parseInt(createDateTime.substring(14));
+
+
+  var ampm = 'AM';
+
+  if(thenHour >= 12) {
+    ampm = 'PM';
+
+    if(thenHour > 12) {
+        thenHour -= 12;
+
+    }
+  }
+
+  if(thenHour == 0) {
+    thenHour = 12;
+  }
+
+  var thenMinutesFormatted = (thenMin < 10) ? '0' + thenMin : thenMin;
+      
+  var thenTime = thenHour + ':' + thenMinutesFormatted + ' ' + ampm;
+
+
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const thenMonthAbbr = months[thenMonth-1];
+
+  var thenDateFormatted = (thenDate < 10) ? '0' + thenDate : thenDate;
+
+  if(nowYear > thenYear) {
+    var message = 'Created ' + thenMonthAbbr + ' ' + thenDateFormatted + ' ' + thenYear;
+    // document.getElementById(divId).setAttribute('data-bs-title', message);
+  }
+  else if(nowYear == thenYear && nowMonth == thenMonth && nowDate == thenDate) {
+      var message = 'Created ' + thenTime;
+      // document.getElementById(divId).innerHTML = message;
+  }
+  else if(nowYear == thenYear && nowMonth == thenMonth && nowDate == (thenDate+1)) {
+      var message = 'Created yesterday, ' + thenTime;
+      // document.getElementById(divId).innerHTML = message;
+  }
+  else if(nowYear == thenYear && nowMonth >= thenMonth && nowDate > (thenDate+1)) {
+      var message = 'Created ' + thenMonthAbbr + ' ' + thenDateFormatted;
+      // document.getElementById(divId).innerHTML = message;
+  }
+  else {
+      var message = 'Created: error';
+      // document.getElementById(divId).innerHTML = message;
+  }
+
+  document.getElementById(divId).setAttribute('data-bs-title', message);
+}
+
+
+
+setEditTimes();
+setCreateTimes();
+setInputTimes();
+
+setInterval(setEditTimes, 3000);
+setInterval(setCreateTimes, 3000);
+setInterval(setInputTimes, 3000);
+
+
+
+
+
+
+function setInputTimes() {
+  const elements = document.getElementsByClassName('timeInput');
+  // var elements = document.querySelectorAll('[var="editTime"]');
+
+
+  for(var i = 0; i < elements.length; i++) {
+    
+    // console.log(elements[i].id);
+    // console.log(elements[i].dataset.value);
+   
+    // setTimeEdited(elements[i].dataset.value, elements[i].id);
+
+    elements[i].value = getNowFormatted();
+    // console.log(elements[i].value);
+
+
+  }
+}
+
+
+
+function getNowFormatted() {
+    var now = new Date();
+
+    // console.log(now);
+
+    var nowYear = now.getFullYear();
+    var nowMonth = parseInt(now.getMonth()+1);
+    var nowDate = now.getDate();
+    var nowHours = now.getHours();
+    var nowMinutes = now.getMinutes();
+
+    var monthFormatted = (nowMonth < 10) ? '0' + nowMonth : nowMonth;
+    var dateFormatted = (nowDate < 10) ? '0' + nowDate : nowDate;
+    var hoursFormatted = (nowHours < 10) ? '0' + nowHours : nowHours;
+    var minutesFormatted = (nowMinutes < 10) ? '0' + nowMinutes : nowMinutes;
+
+    var nowFormatted = monthFormatted + '-' + dateFormatted + '-' + nowYear + ',' + hoursFormatted + ':' + minutesFormatted;
+    
+    console.log(nowFormatted);
+
+    return nowFormatted;
+}
+
+
+
+// console.log(Intl.DateTimeFormat().resolvedOptions().timeZone)
+// var offset = new Date().getTimezoneOffset();
+// console.log(offset/-60);
+// console.log(new Date())
+
+
+
+
+
+
+
+        document.addEventListener("DOMContentLoaded", function(){
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function(element){
+                return new bootstrap.Tooltip(element);
+            });
+        });
+
+
+
+        function stopModals() {
+  var modalBtns = document.querySelectorAll('[data-bs-toggle="modal"]');
+  for(var i = 0; i < modalBtns.length; i++) {
+    modalBtns[i].setAttribute('data-bs-toggle', '');
+  }
+
+}
+
+function startModals() {
+  var modalBtns = document.querySelectorAll('[data-bs-toggle=""]');
+  for(var i = 0; i < modalBtns.length; i++) {
+    modalBtns[i].setAttribute('data-bs-toggle', 'modal');
+  }
+
+}
+
+
+       
 </script>
 <!-- <script>tinymce.init({
   selector: 'textarea',  // change this value according to your HTML

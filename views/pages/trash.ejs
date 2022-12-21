@@ -9,24 +9,26 @@
 
 <main>
 
-   <a title="Your lists" href="/lists"> <div class="logo" style="position:absolute; top:10px; left:10px" >
-        <img class="zoom" src="/img/brain.svg" style="width:40px;"><span style="padding-left:4px; font-weight: bold;color:#f289ca">lists</span>
-    </div>
-  </a>
+  <%- include ('../partials/menu') %>
 
-  <!-- <a href="/trash">
-  <button class="btn rounded-10 zoom" style="position:absolute;right:200px;top:17px;border-color:#fb6f92;background-color:#ffe5ec;padding: 0;line-height: 1.25;width:30px"><img src="/img/trash.png" style="width:10px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')"></button>
-</a> -->
-    <button class="btn rounded-10 pull-right name" style="border-color:#f289ca;background-color:#ffe6ee;position:absolute; top:10px; right:50px;font-size:12px" disabled><%= givenName %></button> 
-    <a href="/logout" class="btn rounded-10 pull-right logout"style="position:absolute;top:10px; right:5px;border-color:#000000;background-color:#ececec;font-size:11px">←</a>
-
-
-    <%- include ('../partials/message') %>
 
     <div class="text-center" style="padding-top:50px;color:#f289ca">
       
         <h4 class="site-title" >trash</h4>
-        <p style="font-size:12px"><%=lists.length %> lists</p>
+        <div style="padding-top:5px;padding-bottom:5px">
+          <form action="/search?trash=true" method="POST">
+          <input type="text" id="q" name="q" class="search-hover zoom" placeholder="search trash by title or content">
+        </form>
+
+      </div>
+        <% if(lists.length == 1) { %>
+          <p id="listCount" style="font-size:12px;padding-top:16px">1 list</p>
+        <% } else { %>
+          <p id="listCount" style="font-size:12px;padding-top:16px"><%= lists.length %> lists</p>
+        <% } %>
+
+
+
         <!-- <div style="padding-top:5px;padding-bottom:5px">
           <form action="/search" method="POST">
           <input type="text" id="q" name="q" class="search-hover zoom" placeholder="search by title or content">
@@ -46,9 +48,9 @@
         </button>
 
         <form action="/restoreAll" method="POST">
-        <button      title="Restore all" 
+        <button      title="Recover all" 
          class="btn" style="position:absolute;right:120px;font-size:12px;border-radius:10;background-color:#e8fcec;color:#17d475;border-color:#17d475">
-                Restore All
+                Recover All
         </button>
     </form>
         <% } %>
@@ -71,7 +73,7 @@
           <!-- <div style="padding-left:30px;"> -->
 
           <form style="display:inline" action="/restoreSelectedLists" method="POST">
-            <button id="restoreSelectedLists" title="Restore selected" class="btn rounded-10 zoom" name="listIds" style="position:absolute;top:163px;left:73px;border-color:#17d475;background-color:#e8fcec;padding: 0;line-height: .25;width:20px;display:none"><img src="/img/restore.png" style="width:15px" onmouseover="hover(this, 'restorePink')" onmouseout="unhover(this, 'restore')"></button>
+            <button id="restoreSelectedLists" title="Recover selected" class="btn rounded-10 zoom" name="listIds" style="position:absolute;top:163px;left:73px;border-color:#17d475;background-color:#e8fcec;padding: 0;line-height: .25;width:20px;display:none"><img src="/img/restore.png" style="width:15px" onmouseover="hover(this, 'restorePink')" onmouseout="unhover(this, 'restore')"></button>
           </form>
           
           <!-- </div> -->
@@ -112,7 +114,6 @@
   </div>
 
 <!-- <div class="text-center" style="padding-top:20px"> -->
-  <% if(lists.length > 0) { %>
     
     <div class="row" style="overflow:auto;padding-top:50px;padding-left:20px;display:block">
       <div class="d-flex" >
@@ -126,9 +127,14 @@
 
       <div title="Lists in trash cannot be edited" data-bs-toggle="" data-bs-target="#editList<%= list.listid%>" type="" href="#editList<%= list.listid%>" data-toggle="modal" id="<%= list.listid %>" class="col card card-body m-2" style="min-width: 250px;overflow-x:scroll;background-color:#<%= list.color %>;">   
        
-        <div class="row" style="font-weight:bold;padding-left:10px"><%= list.title %>  
 
-
+          <div class="row" style="font-weight:bold;padding-left:10px">
+            <div style="width:70%;text-overflow:ellipsis;
+            white-space: nowrap;
+            overflow: hidden; ">
+            
+            <%= list.title %>  
+          </div>
 
             
           <span class="col">
@@ -137,13 +143,13 @@
            
           <form action="/restoreList" method="POST">
             <input type="number" name="listId" value=<%= list.listid %> hidden>
-            <button title="Restore list" class="btn rounded-10 zoom" style="position:absolute;right:40px;border-color:#17d475;background-color:#e8fcec;padding: 0;line-height: 1;width:20px"><img src="/img/restore.png" style="width:15px" onmouseover="hover(this, 'restorePink')" onmouseout="unhover(this, 'restore')"></button>
+            <button title="Recover list" class="btn rounded-10 zoom" style="position:absolute;right:40px;border-color:#17d475;background-color:#e8fcec;padding: 0;line-height: 1;width:20px"><img src="/img/restore.png" style="width:15px" onmouseover="hover(this, 'restorePink')" onmouseout="unhover(this, 'restore')"></button>
           </form>
 
 
 
           <button data-id="<%= list.listid %>" data-bs-toggle="modal" data-bs-target="#confirmPermanentDelete" href="#confirmPermanentDelete" data-toggle="modal"
-          class="btn" title="Permanently delete" class="btn rounded-10 zoom" style="position:absolute;right:10px;border-color:#fb6f92;background-color:#ffe5ec;padding: 0;line-height: .25;width:20px"><img src="/img/trash.png" style="width:15px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')"></button>
+           title="Permanently delete" class="btn rounded-10 zoom" style="position:absolute;right:10px;border-color:#fb6f92;background-color:#ffe5ec;padding: 0;line-height: .25;width:20px"><img src="/img/trash.png" style="width:15px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')"></button>
           
         </span>
 
@@ -157,6 +163,13 @@
         <br>
         <%- list.list %>
 
+
+        <div data-bs-toggle="tooltip" data-bs-custom-class="timeTooltip" class="createTime" id="createTime<%= list.listid%>" data-value="<%= list.createdatetime %>" style="text-align:center;padding-top:5px;font-size:12px;font-weight: bold;">
+                    
+          <button class="editTime btn" id="editTime<%= list.listid%>" data-value="<%= list.editdatetime %>" style="text-align:center;padding-top:5px;font-size:12px;font-weight: bold;"></button>
+
+        
+        </div>
       </div>
 
 
@@ -174,14 +187,22 @@
 
 <!-- TEST -->
 
- <% } else { %>
+<% if(search && lists.length == 0){ %>
+  <div class="text-center" style="padding-top:100px">
+
+    <h6>no search results</h6>
+    <img style="width:100px" src="/img/noResults.png">
+
+  </div>
+<% } else if(lists.length == 0) { %>
   <div class="text-center" style="padding-top:100px">
 
     <h6>no lists in trash</h6>
     <img style="width:100px" src="/img/cat.png">
 
   </div>
-<% } %>
+
+  <% } %>
 <!-- </div> -->
 
 <!-- <div class="modal fade" id="listColors" tabindex="-1" aria-labelledby="listColors" aria-hidden="true">
@@ -302,7 +323,8 @@
 
 
     <div class="modal-content  mx-auto text-center" style="max-width:300px;padding:10px">
-        Permanently delete selection?
+
+        <div id="permanentlyDeleteSelectedMessage"></div>
 
         <div class="mx-auto" style="padding-top:10px">
         <button class="btn rounded-10" data-bs-dismiss="modal"  style="width:90px;background:#e8fcec;color:#17d475;border-color: #17d475;">Cancel</button>
@@ -443,6 +465,10 @@ document.getElementById('confirmPermanentlyDeleteSelected').addEventListener('sh
     document.getElementById('modalListIds').value = e.relatedTarget.dataset.id;
     // console.log(document.getElementById('modalListId').value);
 
+
+    var numLists = e.relatedTarget.dataset.id.split(",").length;
+    document.getElementById('permanentlyDeleteSelectedMessage').innerHTML = (numLists == 1) ? 'Permanently delete 1 selected list?' : 'Permanently delete ' + numLists + ' selected lists?';
+
 });
 
 
@@ -568,6 +594,9 @@ document.getElementById('unselectAll').style.display = 'block';
     document.getElementById('delSelectedLists').style.display = 'none';
 
     document.getElementById('unselectAll').style.display = 'none';
+
+    document.getElementById('restoreSelectedLists').style.display = 'none';
+
     
 
 
@@ -651,6 +680,261 @@ console.log(document.getElementById('delSelectedLists').value);
   
 // }
 })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function setEditTimes() {
+  const elements = document.getElementsByClassName('editTime');
+  // var elements = document.querySelectorAll('[var="editTime"]');
+
+
+  for(var i = 0; i < elements.length; i++) {
+    
+    // console.log(elements[i].id);
+    // console.log(elements[i].dataset.value);
+   
+    setTimeEdited(elements[i].dataset.value, elements[i].id);
+
+  }
+}
+
+
+function setCreateTimes() {
+  const elements = document.getElementsByClassName('createTime');
+  // var elements = document.querySelectorAll('[var="editTime"]');
+
+
+
+
+
+  for(var i = 0; i < elements.length; i++) {
+    
+    // console.log(elements[i].id);
+    // console.log(elements[i].dataset.value);
+   
+    setTimeCreated(elements[i].dataset.value, elements[i].id);
+
+  }
+}
+
+
+function setTimeEdited(editDateTime, divId) {
+  var now = new Date();
+  var nowYear = parseInt(now.getFullYear());
+  var nowMonth = parseInt(now.getMonth()+1);
+  var nowDate = parseInt(now.getDate());
+
+
+
+  var thenYear = parseInt(editDateTime.substring(6,10));
+  var thenMonth = parseInt(editDateTime.substring(0,2));
+  var thenDate = parseInt(editDateTime.substring(3,5));
+  var thenHour = parseInt(editDateTime.substring(11,13));
+  var thenMin = parseInt(editDateTime.substring(14));
+
+
+  var ampm = 'AM';
+
+  if(thenHour >= 12) {
+    ampm = 'PM';
+
+    if(thenHour > 12) {
+        thenHour -= 12;
+
+    }
+  }
+
+  if(thenHour == 0) {
+    thenHour = 12;
+  }
+
+  var thenMinutesFormatted = (thenMin < 10) ? '0' + thenMin : thenMin;
+      
+  var thenTime = thenHour + ':' + thenMinutesFormatted + ' ' + ampm;
+
+
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const thenMonthAbbr = months[thenMonth-1];
+
+  var thenDateFormatted = (thenDate < 10) ? '0' + thenDate : thenDate;
+  
+
+  if(nowYear > thenYear) {
+    var message = 'Edited ' + thenMonthAbbr + ' ' + thenDateFormatted + ' ' + thenYear;
+    document.getElementById(divId).innerHTML = message;
+  }
+  else if(nowYear == thenYear && nowMonth == thenMonth && nowDate == thenDate) {
+      var message = 'Edited ' + thenTime;
+      document.getElementById(divId).innerHTML = message;
+  }
+  else if(nowYear == thenYear && nowMonth == thenMonth && nowDate == (thenDate+1)) {
+      var message = 'Edited yesterday, ' + thenTime;
+      document.getElementById(divId).innerHTML = message;
+  }
+  else if(nowYear == thenYear && nowMonth >= thenMonth && nowDate > (thenDate+1)) {
+      var message = 'Edited ' + thenMonthAbbr + ' ' + thenDateFormatted;
+      document.getElementById(divId).innerHTML = message;
+  }
+  else {
+      var message = 'Edited: error';
+      document.getElementById(divId).innerHTML = message;
+  }
+}
+
+
+function setTimeCreated(createDateTime, divId) {
+  var now = new Date();
+  var nowYear = parseInt(now.getFullYear());
+  var nowMonth = parseInt(now.getMonth()+1);
+  var nowDate = parseInt(now.getDate());
+
+
+
+  var thenYear = parseInt(createDateTime.substring(6,10));
+  var thenMonth = parseInt(createDateTime.substring(0,2));
+  var thenDate = parseInt(createDateTime.substring(3,5));
+  var thenHour = parseInt(createDateTime.substring(11,13));
+  var thenMin = parseInt(createDateTime.substring(14));
+
+
+  var ampm = 'AM';
+
+  if(thenHour >= 12) {
+    ampm = 'PM';
+
+    if(thenHour > 12) {
+        thenHour -= 12;
+
+    }
+  }
+
+  if(thenHour == 0) {
+    thenHour = 12;
+  }
+
+  var thenMinutesFormatted = (thenMin < 10) ? '0' + thenMin : thenMin;
+      
+  var thenTime = thenHour + ':' + thenMinutesFormatted + ' ' + ampm;
+
+
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const thenMonthAbbr = months[thenMonth-1];
+
+  var thenDateFormatted = (thenDate < 10) ? '0' + thenDate : thenDate;
+
+  if(nowYear > thenYear) {
+    var message = 'Created ' + thenMonthAbbr + ' ' + thenDateFormatted + ' ' + thenYear;
+    // document.getElementById(divId).setAttribute('data-bs-title', message);
+  }
+  else if(nowYear == thenYear && nowMonth == thenMonth && nowDate == thenDate) {
+      var message = 'Created ' + thenTime;
+      // document.getElementById(divId).innerHTML = message;
+  }
+  else if(nowYear == thenYear && nowMonth == thenMonth && nowDate == (thenDate+1)) {
+      var message = 'Created yesterday, ' + thenTime;
+      // document.getElementById(divId).innerHTML = message;
+  }
+  else if(nowYear == thenYear && nowMonth >= thenMonth && nowDate > (thenDate+1)) {
+      var message = 'Created ' + thenMonthAbbr + ' ' + thenDateFormatted;
+      // document.getElementById(divId).innerHTML = message;
+  }
+  else {
+      var message = 'Created: error';
+      // document.getElementById(divId).innerHTML = message;
+  }
+
+  document.getElementById(divId).setAttribute('data-bs-title', message);
+}
+
+
+
+setEditTimes();
+setCreateTimes();
+// setInputTimes();
+
+setInterval(setEditTimes, 3000);
+setInterval(setCreateTimes, 3000);
+// setInterval(setInputTimes, 3000);
+
+
+
+
+
+
+// function setInputTimes() {
+//   const elements = document.getElementsByClassName('timeInput');
+//   // var elements = document.querySelectorAll('[var="editTime"]');
+
+
+//   for(var i = 0; i < elements.length; i++) {
+    
+//     // console.log(elements[i].id);
+//     // console.log(elements[i].dataset.value);
+   
+//     // setTimeEdited(elements[i].dataset.value, elements[i].id);
+
+//     elements[i].value = getNowFormatted();
+//     // console.log(elements[i].value);
+
+
+//   }
+// }
+
+
+
+function getNowFormatted() {
+    var now = new Date();
+
+    // console.log(now);
+
+    var nowYear = now.getFullYear();
+    var nowMonth = parseInt(now.getMonth()+1);
+    var nowDate = now.getDate();
+    var nowHours = now.getHours();
+    var nowMinutes = now.getMinutes();
+
+    var monthFormatted = (nowMonth < 10) ? '0' + nowMonth : nowMonth;
+    var dateFormatted = (nowDate < 10) ? '0' + nowDate : nowDate;
+    var hoursFormatted = (nowHours < 10) ? '0' + nowHours : nowHours;
+    var minutesFormatted = (nowMinutes < 10) ? '0' + nowMinutes : nowMinutes;
+
+    var nowFormatted = monthFormatted + '-' + dateFormatted + '-' + nowYear + ',' + hoursFormatted + ':' + minutesFormatted;
+    
+    console.log(nowFormatted);
+
+    return nowFormatted;
+}
+
+
+document.addEventListener("DOMContentLoaded", function(){
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function(element){
+                return new bootstrap.Tooltip(element);
+            });
+        });
 </script>
 <!-- <script>tinymce.init({
   selector: 'textarea',  // change this value according to your HTML

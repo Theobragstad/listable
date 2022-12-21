@@ -8,7 +8,9 @@ CREATE TABLE lists (
     list TEXT NOT NULL,
     color VARCHAR(6) NOT NULL,
     trash BOOLEAN NOT NULL,
-    archive BOOLEAN NOT NULL
+    archive BOOLEAN NOT NULL, 
+    editDateTime VARCHAR(16) NOT NULL,
+    createDateTime VARCHAR(16) NOT NULL
 );
 
 CREATE TABLE listsToUsers (

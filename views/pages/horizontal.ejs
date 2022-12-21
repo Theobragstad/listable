@@ -4,6 +4,13 @@
 
 <main>
 
+    <p id="1" style="font-size:12px"></p>
+    <p id="2" style="font-size:12px"></p>
+    <p id="3" style="font-size:12px"></p>
+    <p id="4" style="font-size:12px"></p>
+    <p id="5" style="font-size:12px"></p>
+
+
     <!-- <div class="container-fluid py-2" style="overflow:auto;">
         <div class="d-flex flex-row flex-nowrap" >
             <div class="card card-body m-2" style="min-width: 300px;">Card</div>
@@ -33,9 +40,7 @@
     </div> -->
 
 
-    <%= color%>
     <br>
-    <%= id %>
 <!-- Button trigger modal -->
 <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#listColors">
     <img src="/img/palette.png" style="width:20px">
@@ -85,6 +90,91 @@
 
         document.getElementById(id).src='/img/colors/'+id+'.png';
     }
+
+
+
+function getNowFormatted() {
+    var now = new Date();
+    // var now = new Date(2003, 6, 3, 9, 1);
+
+    var nowYear = now.getFullYear();
+    var nowMonth = parseInt(now.getMonth()+1);
+    var nowDate = now.getDate();
+    var nowHours = now.getHours();
+    var nowMinutes = now.getMinutes();
+
+    var monthFormatted = (nowMonth < 10) ? '0' + nowMonth : nowMonth;
+    var dateFormatted = (nowDate < 10) ? '0' + nowDate : nowDate;
+    var hoursFormatted = (nowHours < 10) ? '0' + nowHours : nowHours;
+    var minutesFormatted = (nowMinutes < 10) ? '0' + nowMinutes : nowMinutes;
+
+    var nowFormatted = monthFormatted + '-' + dateFormatted + '-' + nowYear + ',' + hoursFormatted + ':' + minutesFormatted;
+    return nowFormatted;
+}
+
+// 24 hr conversion
+
+function setTimeEdited(editDateTime, divId) {
+
+    var now = new Date();
+
+    var nowYear = parseInt(now.getFullYear());
+    var nowMonth = parseInt(now.getMonth()+1);
+    var nowDate = parseInt(now.getDate());
+
+    var thenYear = parseInt(editDateTime.substring(6,10));
+    var thenMonth = parseInt(editDateTime.substring(0,2));
+    var thenDate = parseInt(editDateTime.substring(3,5));
+    var thenHour = parseInt(editDateTime.substring(11,13));
+    var thenMin = parseInt(editDateTime.substring(14));
+
+    var thenTime = thenHour + ':' + thenMin + ' AM';
+    if(thenHour >= 12) {
+        if(thenHour > 12) {
+            thenHour -= 12;
+        }
+        thenTime = thenHour + ':' + thenMin + ' PM';
+    }
+    
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const thenMonthAbbr = months[thenMonth-1];
+    
+    if(nowYear > thenYear) {
+       var message = 'Edited ' + thenMonthAbbr + ' ' + thenDate + ' ' + thenYear;
+       document.getElementById(divId).innerHTML = message;
+    }
+    else if(nowYear == thenYear && nowMonth == thenMonth && nowDate == thenDate) {
+        var message = 'Edited ' + thenTime;
+        document.getElementById(divId).innerHTML = message;
+    }
+    else if(nowYear == thenYear && nowMonth == thenMonth && nowDate == (thenDate+1)) {
+        var message = 'Edited yesterday, ' + thenTime;
+        document.getElementById(divId).innerHTML = message;
+    }
+    else if(nowYear == thenYear) {
+        var message = 'Edited ' + thenMonthAbbr + ' ' + thenDate;
+        document.getElementById(divId).innerHTML = message;
+    }
+    else {
+        var message = 'Edited: error';
+        document.getElementById(divId).innerHTML = message;
+    }
+}
+
+
+
+
+
+setTimeEdited('12-20-2021,10:11', '1');
+setTimeEdited('11-04-2022,10:11', '2');
+setTimeEdited('12-19-2022,13:11', '3');
+setTimeEdited('12-20-2022,13:55', '4');
+setTimeEdited('12-20-2023,13:55', '5');
+
+console.log(getNowFormatted());
+
+    
+
 </script>
 
    

@@ -62,7 +62,14 @@ app.use(passport.session());
   
 app.get('/', (req, res) => {
 
-    res.render("pages/home");
+    if(req.session.user) {
+        return res.redirect('/lists');  
+    }
+    return res.render("pages/home");
+});
+
+app.get('/home', (req, res) => {
+    return res.redirect('/');
 });
   
 // Auth 
@@ -128,11 +135,11 @@ app.get('/lists', function(req, res) {
     db.any(`SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') AND trash = FALSE AND archive = FALSE ORDER BY listId DESC;`)
     .then((lists) => {
         const successMessages = ['added new list', 'updated list', 'changed list color', 'deleted list',
-                                'deleted selected lists', 'restored list', 'restored selected lists', 'restored all lists',
+                                'deleted selected lists', 'recovered list', 'recovered selected lists', 'recovered all lists',
                                  'copied list', 'archived list', 'unarchived list', 'created unarchived copy'];
         
         const errorMessages = ['error adding new list', 'error updating list', 'error changing list color', 'error deleting list', 'error deleting selected lists',
-                            'error restoring list', 'error restoring selected lists', 'error restoring all lists', 'error copying list', 'error archiving list', 'error unarchiving list',
+                            'error recovering list', 'error recovering selected lists', 'error recovering all lists', 'error copying list', 'error archiving list', 'error unarchiving list',
                                     'error copying archived list'];
         var error = 0;
         var message = '';
@@ -169,6 +176,11 @@ app.get('/lists', function(req, res) {
         else if(req.query.deleteSelected) {
             message = (req.query.deleteSelected == 'success') ? successMessages[4] : errorMessages[4];
             error = (req.query.deleteSelected == 'success') ? 0 : 1;
+
+            if(req.query.count) {
+                message = (req.query.count == '1') ? 'deleted ' + req.query.count + ' selected list' : 'deleted ' + req.query.count + ' selected lists';
+            }
+            
             // var message = (req.query.deleteSelected == 'success') ? 'deleted selected lists' : 'error deleting selected lists';
             // var error = (req.query.deleteSelected == 'success') ? false : true;
         }
@@ -182,6 +194,10 @@ app.get('/lists', function(req, res) {
         else if(req.query.restoreSelected) {
             message = (req.query.restoreSelected == 'success') ? successMessages[6] : errorMessages[6];
             error = (req.query.restoreSelected == 'success') ? 0 : 1;
+
+            if(req.query.count) {
+                message = (req.query.count == '1') ? 'recovered ' + req.query.count + ' selected list' : 'recovered ' + req.query.count + ' selected lists';
+            }
             // var message = (req.query.restoreSelected == 'success') ? 'restored selected lists' : 'error restoring selected lists';
             // var error = (req.query.restoreSelected == 'success') ? false : true;
         }
@@ -273,9 +289,25 @@ app.get('/logout', function (req, res, next) {
 
 app.post('/search', function(req, res) {
     var q = req.body.q;
-    db.any(`SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') AND trash = FALSE AND (title LIKE '%${q}%' OR LOWER(title) LIKE '%${q}%' OR list LIKE '%${q}%' OR LOWER(list) LIKE '%${q}%');`)
+
+
+    var searchQuery = `SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') AND trash = FALSE AND (title LIKE '%${q}%' OR LOWER(title) LIKE '%${q}%' OR list LIKE '%${q}%' OR LOWER(list) LIKE '%${q}%');`;
+    var renderPage = 'lists';
+
+    if(req.query.archive && req.query.archive == 'true') {
+        searchQuery = `SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') AND trash = FALSE AND archive = TRUE AND (title LIKE '%${q}%' OR LOWER(title) LIKE '%${q}%' OR list LIKE '%${q}%' OR LOWER(list) LIKE '%${q}%');`;
+        renderPage = 'archive';
+    }
+    else if(req.query.trash && req.query.trash == 'true') {
+        searchQuery = `SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') AND trash = TRUE AND archive = FALSE AND (title LIKE '%${q}%' OR LOWER(title) LIKE '%${q}%' OR list LIKE '%${q}%' OR LOWER(list) LIKE '%${q}%');`;
+        renderPage = 'trash';
+    }
+
+           
+
+    db.any(searchQuery)
         .then((lists) => {
-            return res.render('pages/lists', {search: true, lists, givenName: req.session.user.givenName, message: `results for '` + q + `'`});
+            return res.render('pages/' + renderPage, {search: true, lists, givenName: req.session.user.givenName, message: `results for '` + q + `'`});
 
         })
         .catch((error) => {
@@ -331,10 +363,17 @@ app.post('/emptyTrash', function(req, res) {
 });
 
 
+
+
+
 app.post('/addList', function(req, res) {
     var title = (!req.body.title) ? '' : req.body.title;
 
-    db.any(`INSERT INTO lists (title, list, color, trash, archive) VALUES ('${title.replace(/'/g, "''")}', '${req.body.list.replace(/'/g, "''")}', 'ffffff', FALSE, FALSE) RETURNING listId;`)
+    // var nowFormatted = getNowFormatted();
+
+
+
+    db.any(`INSERT INTO lists (title, list, color, trash, archive, editDateTime, createDateTime) VALUES ('${title.replace(/'/g, "''")}', '${req.body.list.replace(/'/g, "''")}', 'ffffff', FALSE, FALSE, '${req.body.now}', '${req.body.now}') RETURNING listId;`)
         .then((listId) => {
             db.any(`INSERT INTO listsToUsers (listId, userId) VALUES (${listId[0].listid}, '${req.session.user.id}');`)
                 .then(() => {
@@ -415,12 +454,13 @@ app.post('/deleteSelectedLists', function(req, res) {
     var result = array.map(function (x) { 
         return parseInt(x, 10); 
       });
-      
-    // console.log(result);
+
+
 
     db.any(`UPDATE lists SET trash = TRUE WHERE listId IN(${result});`)
         .then(() => {
-            return res.redirect('/lists?deleteSelected=success');
+            var count = encodeURIComponent(result.length);
+            return res.redirect('/lists?deleteSelected=success&count=' + count);
         })
         .catch((error) => {
             console.log(error);
@@ -441,7 +481,8 @@ app.post('/permanentlyDeleteSelected', function(req, res) {
 
     db.any(`DELETE FROM listsToUsers WHERE listId IN(${result}); DELETE FROM lists WHERE listId IN(${result});`)
         .then(() => {
-            return res.redirect('/trash?permanentlyDeleteSelected=success');
+            var count = encodeURIComponent(result.length);
+            return res.redirect('/trash?permanentlyDeleteSelected=success&count=' + count);
 
         })
         .catch((error) => {
@@ -452,8 +493,10 @@ app.post('/permanentlyDeleteSelected', function(req, res) {
 
 app.post('/updateList', function(req, res) {
     // var title = (!req.body.title) ? 'edited list' : req.body.title;
+    // var nowFormatted = getNowFormatted();
 
-    db.any(`UPDATE lists SET title = '${req.body.title.replace(/'/g, "''")}', list = '${req.body.list.replace(/'/g, "''")}' WHERE listId = ${req.body.listId};`)
+
+    db.any(`UPDATE lists SET title = '${req.body.title.replace(/'/g, "''")}', list = '${req.body.list.replace(/'/g, "''")}', editDateTime = '${req.body.now}' WHERE listId = ${req.body.listId};`)
         .then(() => {
             if(req.query.archived && req.query.archived == 'true') {
                 return res.redirect('/archive?update=success');
@@ -475,9 +518,9 @@ app.get('/trash', function(req, res) {
     db.any(`SELECT * FROM lists WHERE trash = TRUE AND listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}');`)
         .then((lists) => {
             const successMessages = ['permanently deleted list',
-                                'emptied trash', 'permanently deleted selected lists'];
+                                'emptied trash', 'permanently deleted selection'];
         
-        const errorMessages = ['error permanently deleting list', 'error emptying trash', 'error permanently deleting selected lists'];
+        const errorMessages = ['error permanently deleting list', 'error emptying trash', 'error permanently deleting selection'];
         var error = 0;
         var message = '';
 
@@ -496,13 +539,17 @@ app.get('/trash', function(req, res) {
             else if(req.query.permanentlyDeleteSelected) {
                 message = (req.query.permanentlyDeleteSelected == 'success') ? successMessages[2] : errorMessages[2];
                 error = (req.query.permanentlyDeleteSelected == 'success') ? 0 : 1;
+
+                if(req.query.count) {
+                    message = (req.query.count == '1') ? 'permanently deleted ' + req.query.count + ' list' : 'permanently deleted ' + req.query.count + ' lists';
+                }
             }
 
-            return res.render('pages/trash', {lists, error, message, givenName: req.session.user.givenName});
+            return res.render('pages/trash', {lists, error, message, search: false, givenName: req.session.user.givenName});
         })
         .catch((error) => {
             console.log(error);
-            return res.render('pages/trash', {lists: [], error: true, message: 'error loading trash', givenName: req.session.user.givenName});
+            return res.render('pages/trash', {lists: [], error: true, message: 'error loading trash', search: false, givenName: req.session.user.givenName});
         });
     
     
@@ -537,9 +584,10 @@ app.post('/restoreAll', function(req, res) {
 
 
 app.post('/copy', function(req, res) {
+    // var nowFormatted = getNowFormatted();
 
 
-    db.any(`INSERT INTO lists (title, list, color, trash, archive) VALUES ('${req.body.title.replace(/'/g, "''")}', '${req.body.list.replace(/'/g, "''")}', '${req.body.color}', FALSE, FALSE) RETURNING listId;`)
+    db.any(`INSERT INTO lists (title, list, color, trash, archive, editDateTime, createDateTime) VALUES ('${req.body.title.replace(/'/g, "''")}', '${req.body.list.replace(/'/g, "''")}', '${req.body.color}', FALSE, FALSE, '${req.body.now}', '${req.body.now}') RETURNING listId;`)
     .then((listId) => {
         db.any(`INSERT INTO listsToUsers (listId, userId) VALUES (${listId[0].listid}, '${req.session.user.id}');`)
             .then(() => {
@@ -569,7 +617,8 @@ app.post('/restoreSelectedLists', function(req, res) {
 
     db.any(`UPDATE lists SET trash = FALSE WHERE listId IN(${result});`)
         .then(() => {
-            return res.redirect('/lists?restoreSelected=success');
+            var count = encodeURIComponent(result.length);
+            return res.redirect('/lists?restoreSelected=success&count=' + count);
         })
         .catch((error) => {
             console.log(error);
@@ -621,11 +670,11 @@ app.get('/archive', (req , res) => {
             // var error = (req.query.permanentlyDeleted == 'success') ? false : true;
             }
 
-            return res.render('pages/archive', {lists, error, message, givenName: req.session.user.givenName});
+            return res.render('pages/archive', {lists, error, message, search: false, givenName: req.session.user.givenName});
         })
         .catch((error) => {
             console.log(error);
-            return res.render('pages/archive', {lists: [], error: true, message: 'error loading archive', givenName: req.session.user.givenName});
+            return res.render('pages/archive', {lists: [], error: true, message: 'error loading archive', search: false, givenName: req.session.user.givenName});
         });
 });
 
@@ -645,6 +694,29 @@ app.post('/archiveList', function(req, res) {
 });
 
 
+// function getNowFormatted(date) {
+//     // var now = new Date();
+//     var now = date;
+
+//     console.log(now);
+
+//     var nowYear = now.getFullYear();
+//     var nowMonth = parseInt(now.getMonth()+1);
+//     var nowDate = now.getDate();
+//     var nowHours = now.getHours();
+//     var nowMinutes = now.getMinutes();
+
+//     var monthFormatted = (nowMonth < 10) ? '0' + nowMonth : nowMonth;
+//     var dateFormatted = (nowDate < 10) ? '0' + nowDate : nowDate;
+//     var hoursFormatted = (nowHours < 10) ? '0' + nowHours : nowHours;
+//     var minutesFormatted = (nowMinutes < 10) ? '0' + nowMinutes : nowMinutes;
+
+//     var nowFormatted = monthFormatted + '-' + dateFormatted + '-' + nowYear + ',' + hoursFormatted + ':' + minutesFormatted;
+    
+//     console.log(nowFormatted);
+
+//     return nowFormatted;
+// }
 
 
 app.use((req, res, next) => {
