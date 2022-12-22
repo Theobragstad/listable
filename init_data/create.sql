@@ -18,5 +18,6 @@ CREATE TABLE lists (
 
 CREATE TABLE listsToUsers (
     listId INT NOT NULL REFERENCES lists(listId),
-    userId VARCHAR(50) NOT NULL REFERENCES users(UserId)
+    userId VARCHAR(50) NOT NULL REFERENCES users(UserId),
+    owner BOOLEAN NOT NULL
 );

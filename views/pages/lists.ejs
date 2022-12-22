@@ -218,8 +218,8 @@
           <% collaborators.forEach(function(collaborator){ %>
             <% if(collaborator.listid == list.listid && email !== collaborator.email){ %>
               <button data-bs-toggle="tooltip"   data-bs-placement="top"
-              data-bs-custom-class="collaborator-tooltip"
-              data-bs-title="<%= collaborator.email %>" class="btn zoom"><img src="<%= collaborator.profilephotourl %>" style="width:20px;border-radius: 50%;"></button>
+              data-bs-custom-class="small-tooltip"
+              data-bs-title="<%= collaborator.email %>" class="btn zoom"><img src="<%= collaborator.profilephotourl %>" style="width:20px;border-radius: 50%;" ></button>
               
               <% } %>
         <% }); %>

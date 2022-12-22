@@ -97,11 +97,11 @@ app.get('/auth/callback/success' , (req , res) => {
     else {
         // console.log(req.user.name.givenName);
         // console.log(req.user.name.familyName);
-        var name = req.user.name.givenName + ' ' + req.user.name.familyName;
+        // var name = req.user.name.givenName + ' ' + req.user.name.familyName;
         // console.log(fullname);
     
     
-        db.any(`INSERT INTO users (userId, email, fullname, profilePhotoUrl) SELECT '${req.user.id}', '${req.user.email}', '${name}', '${req.user.photos[0].value}' WHERE NOT EXISTS (SELECT 1 FROM users WHERE userId = '${req.user.id}');`)
+        db.any(`INSERT INTO users (userId, email, fullname, profilePhotoUrl) SELECT '${req.user.id}', '${req.user.email}', '${req.user.displayName}', '${req.user.photos[0].value}' WHERE NOT EXISTS (SELECT 1 FROM users WHERE userId = '${req.user.id}');`)
             .then(() => {
                 // console.log(req.user.email);
 
@@ -311,6 +311,21 @@ app.get('/emailsAndListIds', (req , res) => {
 });
 
 
+app.get('/getListOwner', (req , res) => {
+    var listId = 1;
+
+    db.any(`SELECT * FROM listsToUsers WHERE listId = '${listId}' LIMIT 1;`)
+        .then((rows) => {
+            return res.send(rows);
+        })
+        .catch((error) => {
+            console.log(error);
+            return res.send(error);
+        });
+});
+
+
+
 
 
 
@@ -386,12 +401,26 @@ app.post('/search', function(req, res) {
 
     db.any(searchQuery)
         .then((lists) => {
-            return res.render('pages/' + renderPage, {search: true, lists, givenName: req.session.user.givenName, message: `results for '` + q + `'`});
+            db.any(`SELECT users.email, users.profilePhotoUrl, listsToUsers.listId FROM listsToUsers INNER JOIN users ON listsToUsers.userId = users.userId;`)
+                .then((rows) => {
+                    return res.render('pages/' + renderPage, {search: true, lists, collaborators: rows, email: req.session.user.email, profilePhoto: req.session.user.profilePhoto, givenName: req.session.user.givenName, message: `results for '` + q + `'`});
+
+    
+                })
+                .catch((error) => {
+                    console.log(error);
+                    return res.render('pages/' + renderPage, {search: true, lists, collaborators: [], email: req.session.user.email, profilePhoto: req.session.user.profilePhoto, givenName: req.session.user.givenName, message: `results for '` + q + `'`});
+
+    
+                });
+
+
+            // return res.render('pages/' + renderPage, {search: true, lists, email: req.session.user.email, profilePhoto: req.session.user.profilePhoto, givenName: req.session.user.givenName, message: `results for '` + q + `'`});
 
         })
         .catch((error) => {
             console.log(error);
-            return res.render('pages/lists', {search: true, error: true, lists: [], givenName: req.session.user.givenName, message: 'search error'});
+            return res.render('pages/lists', {search: true, error: true, lists: [], email: req.session.user.email, profilePhoto: req.session.user.profilePhoto, givenName: req.session.user.givenName, message: 'search error'});
         });
 });
 

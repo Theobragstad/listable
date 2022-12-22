@@ -21,7 +21,8 @@
 <a href="/trash">
 <button title="Open trash" class="btn rounded-10 zoom" style="position:absolute;right:200px;top:17px;border-color:#fb6f92;background-color:#ffe5ec;padding: 0;line-height: 1.25;width:30px"><img src="/img/trash.png" style="width:20px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')"></button>
 </a>
-<button class="btn rounded-10 pull-right name" style="border-color:#f289ca;background-color:#ffe6ee;position:absolute; top:10px; right:50px;font-size:12px" disabled>
+<button class="btn rounded-10 pull-right name " data-bs-toggle="tooltip"   data-bs-placement="bottom"
+data-bs-custom-class="small-tooltip" data-bs-title="<%= email %>" style="border-color:#f289ca;background-color:#ffe6ee;position:absolute; top:10px; right:50px;font-size:12px" >
   <img src="<%= profilePhoto %>" style="width:20px;border-radius: 50%;">
   
   <%= givenName %></button> 
@@ -31,4 +32,6 @@
 <%- include ('../partials/message') %>
 
 </div>
+
+
 
