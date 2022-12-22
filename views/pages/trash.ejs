@@ -17,7 +17,7 @@
         <h4 class="site-title" >trash</h4>
         <div style="padding-top:5px;padding-bottom:5px">
           <form action="/search?trash=true" method="POST">
-          <input type="text" id="q" name="q" class="search-hover zoom" placeholder="search trash by title or content">
+          <input type="text" id="q" name="q" class="search-hover zoom" placeholder="search trash">
         </form>
 
       </div>
@@ -140,8 +140,11 @@
           <span class="col">
 
 
-           
-          <form action="/restoreList" method="POST">
+            <% if(list.archive) {  %>
+              <form action="/restoreList?archived=true" method="POST">
+                <% } else { %>
+              <form action="/restoreList" method="POST">
+                <% } %>
             <input type="number" name="listId" value=<%= list.listid %> hidden>
             <button title="Recover list" class="btn rounded-10 zoom" style="position:absolute;right:40px;border-color:#17d475;background-color:#e8fcec;padding: 0;line-height: 1;width:20px"><img src="/img/restore.png" style="width:15px" onmouseover="hover(this, 'restorePink')" onmouseout="unhover(this, 'restore')"></button>
           </form>
@@ -580,7 +583,7 @@ document.getElementById('restoreSelectedLists').style.display = 'block';
 document.getElementById('restoreSelectedLists').value = selectedListIds;
 
 
-console.log(document.getElementById('delSelectedLists').value);
+// console.log(document.getElementById('delSelectedLists').value);
 
 document.getElementById('unselectAll').style.display = 'block';
 
@@ -632,7 +635,7 @@ var selectedListIds = [];
 
 
 if(e.metaKey && e.keyCode == 65) {
-  console.log('cmd a')
+  // console.log('cmd a')
 
   const elements = document.getElementsByClassName('listSelector');
 

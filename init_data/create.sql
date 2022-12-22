@@ -1,5 +1,8 @@
 CREATE TABLE users (
-    userId VARCHAR(50) PRIMARY KEY
+    userId VARCHAR(50) PRIMARY KEY,
+    email TEXT NOT NULL,
+    fullname TEXT NOT NULL
+
 );
 
 CREATE TABLE lists (
@@ -9,8 +12,8 @@ CREATE TABLE lists (
     color VARCHAR(6) NOT NULL,
     trash BOOLEAN NOT NULL,
     archive BOOLEAN NOT NULL, 
-    editDateTime VARCHAR(16) NOT NULL,
-    createDateTime VARCHAR(16) NOT NULL
+    editDateTime VARCHAR(19) NOT NULL,
+    createDateTime VARCHAR(19) NOT NULL
 );
 
 CREATE TABLE listsToUsers (

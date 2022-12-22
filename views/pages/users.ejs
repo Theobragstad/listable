@@ -5,6 +5,8 @@
     <% if(rows) { %>
         <% rows.forEach(function(user){ %>
             <h6><%= user.userid %></h6>
+            <h6><%= user.email %></h6>
+            <h6><%= user.fullname %></h6>
         <% }); %>
     <% } else { %>
         <h6>no users</h6>

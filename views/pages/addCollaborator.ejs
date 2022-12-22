@@ -4,11 +4,88 @@
 
 <main>
 
-    <p id="1" style="font-size:12px"></p>
+    <div data-bs-backdrop="static" data-bs-keyboard="false" class="modal fade" id="myModal" tabindex="-1" aria-labelledby="myModalLabel" aria-modal="true" role="dialog" style="display: block;">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="myModalLabel">Collaborator Search Results</h5>
+            </div>
+            <div class="modal-body">
+
+
+                <% if(users.length == 0) { %>
+                    No users found, or that person is already a collaborator.
+                <% } else { %>
+                    <div style="color:#fb6f92;font-weight: bold;font-size:12px;padding-bottom:10px" >Select a person to collaborate on this list with:</div>
+                <% } %>
+
+                <% users.forEach(function(user) { %>
+                    <div style="padding-bottom:5px">
+                        <form action="/addCollaborator" method="POST">
+                            <input class="form-control" name="collaboratorUserId" type="text" value="<%= user.userid %>" hidden>
+                            <input class="form-control" name="listId" type="text" value="<%= listid %>" hidden>
+                    <button class="btn rounded-pill" style="background-color:#03a9f4;color:white;font-weight: bold;font-size:12px">
+                    <%= user.fullname %> < <%= user.email %> >
+                </button>
+            </form>
+
+            </div>
+        
+
+      
+
+
+
+
+           
+          
+          
+        
+        
+        
+        
+                <% }) %>
+        
+                
+                
+
+
+
+            </div>
+            <!-- <div class="modal-footer"> -->
+              
+              <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+            <!-- </div> -->
+          </div>
+        </div>
+      </div>
+      
+
+    <!-- <button class="btn rounded-pill">Add collaborator</button>
+    <div style="padding-top:5px;padding-bottom:5px">
+        <form action="/searchUsers" method="POST">
+        <input type="text" id="q" name="q" class="" placeholder="search users">
+      </form>
+
+
+     
+ -->
+
+
+
+
+
+
+
+
+
+
+
+    <!-- <p id="1" style="font-size:12px"></p>
     <p id="2" style="font-size:12px"></p>
     <p id="3" style="font-size:12px"></p>
     <p id="4" style="font-size:12px"></p>
-    <p id="5" style="font-size:12px"></p>
+    <p id="5" style="font-size:12px"></p> -->
 
 
     <!-- <div class="container-fluid py-2" style="overflow:auto;">
@@ -42,12 +119,12 @@
 
     <br>
 <!-- Button trigger modal -->
-<button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#listColors">
+<!-- <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#listColors">
     <img src="/img/palette.png" style="width:20px">
-  </button>
+  </button> -->
   
   <!-- Modal -->
-  <div class="modal fade" id="listColors" tabindex="-1" aria-labelledby="listColors" aria-hidden="true">
+  <!-- <div class="modal fade" id="listColors" tabindex="-1" aria-labelledby="listColors" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         
@@ -66,7 +143,7 @@
         
       </div>
     </div>
-  </div>
+  </div> -->
 
 
    
@@ -75,106 +152,22 @@
 
     
 <script>
-    function changeListColor(val, id){
-        console.log(val);
-        var element = document.body;
-        element.style.backgroundColor = val;
-
-        
-        var imgs = ['white','yellow','orange','green','greenBlue','lightBlue','lavender','pink','purple'];
-        var ids = ['whiteSelected','yellowSelected','orangeSelected','greenSelected','greenBlueSelected','lightBlueSelected','lavenderSelected','pinkSelected','purpleSelected']; 
-
-        for(var i = 0; i < 9; i++) {
-            document.getElementById(ids[i]).src='/img/colors/'+imgs[i]+'.png';
-        }
-
-        document.getElementById(id).src='/img/colors/'+id+'.png';
-    }
+   
 
 
 
-function getNowFormatted() {
-    var now = new Date();
-    // var now = new Date(2003, 6, 3, 9, 1);
 
-    var nowYear = now.getFullYear();
-    var nowMonth = parseInt(now.getMonth()+1);
-    var nowDate = now.getDate();
-    var nowHours = now.getHours();
-    var nowMinutes = now.getMinutes();
 
-    var monthFormatted = (nowMonth < 10) ? '0' + nowMonth : nowMonth;
-    var dateFormatted = (nowDate < 10) ? '0' + nowDate : nowDate;
-    var hoursFormatted = (nowHours < 10) ? '0' + nowHours : nowHours;
-    var minutesFormatted = (nowMinutes < 10) ? '0' + nowMinutes : nowMinutes;
-
-    var nowFormatted = monthFormatted + '-' + dateFormatted + '-' + nowYear + ',' + hoursFormatted + ':' + minutesFormatted;
-    return nowFormatted;
-}
-
-// 24 hr conversion
-
-function setTimeEdited(editDateTime, divId) {
-
-    var now = new Date();
-
-    var nowYear = parseInt(now.getFullYear());
-    var nowMonth = parseInt(now.getMonth()+1);
-    var nowDate = parseInt(now.getDate());
-
-    var thenYear = parseInt(editDateTime.substring(6,10));
-    var thenMonth = parseInt(editDateTime.substring(0,2));
-    var thenDate = parseInt(editDateTime.substring(3,5));
-    var thenHour = parseInt(editDateTime.substring(11,13));
-    var thenMin = parseInt(editDateTime.substring(14));
-
-    var thenTime = thenHour + ':' + thenMin + ' AM';
-    if(thenHour >= 12) {
-        if(thenHour > 12) {
-            thenHour -= 12;
-        }
-        thenTime = thenHour + ':' + thenMin + ' PM';
-    }
+window.onload = function () {
+        // https://getbootstrap.com/docs/5.0/components/modal/#via-javascript
+        let myModal = new bootstrap.Modal(
+          document.getElementById("myModal"),
+          {}
+        );
+        // https://getbootstrap.com/docs/5.0/components/modal/#show
+        myModal.show();
+      };
     
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    const thenMonthAbbr = months[thenMonth-1];
-    
-    if(nowYear > thenYear) {
-       var message = 'Edited ' + thenMonthAbbr + ' ' + thenDate + ' ' + thenYear;
-       document.getElementById(divId).innerHTML = message;
-    }
-    else if(nowYear == thenYear && nowMonth == thenMonth && nowDate == thenDate) {
-        var message = 'Edited ' + thenTime;
-        document.getElementById(divId).innerHTML = message;
-    }
-    else if(nowYear == thenYear && nowMonth == thenMonth && nowDate == (thenDate+1)) {
-        var message = 'Edited yesterday, ' + thenTime;
-        document.getElementById(divId).innerHTML = message;
-    }
-    else if(nowYear == thenYear) {
-        var message = 'Edited ' + thenMonthAbbr + ' ' + thenDate;
-        document.getElementById(divId).innerHTML = message;
-    }
-    else {
-        var message = 'Edited: error';
-        document.getElementById(divId).innerHTML = message;
-    }
-}
-
-
-
-
-
-setTimeEdited('12-20-2021,10:11', '1');
-setTimeEdited('11-04-2022,10:11', '2');
-setTimeEdited('12-19-2022,13:11', '3');
-setTimeEdited('12-20-2022,13:55', '4');
-setTimeEdited('12-20-2023,13:55', '5');
-
-console.log(getNowFormatted());
-
-    
-
 </script>
 
    

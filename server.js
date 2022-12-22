@@ -95,9 +95,16 @@ app.get('/auth/callback/success' , (req , res) => {
         res.redirect('/auth/callback/failure');
     }
     else {
-        db.any(`INSERT INTO users (userId) SELECT '${req.user.id}' WHERE NOT EXISTS (SELECT 1 FROM users WHERE userId = '${req.user.id}');`)
+        // console.log(req.user.name.givenName);
+        // console.log(req.user.name.familyName);
+        var name = req.user.name.givenName + ' ' + req.user.name.familyName;
+        // console.log(fullname);
+    
+    
+        db.any(`INSERT INTO users (userId, email, fullname) SELECT '${req.user.id}', '${req.user.email}', '${name}' WHERE NOT EXISTS (SELECT 1 FROM users WHERE userId = '${req.user.id}');`)
             .then(() => {
-                req.session.user = {id: req.user.id, givenName: req.user.name.givenName};
+                // console.log(req.user.email);
+                req.session.user = {id: req.user.id, givenName: req.user.name.givenName, email: req.user.email};
                 req.session.save();
 
                 return res.redirect('/lists?login=success');
@@ -132,7 +139,7 @@ const auth = (req, res, next) => {
 
 
 app.get('/lists', function(req, res) {
-    db.any(`SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') AND trash = FALSE AND archive = FALSE ORDER BY listId DESC;`)
+    db.any(`SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') AND trash = FALSE AND archive = FALSE ORDER BY editDateTime DESC;`)
     .then((lists) => {
         const successMessages = ['added new list', 'updated list', 'changed list color', 'deleted list',
                                 'deleted selected lists', 'recovered list', 'recovered selected lists', 'recovered all lists',
@@ -143,6 +150,7 @@ app.get('/lists', function(req, res) {
                                     'error copying archived list'];
         var error = 0;
         var message = '';
+
 
 
 
@@ -188,6 +196,10 @@ app.get('/lists', function(req, res) {
         else if(req.query.restore) {
             message = (req.query.restore == 'success') ? successMessages[5] : errorMessages[5];
             error = (req.query.restore == 'success') ? 0 : 1;
+
+            if(req.query.archived && req.query.archived == 'true') {
+                return res.redirect('/archive?restore=success&archived=true');
+            }
             // var message = (req.query.restore == 'success') ? 'restored list' : 'error restoring list';
             // var error = (req.query.restore == 'success') ? false : true;
         }
@@ -265,6 +277,31 @@ app.get('/users', (req , res) => {
         });
 });
 
+
+app.get('/listsToUsers', (req , res) => {
+    db.any(`SELECT * FROM listsToUsers;`)
+        .then((rows) => {
+            return res.send(rows);
+
+        })
+        .catch((error) => {
+            console.log(error);
+            return res.send(error);
+        });
+});
+
+app.get('/testlists', (req , res) => {
+    db.any(`SELECT * FROM lists;`)
+        .then((rows) => {
+            return res.send(rows);
+
+        })
+        .catch((error) => {
+            console.log(error);
+            return res.send(error);
+        });
+});
+
   
 
 
@@ -291,15 +328,15 @@ app.post('/search', function(req, res) {
     var q = req.body.q;
 
 
-    var searchQuery = `SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') AND trash = FALSE AND (title LIKE '%${q}%' OR LOWER(title) LIKE '%${q}%' OR list LIKE '%${q}%' OR LOWER(list) LIKE '%${q}%');`;
+    var searchQuery = `SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') AND trash = FALSE AND (title LIKE '%${q}%' OR LOWER(title) LIKE '%${q}%' OR list LIKE '%${q}%' OR LOWER(list) LIKE '%${q}%') ORDER BY editDateTime DESC;`;
     var renderPage = 'lists';
 
     if(req.query.archive && req.query.archive == 'true') {
-        searchQuery = `SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') AND trash = FALSE AND archive = TRUE AND (title LIKE '%${q}%' OR LOWER(title) LIKE '%${q}%' OR list LIKE '%${q}%' OR LOWER(list) LIKE '%${q}%');`;
+        searchQuery = `SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') AND trash = FALSE AND archive = TRUE AND (title LIKE '%${q}%' OR LOWER(title) LIKE '%${q}%' OR list LIKE '%${q}%' OR LOWER(list) LIKE '%${q}%') ORDER BY editDateTime DESC;`;
         renderPage = 'archive';
     }
     else if(req.query.trash && req.query.trash == 'true') {
-        searchQuery = `SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') AND trash = TRUE AND archive = FALSE AND (title LIKE '%${q}%' OR LOWER(title) LIKE '%${q}%' OR list LIKE '%${q}%' OR LOWER(list) LIKE '%${q}%');`;
+        searchQuery = `SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') AND trash = TRUE AND archive = FALSE AND (title LIKE '%${q}%' OR LOWER(title) LIKE '%${q}%' OR list LIKE '%${q}%' OR LOWER(list) LIKE '%${q}%') ORDER BY editDateTime DESC;`;
         renderPage = 'trash';
     }
 
@@ -391,7 +428,7 @@ app.post('/addList', function(req, res) {
 });
 
 app.get('/horiz', function(req, res) {
-return res.render('pages/horizontal');
+return res.render('pages/horizontal', {users: []});
 
 
 });
@@ -448,7 +485,7 @@ app.post('/unarchiveList', function(req, res) {
 
 
 app.post('/deleteSelectedLists', function(req, res) {
-    console.log(req.body.listIds);
+    // console.log(req.body.listIds);
     var array = req.body.listIds.split(',');
     // console.log(array);
     var result = array.map(function (x) { 
@@ -515,7 +552,7 @@ app.post('/updateList', function(req, res) {
 
         
 app.get('/trash', function(req, res) {
-    db.any(`SELECT * FROM lists WHERE trash = TRUE AND listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}');`)
+    db.any(`SELECT * FROM lists WHERE trash = TRUE AND listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') ORDER BY editDateTime DESC;`)
         .then((lists) => {
             const successMessages = ['permanently deleted list',
                                 'emptied trash', 'permanently deleted selection'];
@@ -560,6 +597,9 @@ app.get('/trash', function(req, res) {
 app.post('/restoreList', function(req, res) {
     db.any(`UPDATE lists SET trash = FALSE WHERE listId = ${req.body.listId};`)
         .then((lists) => {
+            if(req.query.archived && req.query.archived == 'true') {
+                return res.redirect('/lists?restore=success&archived=true');
+            }
             return res.redirect('/lists?restore=success');
         })
         .catch((error) => {
@@ -643,11 +683,10 @@ app.post('/restoreSelectedLists', function(req, res) {
 
 app.get('/archive', (req , res) => {
 
-    
-    db.any(`SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') AND archive = TRUE AND trash = FALSE;`)
+    db.any(`SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') AND archive = TRUE AND trash = FALSE ORDER BY editDateTime DESC;`)
         .then((lists) => {
-            const successMessages = ['changed list color', 'updated list', 'deleted list'];
-            const errorMessages = ['error changing list color', 'error updating list', 'error deleting list'];
+            const successMessages = ['changed list color', 'updated list', 'deleted list', 'restored archived list'];
+            const errorMessages = ['error changing list color', 'error updating list', 'error deleting list', 'error restoring archived list'];
             var error = 0;
             var message = '';
 
@@ -666,6 +705,19 @@ app.get('/archive', (req , res) => {
             else if(req.query.delete) {
                 message = (req.query.delete == 'success') ? successMessages[2] : errorMessages[2];
                 error = (req.query.delete == 'success') ? 0 : 1;
+            // var message = (req.query.permanentlyDeleted == 'success') ? 'permanently deleted list' : 'error permanently deleting list';
+            // var error = (req.query.permanentlyDeleted == 'success') ? false : true;
+            }
+            else if(req.query.restore) {
+                // message = (req.query.restore == 'success') ? successMessages[3] : errorMessages[3];
+                error = (req.query.restore == 'success') ? 0 : 1;
+
+                if(req.query.archived && req.query.archived == 'true') {
+                    message = successMessages[3];
+                }
+                else {
+                    message = errorMessages[3];
+                }
             // var message = (req.query.permanentlyDeleted == 'success') ? 'permanently deleted list' : 'error permanently deleting list';
             // var error = (req.query.permanentlyDeleted == 'success') ? false : true;
             }
@@ -717,6 +769,48 @@ app.post('/archiveList', function(req, res) {
 
 //     return nowFormatted;
 // }
+
+
+
+app.post('/searchUsers', function(req, res) {
+    var q = req.body.q;
+
+    // console.log(req.body.listIdToCollaborate);
+
+    var searchQuery = `SELECT * FROM users WHERE userId != '${req.session.user.id}' AND userID NOT IN(SELECT userID FROM listsToUsers WHERE listId = '${req.body.listIdToCollaborate}') AND (email LIKE '%${q}%' OR LOWER(email) LIKE '%${q}%' OR fullname LIKE '%${q}%' OR LOWER(fullname) LIKE '%${q}%');`;
+
+    db.any(searchQuery)
+        .then((users) => {
+            // return res.render('pages/horizontal', {users});
+            console.log(users);
+            return res.render('pages/addCollaborator', {users, listid: req.body.listIdToCollaborate, error: false, message: 'results for ' + q});
+
+
+        })
+        .catch((error) => {
+            console.log(error);
+            // return res.render('pages/horizontal', {users: []});
+            return res.render('pages/addCollaborator', {users: [], listid: req.body.listIdToCollaborate, error: true, message: 'error searching users'});
+
+        });
+});
+
+
+
+
+app.post('/addCollaborator', function(req, res) {
+    // console.log(req.body.listId);
+    // console.log(req.body.collaboratorUserId);
+    // INSERT INTO listsToUsers (listId, userId) VALUES ('${req.body.listId}', '${req.body.collaboratorUserId}');
+    db.any(`INSERT INTO listsToUsers (listId, userId) SELECT '${req.body.listId}', '${req.body.collaboratorUserId}' WHERE NOT EXISTS (SELECT 1 FROM listsToUsers WHERE listId = '${req.body.listId}' AND userId = '${req.body.collaboratorUserId}');`)
+        .then(() => {
+            return res.redirect('/lists?addCollaborator=success');
+        })
+        .catch((error) => {
+            console.log(error);
+            return res.redirect('/lists?addCollaborator=failure');
+        });
+});
 
 
 app.use((req, res, next) => {

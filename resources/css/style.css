@@ -137,7 +137,7 @@ input#q:focus {
 @media (prefers-color-scheme: dark) {
     body {
       background-color: #121212;
-      filter: brightness(50%);
+      /* filter: brightness(50%); */
       /* color: white; */
     }
 

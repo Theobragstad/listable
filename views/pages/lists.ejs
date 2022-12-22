@@ -13,12 +13,15 @@
 
 
     <div class="text-center" style="padding-top:50px;color:#f289ca">
-      
         <h4 class="site-title">your lists</h4>
         <div style="padding-top:5px;padding-bottom:5px">
           <form action="/search" method="POST">
-          <input type="text" id="q" name="q" class="search-hover zoom" placeholder="search all by title or content">
+          <input type="text" id="q" name="q" class="search-hover zoom" placeholder="search all">
         </form>
+
+
+
+
 
       </div>
       <div style="padding-top:10px;">
@@ -100,7 +103,7 @@
           
           <button title="Select list" id="" value=<%= list.listid %> class="btn rounded-10 zoom" style="position:relative;left:26px;top:5px;z-index: 2;line-height: .25;width:15px;padding: 0;"><img class="listSelector" src="/img/colors/white.png" style="width:15px" onclick="changeImage(this, 'colors/white', 'colors/ffffffSelected')"></button>
   </div>
-      <div title="Edit list" data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid%>" data-toggle="modal" id="<%= list.listid %>" class="col card card-body m-2 zoomSmall" style="min-width: 400px;overflow-x:scroll;background-color:#<%= list.color %>;">   
+      <div title="Edit list" data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid%>" data-toggle="modal" id="<%= list.listid %>" class="col card card-body m-2" style="min-width: 400px;overflow-x:scroll;background-color:#<%= list.color %>;">   
        
         <div class="row" style="font-weight:bold;padding-left:10px">
           <div style="width:60%;text-overflow:ellipsis;
@@ -131,7 +134,11 @@
       </div>
 
       <div class="col">
+        <% if(list.archive) {  %>
+          <form action="/copy?archived=true" method="POST">
+        <% } else { %>
         <form action="/copy" method="POST">
+          <% } %>
           <input class="timeInput" class="form-control" name="now" hidden>
 
           <input class="form-control" type="text" name="title" value="<%= list.title %>" hidden>
@@ -145,6 +152,20 @@
     </form>
     </div>
 
+
+
+    <% if(list.archive) {  %>
+      <div class="col">
+        <form action="/unarchiveList" method="POST">
+          <input type="number" name="listId" value=<%= list.listid %> hidden>
+          
+        <button title="Unarchive" class="btn rounded-10 zoom"  style="position:absolute;right:110px;border-color:#17d475;background-color:#e8fcec;padding: 0;line-height: .25;width:20px">
+        <img src="/img/unarchive.png" style="width:20px" onmouseover="hover(this, 'unarchivePink')" onmouseout="unhover(this, 'unarchive')">
+      </button>
+    </form>
+    </div>
+
+    <% } else { %>
     <div class="col">
       <form action="/archiveList" method="POST">
         <input type="number" name="listId" value=<%= list.listid %> hidden>
@@ -154,13 +175,79 @@
     </button>
   </form>
   </div>
+  <% } %>
+
+
+  <!-- <div class="col">
+    <form action="/" method="POST">
+      <input type="number" name="listId" value=<%= list.listid %> hidden>
+      
+    <button title="Add collaborator" class="btn rounded-10 zoom"  style="position:absolute;right:140px;border-color:#1e90ff;padding: 2px;line-height: .25;width:20px">
+    <img src="/img/addCollaborator.png" style="width:15px" onmouseover="hover(this, 'addCollaboratorBlue')" onmouseout="unhover(this, 'addCollaborator')">
+  </button>
+</form>
+</div> -->
+
+<div class="col">
+  <button title="Add collaborator" type="button" class="btn rounded-10 zoom" data-id="<%= list.listid %>" data-bs-toggle="modal" data-bs-target="#addCollaborator<%= list.listid%>" href="#addCollaborator<%= list.listid%>" data-toggle="modal" style="position:absolute;right:140px;border-color:#1e90ff;padding: 2px;line-height: .25;width:20px">
+  <img src="/img/addCollaborator.png" style="width:15px" onmouseover="hover(this, 'addCollaboratorBlue')" onmouseout="unhover(this, 'addCollaborator')">
+</button>
+</div>
+
+      
+
+
         
 
         </div>        
         <br>
         <%- list.list %>
 
+        <% if(list.archive) {  %>
+          <button disabled class="btn rounded-pill" style="width:70px;font-size:10px;border-color:#b24bf3;color:#b24bf3;background-color:#e6d4ff">Archived</button>
+
+        <% } %>
+
+     
+     
+
+     
+     
       </div>
+
+
+      
+
+
+      <div class="modal fade" id="addCollaborator<%= list.listid%>" tabindex="-1" aria-labelledby="addCollaborator" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content mx-auto text-center justify-content-center" style="width:250px">
+            <div style="padding-top:10px">
+              <h6>Add collaborator</h6>
+            </div>
+            <div style="padding-top:5px;padding-bottom:5px;padding:10px">
+              <form action="/searchUsers" method="POST">
+                <input class="form-control" type="text" name="q" placeholder="search users" oninvalid="this.setCustomValidity('Enter a name or email')" oninput="setCustomValidity('')" required>
+                <input class="form-control" name="listIdToCollaborate" type="text" value="<%= list.listid %>" hidden>   <!-- IDK -->
+                <div style="padding-top:5px;">
+                  <button class="btn rounded-pill" style="border-color: #03a9f4;background-color: #b3e5fc;color:#03a9f4;font-size:12px">Search</button>
+                </div>
+              </form>
+            </div> 
+          </div>
+        </div>
+      </div>
+    
+
+
+
+
+      
+
+
+
+
+
 
 
 
@@ -207,6 +294,18 @@
           </div>
           
         </div>
+
+
+
+
+
+
+
+
+
+
+
+
 
 
       
@@ -277,13 +376,24 @@
 
 
 
+<!-- <button onclick="showOrHideModal('show')" style="z-index:10">show</button> -->
+
+
+
+
+<!-- Button trigger modal -->
+
+
+<!-- Modal -->
+<!-- <div class="modal fade" id="searchResultsModal" tabindex="-1" aria-labelledby="searchResultsModal" aria-hidden="true"> -->
+ 
+
+
 
 
 
 
 <!-- <button onclick="setEditTimes()"> call</button> -->
-
-
 
 
 
@@ -433,7 +543,7 @@ function unselectAll() {
 
   function hover(element, src) {
   element.setAttribute('src', '/img/'+src+'.png');
- if(src !== 'paletteColors') {
+ if(src !== 'paletteColors' && src !== 'addCollaboratorBlue') {
   stopModals();
  }
 }
@@ -509,7 +619,7 @@ function unhover(element, src) {
 
 
   if(e.metaKey && e.keyCode == 65) {
-    console.log('cmd a')
+    // console.log('cmd a')
 
     const elements = document.getElementsByClassName('listSelector');
   
@@ -524,7 +634,7 @@ function unhover(element, src) {
 
   } 
 
-  console.log(selectedListIds)
+  // console.log(selectedListIds)
 
 }
   
@@ -541,7 +651,7 @@ document.getElementById('unselectAll').style.display = 'block';
 
 
 
-console.log(document.getElementById('delSelectedLists').value);
+// console.log(document.getElementById('delSelectedLists').value);
   }
   
   // if (e.keyCode >= 65 && e.keyCode <= 90) {
@@ -790,14 +900,18 @@ function getNowFormatted() {
     var nowHours = now.getHours();
     var nowMinutes = now.getMinutes();
 
+    var nowSeconds = now.getSeconds();
+
     var monthFormatted = (nowMonth < 10) ? '0' + nowMonth : nowMonth;
     var dateFormatted = (nowDate < 10) ? '0' + nowDate : nowDate;
     var hoursFormatted = (nowHours < 10) ? '0' + nowHours : nowHours;
     var minutesFormatted = (nowMinutes < 10) ? '0' + nowMinutes : nowMinutes;
 
-    var nowFormatted = monthFormatted + '-' + dateFormatted + '-' + nowYear + ',' + hoursFormatted + ':' + minutesFormatted;
+    var secondsFormatted = (nowSeconds < 10) ? '0' + nowSeconds : nowSeconds;
+
+    var nowFormatted = monthFormatted + '-' + dateFormatted + '-' + nowYear + ',' + hoursFormatted + ':' + minutesFormatted + ':' + secondsFormatted;
     
-    console.log(nowFormatted);
+    // console.log(nowFormatted);
 
     return nowFormatted;
 }
@@ -839,6 +953,27 @@ function startModals() {
   }
 
 }
+
+
+
+// function showOrHideModal(x) {
+//   var e = document.getElementById('searchResultsModal');
+//   console.log(e);
+
+//   if(x == 'show') {
+
+//     e.classList.add("show");
+//     e.style.display = "block";
+//     console.log(e);
+
+//   }
+//   else {
+//     e.classList.remove("show");
+//     e.style.display = "none";
+//     console.log(e);
+
+//   }
+// }
 
 
        
