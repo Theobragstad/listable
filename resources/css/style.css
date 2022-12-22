@@ -120,6 +120,11 @@ input#q:focus {
     --bs-tooltip-color: black;
   }
 
+
+  .collaborator-tooltip {
+    font-size:10px;
+  }
+
   .timeTooltip {
     /* --bs-tooltip-bg: #f289ca; */
     /* --bs-tooltip-color: white; */

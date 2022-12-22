@@ -101,10 +101,14 @@ app.get('/auth/callback/success' , (req , res) => {
         // console.log(fullname);
     
     
-        db.any(`INSERT INTO users (userId, email, fullname) SELECT '${req.user.id}', '${req.user.email}', '${name}' WHERE NOT EXISTS (SELECT 1 FROM users WHERE userId = '${req.user.id}');`)
+        db.any(`INSERT INTO users (userId, email, fullname, profilePhotoUrl) SELECT '${req.user.id}', '${req.user.email}', '${name}', '${req.user.photos[0].value}' WHERE NOT EXISTS (SELECT 1 FROM users WHERE userId = '${req.user.id}');`)
             .then(() => {
                 // console.log(req.user.email);
-                req.session.user = {id: req.user.id, givenName: req.user.name.givenName, email: req.user.email};
+
+                
+                console.log(req.user);
+
+                req.session.user = {id: req.user.id, givenName: req.user.name.givenName, email: req.user.email, profilePhoto: req.user.photos[0].value};
                 req.session.save();
 
                 return res.redirect('/lists?login=success');
@@ -253,9 +257,21 @@ app.get('/lists', function(req, res) {
         //     // return res.render('pages/lists', {search: false, lists, givenName: req.session.user.givenName});
         // }
 
-        return res.render('pages/lists', {lists, error, message, search: false, givenName: req.session.user.givenName});
+        var q = `SELECT users.email, users.profilePhotoUrl, listsToUsers.listId FROM listsToUsers INNER JOIN users ON listsToUsers.userId = users.userId;`;
 
-        // return res.render('pages/lists', {error, message, search: false, lists, givenName: req.session.user.givenName});
+        db.any(q)
+            .then((rows) => {
+                return res.render('pages/lists', {lists, collaborators: rows, email: req.session.user.email, profilePhoto: req.session.user.profilePhoto, error, message, search: false, givenName: req.session.user.givenName});
+
+            })
+            .catch((error) => {
+                console.log(error);
+                return res.render('pages/lists', {lists, collaborators: [], email: req.session.user.email, profilePhoto: req.session.user.profilePhoto, error, message, search: false, givenName: req.session.user.givenName});
+
+            });
+
+        // return res.render('pages/lists', {lists, error, message, search: false, givenName: req.session.user.givenName});
+
 
     })
     .catch((error) => {
@@ -276,6 +292,32 @@ app.get('/users', (req , res) => {
             return res.render('pages/users', {rows: [], error: true, message: 'unable to get users'});
         });
 });
+
+
+
+
+
+app.get('/emailsAndListIds', (req , res) => {
+    var q = `SELECT users.email, listsToUsers.listId FROM listsToUsers INNER JOIN users ON listsToUsers.userId = users.userId;`;
+
+    db.any(q)
+        .then((rows) => {
+            return res.send(rows);
+        })
+        .catch((error) => {
+            console.log(error);
+            return res.send(error);
+        });
+});
+
+
+
+
+
+
+
+
+
 
 
 app.get('/listsToUsers', (req , res) => {
@@ -582,11 +624,11 @@ app.get('/trash', function(req, res) {
                 }
             }
 
-            return res.render('pages/trash', {lists, error, message, search: false, givenName: req.session.user.givenName});
+            return res.render('pages/trash', {lists, profilePhoto: req.session.user.profilePhoto, error, message, search: false, givenName: req.session.user.givenName});
         })
         .catch((error) => {
             console.log(error);
-            return res.render('pages/trash', {lists: [], error: true, message: 'error loading trash', search: false, givenName: req.session.user.givenName});
+            return res.render('pages/trash', {lists: [], profilePhoto: req.session.user.profilePhoto, error: true, message: 'error loading trash', search: false, givenName: req.session.user.givenName});
         });
     
     
@@ -721,8 +763,21 @@ app.get('/archive', (req , res) => {
             // var message = (req.query.permanentlyDeleted == 'success') ? 'permanently deleted list' : 'error permanently deleting list';
             // var error = (req.query.permanentlyDeleted == 'success') ? false : true;
             }
+            var q = `SELECT users.email, users.profilePhotoUrl, listsToUsers.listId FROM listsToUsers INNER JOIN users ON listsToUsers.userId = users.userId;`;
 
-            return res.render('pages/archive', {lists, error, message, search: false, givenName: req.session.user.givenName});
+            db.any(q)
+                .then((rows) => {
+                    // return res.render('pages/lists', {lists, collaborators: rows, email: req.session.user.email, profilePhoto: req.session.user.profilePhoto, error, message, search: false, givenName: req.session.user.givenName});
+                    return res.render('pages/archive', {lists, collaborators: rows, email: req.session.user.email, profilePhoto: req.session.user.profilePhoto, error, message, search: false, givenName: req.session.user.givenName});
+
+                })
+                .catch((error) => {
+                    console.log(error);
+                    // return res.render('pages/lists', {lists, collaborators: [], email: req.session.user.email, profilePhoto: req.session.user.profilePhoto, error, message, search: false, givenName: req.session.user.givenName});
+                    return res.render('pages/archive', {lists, collaborators: rows, email: req.session.user.email, profilePhoto: req.session.user.profilePhoto, error, message, search: false, givenName: req.session.user.givenName});
+
+                });
+            // return res.render('pages/archive', {lists, error, message, search: false, givenName: req.session.user.givenName});
         })
         .catch((error) => {
             console.log(error);

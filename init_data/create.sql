@@ -1,8 +1,8 @@
 CREATE TABLE users (
     userId VARCHAR(50) PRIMARY KEY,
     email TEXT NOT NULL,
-    fullname TEXT NOT NULL
-
+    fullname TEXT NOT NULL,
+    profilePhotoUrl TEXT NOT NULL
 );
 
 CREATE TABLE lists (
