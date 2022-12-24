@@ -512,7 +512,7 @@ app.post('/search', function(req, res) {
         renderPage = 'trash';
     }
 
-           
+           // hello
     var viewQuery = `CREATE OR REPLACE VIEW emails_and_names AS (SELECT userId, email, fullname FROM users WHERE userId IN(SELECT userId FROM listsToUsers WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}')));`;
     db.any(viewQuery+searchQuery)
         .then((lists) => {
