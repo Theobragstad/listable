@@ -87,7 +87,13 @@
     </div>
   </div>
 
-    <div class="row" style="overflow:auto;padding-top:50px;padding-left:20px;display:block">
+
+
+          <div id="overflowArrow" class="zoom" style="display:none;position:absolute;right:20px;top:220px"><img src="/img/rightArrow.png" style="width:30px"></div>
+
+
+
+    <div class="row" id="list" style="overflow:auto;padding-top:50px;padding-left:20px;display:block">
 
       <div class="d-flex" >
         <% let count = 1 %> 
@@ -103,7 +109,7 @@
           
           <button title="Select list" id="" value=<%= list.listid %> class="btn rounded-10 zoom" style="position:relative;left:26px;top:5px;z-index: 2;line-height: .25;width:15px;padding: 0;"><img class="listSelector" src="/img/colors/white.png" style="width:15px" onclick="changeImage(this, 'colors/white', 'colors/ffffffSelected')"></button>
   </div>
-      <div title="Edit list" data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid%>" data-toggle="modal" id="<%= list.listid %>" class="col card card-body m-2" style="min-width: 400px;overflow-x:scroll;background-color:#<%= list.color %>;">   
+      <div title="Edit list" data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid%>" data-toggle="modal" id="<%= list.listid %>" class="col card card-body m-2" style="min-width: 400px;overflow-x:scroll;background-color:#<%= list.color %>;" color="<%= list.color %>">   
        
         <div class="row" style="font-weight:bold;padding-left:10px">
           <div style="width:60%;text-overflow:ellipsis;
@@ -117,14 +123,38 @@
           
             
           <!-- <span class="col"> -->
-
             
-           <div style="z-index:10">
-          <form action="/deleteList" method="POST">
-            <input type="number" name="listId" value=<%= list.listid %> hidden>
-            <button title="Delete list" class="btn rounded-10 zoom" style="position:absolute;right:10px;border-color:#fb6f92;background-color:#ffe5ec;padding: 0;line-height: .25;width:20px"><img src="/img/trash.png" data-bs-dismiss="" style="width:15px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')"></button>
-          </form>
-        </div>
+            
+          
+
+            <% var canDelete = false;  %>
+            <% for(var i = 0; i < collaborators.length; i++) { %>
+              <% if(collaborators[i].owner && collaborators[i].email == user.email) {  %>
+               <%  canDelete = true; %>
+              <% break %>
+              <% } %>
+            <% } %>
+
+            <% if(canDelete) { %>
+              <div style="z-index:10">
+                <form action="/deleteList" method="POST">
+                  <input type="number" name="listId" value=<%= list.listid %> hidden>
+              <button title="Delete list" class="btn rounded-10 zoom" style="position:absolute;right:10px;border-color:#fb6f92;background-color:#ffe5ec;padding: 0;line-height: .25;width:20px"><img src="/img/trash.png" data-bs-dismiss="" style="width:15px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')"></button>
+            </form>
+          </div>
+              <% } else { %>
+                <div style="z-index:10">
+                  <form action="/removeCollaborator" method="POST">
+                    <input type="number" name="listId" value=<%= list.listid %> hidden>
+                    <input type="number" name="userId" value=<%= user.id %> hidden>
+                <button title="Remove myself" class="btn rounded-10 zoom" style="position:absolute;right:10px;border-color:#fb6f92;background-color:#ffe5ec;padding: 0;line-height: .25;width:20px"><img src="/img/removeMyself.png" data-bs-dismiss="" style="width:15px" onmouseover="hover(this, 'removeMyselfRed')" onmouseout="unhover(this, 'removeMyself')"></button>
+              </form>
+            </div>
+                <% } %>
+
+
+            <!-- <button title="Delete list" class="btn rounded-10 zoom" style="position:absolute;right:10px;border-color:#fb6f92;background-color:#ffe5ec;padding: 0;line-height: .25;width:20px"><img src="/img/trash.png" data-bs-dismiss="" style="width:15px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')"></button> -->
+       
           
         <!-- </span> -->
 
@@ -196,6 +226,20 @@
 
 
 
+<div class="col">
+  <form action="/labelsModal" method="GET">
+    <input class="form-control" name="listId" type="number" value=<%= list.listid %> hidden>   <!-- IDK -->
+
+  <button title="Label" type="submit" class="btn rounded-10 zoom" style="position:absolute;right:170px;border-color:#1e90ff;padding: 2px;line-height: .25;width:20px">
+  <img src="/img/label.png" style="width:15px" onmouseover="hover(this, 'labelPink')" onmouseout="unhover(this, 'label')">
+</button>
+</form>
+
+</div>
+
+
+
+
                   
 
 
@@ -205,6 +249,7 @@
         <br>
         <%- list.list %>
 
+
         <% if(list.archive) {  %>
           <button disabled class="btn rounded-pill" style="width:70px;font-size:10px;border-color:#b24bf3;color:#b24bf3;background-color:#e6d4ff">Archived</button>
 
@@ -213,18 +258,90 @@
      
         
         <div>
+
+
+
+
+          
+
+
+
+
+
+
+
+
+
        
 
           <% collaborators.forEach(function(collaborator){ %>
-            <% if(collaborator.listid == list.listid && email !== collaborator.email){ %>
+            <% var owner = (collaborator.owner) ? ' (owner)' : ''; %>
+            <% if(collaborator.listid == list.listid && user.email !== collaborator.email){ %>
+              <span data-id="<%= list.listid %>" data-bs-toggle="modal" data-bs-target="#addCollaborator<%= list.listid%>" href="#addCollaborator<%= list.listid%>" data-toggle="modal">
               <button data-bs-toggle="tooltip"   data-bs-placement="top"
               data-bs-custom-class="small-tooltip"
-              data-bs-title="<%= collaborator.email %>" class="btn zoom"><img src="<%= collaborator.profilephotourl %>" style="width:20px;border-radius: 50%;" ></button>
+              data-bs-title="<%= collaborator.email %><%= owner %>" class="btn zoom"><img src="<%= collaborator.profilephotourl %>" style="width:20px;border-radius: 50%;" >
+            </button>
+            </span>
               
               <% } %>
         <% }); %>
 
             </div>
+
+
+
+
+
+
+
+            <div class="row g-0" style="padding-top:20px">
+
+
+
+              <% labels.forEach(function(label) { %>
+                <% if(label.listid == list.listid){ %>
+                  <div class="col auto" style="padding-right:0;
+                  padding-left:10px;padding-bottom:5px;">
+                  <form action="/removeLabelFromList" method="POST">
+                    <input class="form-control" name="listId" type="number" value="<%= list.listid %>" hidden>
+                    <input class="form-control" name="labelId" type="text" value="<%= label.labelid %>" hidden>
+
+                    <button title="Remove label" onmouseover="setInnerHtml(this,'x')" onmouseout="setInnerHtml(this,'<%=label.label %>')" class="btn rounded-pill" style="vertical-align:middle;border-color: #03a9f4;background-color: #b3e5fc;color:#03a9f4;font-size:12px;padding:5px"><%=label.label %> 
+                    </button>
+
+                    </form>
+                  </div>
+
+                  
+                    <!-- <span style="padding-left:30px;">
+                      <form action="/removeLabelFromList" method="POST">
+                        <input class="form-control" name="listId" type="number" value="<%= list.listid %>" hidden>
+                        <input class="form-control" name="labelId" type="text" value="<%= label.labelid %>" hidden>
+
+                   <span title="Remove label" type="submit" class="btn rounded-pill" style="width:30px;height:15px;font-size:12px;background-color: #fff42f;padding: 0;padding-bottom:16px;line-height: 1.25;"><img src="/img/x.png" style="width:10px" onmouseover="hover(this, 'redX')" onmouseout="unhover(this, 'x')"></span> 
+                  </form>
+                  
+                  </span> -->
+                  
+                  
+                  
+                  
+                  <% } %>
+            <% }); %>
+
+
+
+
+
+
+
+
+
+            </div>
+
+
+
      
 
      
@@ -237,19 +354,64 @@
 
       <div class="modal fade" id="addCollaborator<%= list.listid%>" tabindex="-1" aria-labelledby="addCollaborator" aria-hidden="true">
         <div class="modal-dialog">
-          <div class="modal-content mx-auto text-center justify-content-center" style="width:250px">
+          <div class="modal-content mx-auto text-center justify-content-center" style="width:500px">
             <div style="padding-top:10px">
               <h6>Add collaborator</h6>
             </div>
-            <div style="padding-top:5px;padding-bottom:5px;padding:10px">
+            <div style="padding-top:10px;padding-bottom:5px;padding:10px">
               <form action="/searchUsers" method="POST">
                 <input class="form-control" type="text" name="q" placeholder="search users" oninvalid="this.setCustomValidity('Enter a name or email')" oninput="setCustomValidity('')" required>
                 <input class="form-control" name="listIdToCollaborate" type="text" value="<%= list.listid %>" hidden>   <!-- IDK -->
-                <div style="padding-top:5px;">
+                <div style="padding-top:10px;">
                   <button class="btn rounded-pill" style="border-color: #03a9f4;background-color: #b3e5fc;color:#03a9f4;font-size:12px">Search</button>
                 </div>
               </form>
             </div> 
+
+            <div style="padding-top:10px;padding-bottom:5px;padding:10px">
+              <h6>Current collaborators</h6>
+
+              <% var deletePrivileges = false; %>
+                <% collaborators.forEach(function(collaborator) { %>
+                  <% if(collaborator.listid == list.listid) { %>
+                    <div class="row g-0" style="padding-bottom:5px;">
+                      <div class="col-10" style="margin-left:0px">
+                      <button class="btn rounded-pill" style="right:100px;font-weight:bold;font-size:12px;background-color:#e6d4ff;">
+                        <img src="<%= collaborator.profilephotourl %>" style="width:20px;border-radius: 50%;">
+                        <%= collaborator.fullname %> < <%= collaborator.email %> > 
+                      <% if(collaborator.owner) { %>
+                            <% deletePrivileges = (collaborator.userid == user.id) ? true : false; %>
+                         (owner)
+                        </button>
+                      </div>
+                      <% } else { %>
+                          </button>
+                          </div>
+                      <% } %>
+
+                      <% if(deletePrivileges && collaborator.userid != user.id){ %>
+                     
+
+                      <div class="col-2">
+                        <form action="/removeCollaborator" method="POST">
+                          <input type="number" name="listId" value=<%= list.listid %> hidden>
+                          <input type="number" name="userId" value=<%= collaborator.userid %> hidden>
+                          <button title="Remove collaborator" class="btn zoom rounded-10" style="padding:0px"><img src="/img/redX.png" style="width:15px;"></button>
+                        </form>
+                      </div>
+                      <% } %>
+
+                      <!-- <div class="col-2">
+                        <form action="/removeCollaborator" method="POST">
+                          <input type="number" name="listId" value=<%= list.listid %> hidden>
+                          <input type="number" name="userId" value=<%= collaborator.userid %> hidden>
+                          <button title="Remove collaborator" class="btn zoom rounded-10" style="padding:0px"><img src="/img/redX.png" style="width:15px;"></button>
+                        </form>
+                      </div> -->
+                    </div>
+                  <% } %>
+                <% }) %>
+            </div>
           </div>
         </div>
       </div>
@@ -267,9 +429,9 @@
 
 
 
-      <div class="modal"  id="editList<%= list.listid%>" tabindex="-1" aria-labelledby="editList<%= list.listid%>" aria-hidden="true" >
+      <div class="modal modal-lg"  id="editList<%= list.listid%>" tabindex="-1" aria-labelledby="editList<%= list.listid%>" aria-hidden="true" >
         <div class="modal-dialog "style="" >
-          <div class="modal-content rounded-10">
+          <div class="modal-content rounded-10" style="">
             <!-- <input style="font-weight:bold;padding-left: 10px;padding-top: 10px;" value="">
             <br>
              -->
@@ -324,6 +486,38 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       
       <!-- THIS IS A TEST -->
     <!-- </button> -->
@@ -358,18 +552,20 @@
   <div class="modal-dialog">
     <div class="modal-content mx-auto" style="width:202px">
 
-      <!-- <div id="modalListId" value="1"></div> -->
+      
+
+
 
       <form action="/changeListColor" method="POST">
         <input id="modalListId" name="listId" value="" hidden>
-        <button class="btn"  name="color" value="ffffff" style="padding-right:0"><img id="ffffff" src="/img/colors/white.png" style="width:20px"></button>
+        <button class="btn"  name="color" value="ffffff" style="padding-right:0"><img id="ffffff" src="/img/colors/ffffffSelected.png" style="width:20px"></button>
         <button class="btn" name="color"  value="fdf5c1" style="padding-right:0"><img id="fdf5c1" src="/img/colors/yellow.png" style="width:20px"></button>
         <button class="btn" name="color" value="bae6fc" style="padding-right:0"><img id="bae6fc" src="/img/colors/lightBlue.png" style="width:20px"></button>
 
         <button class="btn" name="color" value="cafbc8" style="padding-right:0"><img id="cafbc8" src="/img/colors/green.png" style="width:20px"></button>
         <button class="btn"  name="color" value="f4c3fb" style="padding-right:0"><img id="f4c3fb" src="/img/colors/pink.png" style="width:20px"></button>
       
-      <button class="btn"name="color" value="dddddd"  style="padding-right:0"><img id="dddddd" src="/img/colors/grey.png" style="width:20px"></button>
+      <button class="btn"name="color" value="eeeeee"  style="padding-right:0"><img id="eeeeee" src="/img/colors/grey.png" style="width:20px"></button>
 
       <button class="btn" name="color" value="f7cdc2" style="padding-right:0"><img id="f7cdc2" src="/img/colors/orange.png" style="width:20px"></button>
 
@@ -454,14 +650,21 @@ document.getElementById('listColors').addEventListener('show.bs.modal', (e) => {
 
 
 function setSelectedColor(color) {
-  var imgs = ['white','yellow','orange','green','greenBlue','lightBlue','lavender','pink','purple', 'grey'];
+  var imgs = ['white','yellow','orange','green','greenBlue','lightBlue','lavender','pink','purple','grey'];
         var ids = ['ffffff','fdf5c1','f7cdc2','cafbc8','bdf6d9','bae6fc','b4c9fa','f4c3fb','d0adfa', 'eeeeee']; 
 
-        for(var i = 0; i < imgs.length; i++) {
+    for(var i = 0; i < 10; i++) {
+
             document.getElementById(ids[i]).src='/img/colors/'+imgs[i]+'.png';
         }
         
   document.getElementById(color).src = '/img/colors/'+color+'Selected.png';
+
+
+
+
+
+          
 }
 
 
@@ -518,7 +721,14 @@ document.getElementById('numSelectedLists').innerHTML = n+' selected';
 document.getElementById('numSelectedLists').style.display = 'block';
 
 document.getElementById('delSelectedLists').style.display = 'block';
-document.getElementById('delSelectedLists').value = selectedListIds;
+// document.getElementById('delSelectedLists').value = selectedListIds;
+
+//////
+document.getElementById('delSelectedLists').setAttribute('data-id' , selectedListIds); 
+
+document.getElementById('restoreSelectedLists').style.display = 'block';
+document.getElementById('restoreSelectedLists').value = selectedListIds;
+//////
 
 
 console.log(document.getElementById('delSelectedLists').value);
@@ -569,6 +779,30 @@ function unhover(element, src) {
   startModals();
 }
 
+function setInnerHtml(element, text) {
+  if(text == 'x') {
+    // var length = element.innerText.length;
+    var length = element.clientWidth*.25;
+    // console.log(element.innerText.length);
+    var s = '';
+    for(var i = 0; i < length/2; i++) {
+    s += '&nbsp;';
+    }
+    s += text;
+    for(var i = 0; i < length/2; i++) {
+    s += '&nbsp;';
+    }
+    console.log(s);
+    element.innerHTML = s;
+    element.style.color = 'red';
+  }
+  else {
+    element.innerHTML = text;
+    element.style.color = '#03a9f4';
+  }
+  stopModals();
+}
+
 // var nSelected = 0;
 // for(var i = 0; i < lists.length; i++) {
 //       if(document.getElementById('listSelector').src='/img/colors/ffffffSelected.png') {
@@ -580,6 +814,7 @@ function unhover(element, src) {
 
   tinymce.init({
     selector: 'textarea',
+    height: 600,
     plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed linkchecker a11ychecker tinymcespellchecker permanentpen powerpaste advtable advcode editimage tinycomments tableofcontents footnotes mergetags autocorrect typography inlinecss  ',
     toolbar: 'blocks fontfamily fontsize | bold italic underline strikethrough forecolor backcolor | link image media table mergetags | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
     image_list: [
@@ -610,11 +845,11 @@ function unhover(element, src) {
         var imgs = ['white','yellow','orange','green','greenBlue','lightBlue','lavender','pink','purple'];
         var ids = ['whiteSelected','yellowSelected','orangeSelected','greenSelected','greenBlueSelected','lightBlueSelected','lavenderSelected','pinkSelected','purpleSelected']; 
 
-        for(var i = 0; i < 9; i++) {
-            document.getElementById(ids[i]).src='/img/colors/'+imgs[i]+'.png';
+        for(var i = 0; i < 10; i++) {
+            // document.getElementById(ids[i]).src='/img/colors/'+imgs[i]+'.png';
         }
 
-        document.getElementById(id).src='/img/colors/'+id+'.png';
+        // document.getElementById(id).src='/img/colors/'+id+'.png';
     }
 
 
@@ -640,8 +875,7 @@ function unhover(element, src) {
     const elements = document.getElementsByClassName('listSelector');
   
   for(var i = 0; i < elements.length; i++) {
-    // console.log(elements[i].src)
-    // console.log(window.location.origin+'/img/colors/ffffffSelected.png');
+    
     if(elements[i].src !== window.location.origin+'/img/colors/ffffffSelected.png') {
       // console.log(elements[i].parentElement.value);
       elements[i].src = '/img/colors/ffffffSelected.png';
@@ -661,7 +895,14 @@ function unhover(element, src) {
 document.getElementById('numSelectedLists').style.display = 'block';
 
 document.getElementById('delSelectedLists').style.display = 'block';
-document.getElementById('delSelectedLists').value = selectedListIds;
+// document.getElementById('delSelectedLists').value = selectedListIds;
+
+//////
+document.getElementById('delSelectedLists').setAttribute('data-id' , selectedListIds); 
+document.getElementById('restoreSelectedLists').style.display = 'block';
+document.getElementById('restoreSelectedLists').value = selectedListIds;
+
+/////
 
 document.getElementById('unselectAll').style.display = 'block';
 
@@ -991,6 +1232,26 @@ function startModals() {
 //   }
 // }
 
+
+function isOverflown(element) {
+  return element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth;
+}
+
+function addButtonsIfOverflown() {
+  var element = document.getElementById('list');
+
+  if(isOverflown(element)) {
+    document.getElementById('overflowArrow').style.display = 'block';
+
+  }
+}
+
+const rightArrow = document.getElementById('overflowArrow');
+rightArrow.onclick = function () {
+      document.getElementById('list').scrollLeft += 30;
+};
+
+addButtonsIfOverflown();
 
        
 </script>

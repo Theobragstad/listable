@@ -109,7 +109,7 @@
         
     <button title="Select list" id="" value=<%= list.listid %> class="btn rounded-10 zoom" style="padding:0;position:relative;left:26px;top:10px;z-index: 2;line-height: .25;width:15px;height:15px"><img class="listSelector" src="/img/colors/white.png" style="width:15px" onclick="changeImage(this, 'colors/white', 'colors/ffffffSelected')"></button>
 
-      <div title="Edit list" data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="" href="#editList<%= list.listid%>" data-toggle="modal" id="<%= list.listid %>" class="col card card-body m-2 zoomSmall" style="min-width: 250px;overflow-x:scroll;background-color:#<%= list.color %>;">   
+      <div title="Edit list" data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid%>" data-toggle="modal" id="<%= list.listid %>" class="col card card-body m-2" style="min-width: 250px;overflow-x:scroll;background-color:#<%= list.color %>;">   
        
         <div class="row" style="font-weight:bold;padding-left:10px"><%= list.title %>  
 
@@ -168,7 +168,7 @@
 
 
 
-      <div class="modal"  id="editList<%= list.listid%>" tabindex="-1" aria-labelledby="editList<%= list.listid%>" aria-hidden="true" >
+      <div class="modal modal-lg"  id="editList<%= list.listid%>" tabindex="-1" aria-labelledby="editList<%= list.listid%>" aria-hidden="true" >
         <div class="modal-dialog "style="" >
           <div class="modal-content rounded-10">
             <!-- <input style="font-weight:bold;padding-left: 10px;padding-top: 10px;" value="">

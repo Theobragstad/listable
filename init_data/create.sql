@@ -1,5 +1,5 @@
 CREATE TABLE users (
-    userId VARCHAR(50) PRIMARY KEY,
+    userId TEXT PRIMARY KEY,
     email TEXT NOT NULL,
     fullname TEXT NOT NULL,
     profilePhotoUrl TEXT NOT NULL
@@ -18,6 +18,29 @@ CREATE TABLE lists (
 
 CREATE TABLE listsToUsers (
     listId INT NOT NULL REFERENCES lists(listId),
-    userId VARCHAR(50) NOT NULL REFERENCES users(UserId),
+    userId TEXT NOT NULL REFERENCES users(userId),
     owner BOOLEAN NOT NULL
 );
+
+
+
+
+
+CREATE TABLE labels (
+    labelId SERIAL PRIMARY KEY,
+    label VARCHAR(50) NOT NULL UNIQUE
+);
+
+CREATE TABLE labelsToUsers (
+    labelId INT NOT NULL REFERENCES labels(labelId),
+    userId TEXT NOT NULL REFERENCES users(userId)
+);
+
+CREATE TABLE labelsToLists (
+    labelId INT NOT NULL REFERENCES labels(labelId),
+    listId INT NOT NULL REFERENCES lists(listId)
+);
+
+
+
+

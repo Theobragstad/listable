@@ -4,7 +4,74 @@
 
 <main>
 
-    <div data-bs-backdrop="static" data-bs-keyboard="false" class="modal fade" id="myModal" tabindex="-1" aria-labelledby="myModalLabel" aria-modal="true" role="dialog" style="display: block;">
+    
+    <div  data-bs-backdrop="static" data-bs-keyboard="false" class="modal fade" id="myModal" tabindex="-1" aria-labelledby="myModalLabel" aria-modal="true" role="dialog" style="display: block;">
+        <div class="modal-dialog">
+          <div class="modal-content mx-auto text-center justify-content-center" style="width:500px">
+            <div style="padding-top:10px">
+              <h6>Create new label</h6>
+            </div>
+            <div style="padding-top:10px;padding-bottom:5px;padding:10px">
+              <form action="/createNewLabel" method="POST">
+                <input class="form-control" name="listId" type="number" value='<%= listid %>' hidden>
+                <input class="form-control" type="text" name="label" maxlength="50" placeholder="enter a label name" oninvalid="this.setCustomValidity('Enter a label name')" oninput="setCustomValidity('')" required>
+                <!-- <input class="form-control" name="listIdToCollaborate" type="text" value="" hidden>  -->
+                <div style="padding-top:10px;">
+                  <button class="btn rounded-pill zoom" style="border-color:black;font-size:10px">+</button>
+                </div>
+              </form>
+            </div> 
+
+            <div style="padding-top:10px;padding:10px">
+              <h6 data-bs-toggle="tooltip"  data-bs-placement="top"  
+              data-bs-custom-class="labelInfoTooltip"
+              data-bs-title="
+                Click a label to add it to the current list" class="btn zoom">Existing labels</h6>
+
+
+                
+              
+            
+                <div style="padding-top:5px">
+              <% if(labels.length == 0) { %>
+                No labels
+
+                <% } else { %>
+                  <div style="padding-bottom:20px">
+                
+                    <form action="/deleteAllLabels" method="POST">
+                      <input class="form-control" name="listId" type="number" value='<%= listid %>' hidden>
+                      <button class="btn rounded-pill zoom" style="background-color:#ffe5ec;color:#fb6f92;border-color: #fb6f92;font-size:8px;padding:5px">Delete all</button>
+                    </form>
+                  
+                  
+                  </div>
+
+                  <% } %>
+
+              <% labels.forEach(function(label) { %>
+                  
+                  <div style="padding-bottom:5px">
+                    <form action="/assignLabelToList" method="POST">
+                    <input class="form-control" name="listId" type="number" value='<%= listid %>' hidden>
+                    <input class="form-control" name="labelId" type="text" value="<%= label.labelid %>" hidden>
+                      <button title="Add label" class="btn rounded-pill" style="border-color: #03a9f4;background-color: #b3e5fc;color:#03a9f4;font-weight: bold;font-size:12px">
+                        <%= label.label %></button>
+                      </form>
+                    </div>
+                    
+
+
+                <% }) %>
+              </div>
+
+                      
+              </div>
+            </div>
+          </div>
+        </div>
+
+    <!-- <div data-bs-backdrop="static" data-bs-keyboard="false" class="modal fade" id="myModal" tabindex="-1" aria-labelledby="myModalLabel" aria-modal="true" role="dialog" style="display: block;">
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
@@ -13,20 +80,13 @@
             <div class="modal-body">
 
 
-                <% if(users.length == 0) { %>
                     No users found, or that person is already a collaborator.
-                <% } else { %>
                     <div style="color:#fb6f92;font-weight: bold;font-size:12px;padding-bottom:10px" >Select a person to collaborate on this list with:</div>
-                <% } %>
 
-                <% users.forEach(function(user) { %>
                     <div style="padding-bottom:5px">
                         <form action="/addCollaborator" method="POST">
-                            <input class="form-control" name="collaboratorUserId" type="text" value="<%= user.userid %>" hidden>
-                            <input class="form-control" name="listId" type="text" value="<%= listid %>" hidden>
-                            <input class="form-control" name="email" type="text" value="<%= user.email %>" hidden>
+                           
                     <button class="btn rounded-pill" style="background-color:#03a9f4;color:white;font-weight: bold;font-size:12px">
-                    <%= user.fullname %> < <%= user.email %> >
                 </button>
             </form>
 
@@ -45,7 +105,6 @@
         
         
         
-                <% }) %>
         
                 
                 
@@ -53,10 +112,8 @@
 
 
             </div>
-            <!-- <div class="modal-footer"> -->
               
-              <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
-            <!-- </div> -->
+             </div> -->
           </div>
         </div>
       </div>
@@ -157,7 +214,12 @@
 
 
 
-
+   document.addEventListener("DOMContentLoaded", function(){
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function(element){
+                return new bootstrap.Tooltip(element);
+            });
+        });
 
 window.onload = function () {
         // https://getbootstrap.com/docs/5.0/components/modal/#via-javascript
