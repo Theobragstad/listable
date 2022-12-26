@@ -74,7 +74,7 @@
 
         <% labels.forEach(function(label) { %>
             <div style="padding-left:60px">
-                <form action="/lists?filterByLabel=true&labelId=<%= label.labelid %>" method="GET">
+                <form action="/search?filterByLabel=true&labelId=<%= label.labelid %>" method="POST">
                 <input class="form-control" name="labelId" value="<%= label.labelid %>" hidden>
                 <button  title="View lists with label" class="btn rounded-pill" style="border-color: #03a9f4;background-color: #b3e5fc;color:#03a9f4;font-weight: bold;font-size:12px" >
 

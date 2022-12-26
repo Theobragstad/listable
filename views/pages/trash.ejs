@@ -86,6 +86,8 @@
         </div>
 
 
+
+
           
 
       
@@ -169,6 +171,29 @@
         <br>
         <%- list.list %>
 
+        <div class="row g-0" style="padding-top:20px">
+    
+    
+    
+          <% labels.forEach(function(label) { %>
+            <% if(label.listid == list.listid){ %>
+              <div class="col auto" style="padding-right:0;
+              padding-left:10px;padding-bottom:5px;">
+              
+
+                <button  class="btn rounded-pill" style="vertical-align:middle;border-color: #03a9f4;background-color: #b3e5fc;color:#03a9f4;font-size:12px;padding:5px"><%=label.label %> 
+                </button>
+
+              </div>
+
+              
+              
+              
+              
+              <% } %>
+        <% }); %>
+        </div>
+
 
         <div data-bs-toggle="tooltip" data-bs-custom-class="timeTooltip" class="createTime" id="createTime<%= list.listid%>" data-value="<%= list.createdatetime %>" style="text-align:center;padding-top:5px;font-size:12px;font-weight: bold;">
                     
@@ -176,6 +201,10 @@
 
         
         </div>
+
+
+
+        
       </div>
 
 

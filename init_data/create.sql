@@ -19,7 +19,8 @@ CREATE TABLE lists (
 CREATE TABLE listsToUsers (
     listId INT NOT NULL REFERENCES lists(listId),
     userId TEXT NOT NULL REFERENCES users(userId),
-    owner BOOLEAN NOT NULL
+    owner BOOLEAN NOT NULL,
+    archive BOOLEAN NOT NULL
 );
 
 CREATE TABLE labels (
