@@ -1,0 +1,847 @@
+<%- include ('../partials/header') %>
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+<main>
+
+
+    <%- include ('../partials/menu') %>
+
+
+    <div class="text-center" style="padding-top:50px;color:#f289ca">
+      
+        <h4 class="site-title">labels</h4>
+
+        <% if(labels.length == 0) { %>
+            <p id="labelCount" style="font-size:12px;padding-top:16px">No labels</p>
+          <% } else if(labels.length == 1) { %>
+            <p id="labelCount" style="font-size:12px;padding-top:16px">1 label</p>
+          <% } else { %>
+            <p id="labelCount" style="font-size:12px;padding-top:16px"><%= labels.length %> labels</p>
+          <% } %>
+        
+
+
+    </div>
+
+
+    <div>
+
+        
+
+            <form action="/createNewLabel?redirect=labels" method="POST" style="padding-top:30px;padding-left:60px">
+
+                <input class="form-control" type="text" name="label" style="width:680px" maxlength="50" placeholder="Add a new label..." oninvalid="this.setCustomValidity('Enter a label name')" oninput="setCustomValidity('')" required>
+                <!-- <input class="form-control" name="listIdToCollaborate" type="text" value="" hidden>  -->
+                <div style="padding-top:10px;">
+                  <button title="Create new label" class="btn rounded-pill zoom" style="position:absolute;left:750px;top:175px;border-color:black;font-size:14px;padding-left:5px;padding-right:5px;padding-top:0px;padding-bottom:0px">+</button>
+                </div>
+              </form>
+
+              <% if(labels.length == 0) { %>
+                <div class="text-center" style="padding-top:205px">
+              
+                  <h6>No labels</h6>
+                  <img style="width:100px" src="/img/house.png">
+              
+                </div>
+              
+                <% } %>
+
+
+            <% if(labels.length != 0) { %>
+              
+    
+                <div style="padding-top:20px;padding-left:60px">
+                    <button onclick="editLabelsToggle()" id="editButton" title="Edit labels"class="btn rounded-10"style="height:30px;border-color:#000000;background-color:#ececec;font-size:12px">Edit labels</a>
+                </div>
+
+                <div style="padding-top:20px;padding-left:60px">
+                        <button  data-bs-toggle="modal" data-bs-target="#confirmDeleteAll" href="#confirmDeleteAll" data-toggle="modal" id="deleteAllButton" title="Delete all labels"class="btn rounded-10"style="height:30px;background-color:#ffe5ec;border-color:#fb6f92;font-size:10px;" hidden><img src="/img/warning.png" style="width:10px">Delete all labels</a>
+                </div>
+              
+                <% } %>
+
+
+
+            
+
+            <!-- <div style="display: flex;padding-top:30px;padding-left:60px"> -->
+                <div style="padding-top:30px;">
+
+
+        <% labels.forEach(function(label) { %>
+            <div style="padding-left:60px">
+                <form action="/lists?filterByLabel=true&labelId=<%= label.labelid %>" method="GET">
+                <input class="form-control" name="labelId" value="<%= label.labelid %>" hidden>
+                <button  title="View lists with label" class="btn rounded-pill" style="border-color: #03a9f4;background-color: #b3e5fc;color:#03a9f4;font-weight: bold;font-size:12px" >
+
+                  <!-- <button  type="text" title="" class="btn rounded-pill" style="border-color: #03a9f4;background-color: #b3e5fc;color:#03a9f4;font-weight: bold;font-size:12px" disabled> -->
+                    <%= label.label %> </button>
+                  </form>
+
+                  <form class="editActions" action="/updateLabel" method="POST" style="padding-top:10px;">
+                    <input class="form-control" name="labelId" type="number" value=<%= label.labelid %> hidden>
+                    <input class="editInput form-control" name="updatedLabel" type="text" value="<%= label.label %>" style="width:650px" hidden>
+                    <div style="padding-top:10px;">
+                        <button  title="Save changes" class="saveChanges btn rounded-pill" style="border-color:#17d475;background-color:#e8fcec;font-weight: bold;font-size:12px;" hidden>Save changes</button>
+                    </div>
+
+                   
+    
+                
+                    
+                  </form>
+                  <!-- <form  action="" method=""> -->
+                    <!-- <input class="form-control" name="labelId" type="number" value=<%= label.labelid %> hidden> -->
+                 <button data-bs-toggle="modal" data-bs-target="#confirmDelete<%= label.labelid %>" href="#confirmDelete<%= label.labelid %>" data-toggle="modal" id="deleteListButton" class="deleteLink btn rounded-pill" title="Delete label" style="position:relative;left:130px;bottom:72px;background-color:#ffe5ec;border-color:#fb6f92;font-weight: bold;font-size:12px" hidden>Delete label</button>
+                <!-- </form> -->
+                  
+                 
+
+
+             
+
+                    </div>
+
+                    <!-- <form class="editActions" action="/deleteLabel" method="POST"> -->
+                        <!-- <input class="form-control" name="labelId" type="number" value=<%= label.labelid %> hidden> -->
+    
+                      <!-- <button class="deleteLink btn rounded-pill" title="Delete label" style="background-color:#ffe5ec;border-color:#fb6f92;font-weight: bold;font-size:12px" hidden>Delete label</button> -->
+                        <!-- </form> -->
+
+                        <div class="modal" id="confirmDelete<%= label.labelid %>" tabindex="-1" aria-labelledby="confirmDelete" aria-hidden="true">
+                            <div class="modal-dialog ">
+                      
+                                <div class="modal-content  mx-auto text-center" style="max-width:200px;padding:10px">
+                                    Delete label?
+                                    <div class="mx-auto" style="padding-top:10px">
+                                    <button class="btn rounded-10" data-bs-dismiss="modal"  style="width:90px;background:#e8fcec;color:#17d475;border-color: #17d475;">Cancel</button>
+                                    <form action="/deleteLabel" method="POST" style="padding-top:10px">
+                                       
+                                            <input class="form-control" name="labelId" type="number" value=<%= label.labelid %> hidden>
+                                      
+                            
+                                        <button  class="btn rounded-10" style="background:#ffe5ec;color:#fb6f92;border-color: #fb6f92;">Continue</button>
+                                    </form>
+                            </div>
+                        
+                                    
+                              </div>
+                            </div>
+                          </div>
+                        
+
+
+                  
+
+                <!-- </a> -->
+        <% }) %>
+    </div>
+
+
+    
+
+ <!-- <input  type="text" title="" class="btn rounded-pill" style="border-color: #03a9f4;background-color: #b3e5fc;color:#03a9f4;font-weight: bold;font-size:12px" disabled
+                   value="<%=  %>" >
+                  </form> -->
+
+
+                  <div class="modal" id="confirmDeleteAll" tabindex="-1" aria-labelledby="confirmDeleteAll" aria-hidden="true">
+                    <div class="modal-dialog ">
+                
+                        
+                        <div class="modal-content  mx-auto text-center" style="max-width:200px;padding:10px">
+                            Delete all labels?
+                            <div class="mx-auto" style="padding-top:10px">
+                            <button class="btn rounded-10" data-bs-dismiss="modal"  style="width:90px;background:#e8fcec;color:#17d475;border-color: #17d475;">Cancel</button>
+                            <form action="/deleteAllLabels" method="POST" style="padding-top:10px">
+
+                    
+                                <button  class="btn rounded-10" style="background:#ffe5ec;color:#fb6f92;border-color: #fb6f92;">Continue</button>
+                            </form>
+                    </div>
+                
+                            
+                            
+                            <!-- <div class="btn-group" style="padding-left:100px;padding-bottom: 10px;">
+                                <div style="padding-right:10px">
+                            <button class="card" data-bs-dismiss="modal"  style="background:#e8fcec;color:#17d475;border-color: #17d475;">Cancel</button>
+                        </div>
+                        <div style="padding-left:10px">
+                            <form action="/emptyTrash" method="POST" >
+                
+                            <button  class="card" style="background:#ffe5ec;color:#fb6f92;border-color: #fb6f92;">Continue</button>
+                        </form>
+                
+                            </div>
+                        </div> -->
+                        
+                      </div>
+                    </div>
+                  </div>
+                
+
+
+
+
+
+                  
+
+
+
+
+
+</main>
+
+<!-- <script src="https://cdn.tiny.cloud/1/is0q015mgv0512rfhujg2w9j8h17y7kkgn7ntlxua0p4pzbx/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script> -->
+
+  
+<script>
+
+
+function editLabelsToggle() {
+
+    var editButton = document.getElementById('editButton');
+    var deleteAllButton = document.getElementById('deleteAllButton');
+    var inputs = document.getElementsByClassName("editInput");
+
+    
+    var saveChangesButtons = document.getElementsByClassName('saveChanges');
+    var deleteLinks = document.getElementsByClassName('deleteLink');
+
+    var editForms = document.getElementsByClassName('editActions');
+
+    if(editButton.innerHTML == 'Edit labels') {
+        for(var i = 0; i < inputs.length; i++) {
+            // console.log(inputs[i])
+            inputs[i].removeAttribute('hidden');
+
+        }
+
+        for(var i = 0; i < saveChangesButtons.length; i++) {
+            // console.log(inputs[i])
+            saveChangesButtons[i].removeAttribute('hidden');
+
+        }
+
+        for(var i = 0; i < deleteLinks.length; i++) {
+            // console.log(inputs[i])
+            deleteLinks[i].removeAttribute('hidden');
+
+        }
+
+        for(var i = 0; i < editForms.length; i++) {
+            // console.log(inputs[i])
+            editForms[i].style.setProperty('padding-bottom','40px');
+
+        }
+
+        deleteAllButton.removeAttribute('hidden');
+
+    
+        editButton.innerHTML = 'Done';
+        
+       
+    }
+    else if(editButton.innerHTML = 'Done') {
+        for(var i = 0; i < inputs.length; i++) {
+            // console.log(inputs[i])
+            inputs[i].setAttribute('hidden', 'true');
+
+        }
+
+        for(var i = 0; i < saveChangesButtons.length; i++) {
+            // console.log(inputs[i])
+            saveChangesButtons[i].setAttribute('hidden', 'true');
+
+        }
+
+        for(var i = 0; i < deleteLinks.length; i++) {
+            // console.log(inputs[i])
+            deleteLinks[i].setAttribute('hidden', 'true');
+
+        }
+
+        for(var i = 0; i < editForms.length; i++) {
+            // console.log(inputs[i])
+            editForms[i].style.setProperty('padding-bottom','10px');
+
+            
+        }
+
+        deleteAllButton.setAttribute('hidden', 'true');
+            
+        editButton.innerHTML = 'Edit labels';
+       
+    }
+}
+
+editLabelsToggle();
+
+
+// document.querySelector('input').addEventListener('input', function() {
+//   this.style.width = this.value.length + 'ch'
+// })
+
+// document.getElementById('listColors').addEventListener('show.bs.modal', (e) => {
+//     // console.log(e.relatedTarget);
+//     console.log(e.relatedTarget.dataset.id);
+
+//     // var element = document.createElement("div");
+//     // element.innerHTML = e.relatedTarget.dataset.id;
+//     // document.getElementById('listColorsContent').appendChild(element);  
+//     // document.getElementById('modalListId').innerHTML = e.relatedTarget.dataset.id;
+
+//     document.getElementById('modalListId').value = e.relatedTarget.dataset.id;
+//     console.log(document.getElementById('modalListId').value);
+
+
+
+// });
+
+
+
+
+
+
+
+
+
+// document.getElementById('listColors').addEventListener('show.bs.modal', (e) => {
+//     // console.log(e.relatedTarget);
+//     // console.log(e.relatedTarget.dataset.id);
+
+//     // var element = document.createElement("div");
+//     // element.innerHTML = e.relatedTarget.dataset.id;
+//     // document.getElementById('listColorsContent').appendChild(element);  
+//     // document.getElementById('modalListId').innerHTML = e.relatedTarget.dataset.id;
+
+//     document.getElementById('modalListId').value = e.relatedTarget.dataset.id;
+//     // console.log(document.getElementById('modalListId').value);
+
+
+
+// });
+
+
+
+
+
+
+
+// function setSelectedColor(color) {
+//   var imgs = ['white','yellow','orange','green','greenBlue','lightBlue','lavender','pink','purple'];
+//         var ids = ['ffffff','fdf5c1','f7cdc2','cafbc8','bdf6d9','bae6fc','b4c9fa','f4c3fb','d0adfa']; 
+
+//         for(var i = 0; i < 9; i++) {
+//             document.getElementById(ids[i]).src='/img/colors/'+imgs[i]+'.png';
+//         }
+        
+//   document.getElementById(color).src = '/img/colors/'+color+'Selected.png';
+// }
+
+
+// function hover(element, src) {
+//   element.setAttribute('src', '/img/'+src+'.png');
+//  if(src !== 'paletteColors') {
+//   stopModals();
+//  }
+// }
+
+// function unhover(element, src) {
+//   element.setAttribute('src', '/img/'+src+'.png');
+//   startModals();
+// }
+
+//   tinymce.init({
+//     selector: 'textarea',
+//     plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed linkchecker a11ychecker tinymcespellchecker permanentpen powerpaste advtable advcode editimage tinycomments tableofcontents footnotes mergetags autocorrect typography inlinecss textcolor colorpicker',
+//     toolbar: 'blocks fontfamily fontsize | bold italic underline strikethrough forecolor backcolor | link image media table mergetags | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+//     image_list: [
+//     {title: 'My image 1', value: 'http://t2.gstatic.com/licensed-image?q=tbn:ANd9GcQOO0X7mMnoYz-e9Zdc6Pe6Wz7Ow1DcvhEiaex5aSv6QJDoCtcooqA7UUbjrphvjlIc'},
+//     {title: 'My image 2', value: 'http://www.moxiecode.com/my2.gif'}
+//   ],
+//     tinycomments_mode: 'embedded',
+//     tinycomments_author: 'Author name',
+//     mergetags_list: [
+//       { value: 'First.Name', title: 'First Name' },
+//       { value: 'Email', title: 'Email' },
+//     ]
+//   });
+
+
+
+
+  
+//   function changeListColor(val, id, listId){
+//     var targetId = document.getElementById('modalListId').value;
+//     // console.log(targetId);
+//     var list = document.getElementById(targetId).style.backgroundColor = val;
+
+//         // var list = document.getElementById(listId);
+//         // list.style.backgroundColor = val;
+
+//         // document.body.style.backgroundColor = val;
+
+
+
+        
+//         var imgs = ['white','yellow','orange','green','greenBlue','lightBlue','lavender','pink','purple'];
+//         var ids = ['whiteSelected','yellowSelected','orangeSelected','greenSelected','greenBlueSelected','lightBlueSelected','lavenderSelected','pinkSelected','purpleSelected']; 
+
+//         for(var i = 0; i < 9; i++) {
+//             document.getElementById(ids[i]).src='/img/colors/'+imgs[i]+'.png';
+//         }
+
+//         document.getElementById(id).src='/img/colors/'+id+'.png';
+//     }
+
+
+
+
+// //   function changeListColor(val, id, listId){
+// //     var targetId = document.getElementById('modalListId').value;
+// //     console.log(targetId);
+// //     var list = document.getElementById(targetId).style.backgroundColor = val;
+
+// //         // var list = document.getElementById(listId);
+// //         // list.style.backgroundColor = val;
+
+// //         // document.body.style.backgroundColor = val;
+
+
+
+        
+// //         var imgs = ['white','yellow','orange','green','greenBlue','lightBlue','lavender','pink','purple'];
+// //         var ids = ['whiteSelected','yellowSelected','orangeSelected','greenSelected','greenBlueSelected','lightBlueSelected','lavenderSelected','pinkSelected','purpleSelected']; 
+
+// //         for(var i = 0; i < 9; i++) {
+// //             document.getElementById(ids[i]).src='/img/colors/'+imgs[i]+'.png';
+// //         }
+
+// //         document.getElementById(id).src='/img/colors/'+id+'.png';
+// //     }
+
+
+// function changeImage(element, img1, img2) {
+//   if(element.getAttribute('src') == '/img/'+img1+'.png') {
+//     element.setAttribute('src', '/img/'+img2+'.png');
+//   }
+//   else {
+//     element.setAttribute('src', '/img/'+img1+'.png');
+//   }  
+
+//   countSelectedLists();
+// }
+
+// function countSelectedLists() {
+//   const elements = document.getElementsByClassName('listSelector');
+  
+//   var n = 0;
+//   var selectedListIds = [];
+//   for(var i = 0; i < elements.length; i++) {
+//     // console.log(elements[i].src)
+//     // console.log(window.location.origin+'/img/colors/ffffffSelected.png');
+//     if(elements[i].src == window.location.origin+'/img/colors/ffffffSelected.png') {
+//       n++;
+//       // console.log(elements[i].parentElement.value);
+//       selectedListIds.push(elements[i].parentElement.value);
+//     }
+//   }
+
+//   // console.log('num selected: '+n);
+//   // for(var i=0; i < selectedListIds.length;i++) {
+//   //   console.log(selectedListIds[i]);
+//   // }
+
+
+//   if(n >0) {
+// document.getElementById('numSelectedLists').innerHTML = n+' selected';
+// document.getElementById('numSelectedLists').style.display = 'block';
+
+// document.getElementById('delSelectedLists').style.display = 'block';
+
+// // document.getElementById('delSelectedLists').value = selectedListIds;
+// document.getElementById('delSelectedLists').setAttribute('data-id' , selectedListIds); 
+
+
+// document.getElementById('restoreSelectedLists').style.display = 'block';
+// document.getElementById('restoreSelectedLists').value = selectedListIds;
+
+
+// console.log(document.getElementById('delSelectedLists').value);
+
+// document.getElementById('unselectAll').style.display = 'block';
+
+
+
+
+//   } else {
+//     document.getElementById('numSelectedLists').style.display = 'none';
+//     // document.getElementById('numSelectedLists').innerHTML = '';
+
+//     document.getElementById('delSelectedLists').style.display = 'none';
+
+//     document.getElementById('unselectAll').style.display = 'none';
+    
+
+
+
+//   }
+  
+// }
+
+// function unselectAll() {
+//   var selected = document.querySelectorAll('[src="/img/colors/ffffffSelected.png"]');
+
+//   // console.log(selected[0].src);
+
+//   for(var i = 0; i < selected.length; i++) {
+//     selected[i].src = '/img/colors/white.png';
+//   }
+
+//   countSelectedLists();
+  
+  
+// }
+
+
+
+// document.addEventListener("keydown", function(e) {
+
+// if(!e.metaKey || e.metaKey && e.keyCode == 82 || e.metaKey && e.keyCode == 87) {
+//   return true;
+// }
+// e.preventDefault();
+
+// var selectedListIds = [];
+
+
+// if(e.metaKey && e.keyCode == 65) {
+//   console.log('cmd a')
+
+//   const elements = document.getElementsByClassName('listSelector');
+
+// for(var i = 0; i < elements.length; i++) {
+//   // console.log(elements[i].src)
+//   // console.log(window.location.origin+'/img/colors/ffffffSelected.png');
+//   if(elements[i].src !== window.location.origin+'/img/colors/ffffffSelected.png') {
+//     // console.log(elements[i].parentElement.value);
+//     elements[i].src = '/img/colors/ffffffSelected.png';
+//   }
+//   selectedListIds.push(elements[i].parentElement.value);
+
+// } 
+
+// console.log(selectedListIds)
+
+// }
+
+
+
+// if(selectedListIds.length > 0) {
+// document.getElementById('numSelectedLists').innerHTML = selectedListIds.length+' selected';
+// document.getElementById('numSelectedLists').style.display = 'block';
+
+// document.getElementById('delSelectedLists').style.display = 'block';
+
+// //
+// // document.getElementById('delSelectedLists').value = selectedListIds;
+// document.getElementById('delSelectedLists').setAttribute('data-id' , selectedListIds); 
+
+
+// document.getElementById('restoreSelectedLists').style.display = 'block';
+// document.getElementById('restoreSelectedLists').value = selectedListIds;
+
+// document.getElementById('unselectAll').style.display = 'block';
+
+
+
+// console.log(document.getElementById('delSelectedLists').value);
+// }
+
+// // if (e.keyCode >= 65 && e.keyCode <= 90) {
+// //   var char = (e.metaKey ? '⌘-' : '') + String.fromCharCode(e.keyCode)
+// //   // document.getElementById('keydown').innerHTML += '<kbd>' + char + '</kbd>'
+  
+// // }
+// })
+
+
+
+
+// function setEditTimes() {
+//   const elements = document.getElementsByClassName('editTime');
+//   // var elements = document.querySelectorAll('[var="editTime"]');
+
+
+//   for(var i = 0; i < elements.length; i++) {
+    
+//     // console.log(elements[i].id);
+//     // console.log(elements[i].dataset.value);
+   
+//     setTimeEdited(elements[i].dataset.value, elements[i].id);
+
+//   }
+// }
+
+
+// function setCreateTimes() {
+//   const elements = document.getElementsByClassName('createTime');
+//   // var elements = document.querySelectorAll('[var="editTime"]');
+
+
+
+
+
+//   for(var i = 0; i < elements.length; i++) {
+    
+//     // console.log(elements[i].id);
+//     // console.log(elements[i].dataset.value);
+   
+//     setTimeCreated(elements[i].dataset.value, elements[i].id);
+
+//   }
+// }
+
+
+// function setTimeEdited(editDateTime, divId) {
+//   var now = new Date();
+//   var nowYear = parseInt(now.getFullYear());
+//   var nowMonth = parseInt(now.getMonth()+1);
+//   var nowDate = parseInt(now.getDate());
+
+
+
+//   var thenYear = parseInt(editDateTime.substring(6,10));
+//   var thenMonth = parseInt(editDateTime.substring(0,2));
+//   var thenDate = parseInt(editDateTime.substring(3,5));
+//   var thenHour = parseInt(editDateTime.substring(11,13));
+//   var thenMin = parseInt(editDateTime.substring(14));
+
+
+//   var ampm = 'AM';
+
+//   if(thenHour >= 12) {
+//     ampm = 'PM';
+
+//     if(thenHour > 12) {
+//         thenHour -= 12;
+
+//     }
+//   }
+
+//   if(thenHour == 0) {
+//     thenHour = 12;
+//   }
+
+//   var thenMinutesFormatted = (thenMin < 10) ? '0' + thenMin : thenMin;
+      
+//   var thenTime = thenHour + ':' + thenMinutesFormatted + ' ' + ampm;
+
+
+//   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+//   const thenMonthAbbr = months[thenMonth-1];
+
+//   var thenDateFormatted = (thenDate < 10) ? '0' + thenDate : thenDate;
+  
+
+//   if(nowYear > thenYear) {
+//     var message = 'Edited ' + thenMonthAbbr + ' ' + thenDateFormatted + ' ' + thenYear;
+//     document.getElementById(divId).innerHTML = message;
+//   }
+//   else if(nowYear == thenYear && nowMonth == thenMonth && nowDate == thenDate) {
+//       var message = 'Edited ' + thenTime;
+//       document.getElementById(divId).innerHTML = message;
+//   }
+//   else if(nowYear == thenYear && nowMonth == thenMonth && nowDate == (thenDate+1)) {
+//       var message = 'Edited yesterday, ' + thenTime;
+//       document.getElementById(divId).innerHTML = message;
+//   }
+//   else if(nowYear == thenYear && nowMonth >= thenMonth && nowDate > (thenDate+1)) {
+//       var message = 'Edited ' + thenMonthAbbr + ' ' + thenDateFormatted;
+//       document.getElementById(divId).innerHTML = message;
+//   }
+//   else {
+//       var message = 'Edited: error';
+//       document.getElementById(divId).innerHTML = message;
+//   }
+// }
+
+
+// function setTimeCreated(createDateTime, divId) {
+//   var now = new Date();
+//   var nowYear = parseInt(now.getFullYear());
+//   var nowMonth = parseInt(now.getMonth()+1);
+//   var nowDate = parseInt(now.getDate());
+
+
+
+//   var thenYear = parseInt(createDateTime.substring(6,10));
+//   var thenMonth = parseInt(createDateTime.substring(0,2));
+//   var thenDate = parseInt(createDateTime.substring(3,5));
+//   var thenHour = parseInt(createDateTime.substring(11,13));
+//   var thenMin = parseInt(createDateTime.substring(14));
+
+
+//   var ampm = 'AM';
+
+//   if(thenHour >= 12) {
+//     ampm = 'PM';
+
+//     if(thenHour > 12) {
+//         thenHour -= 12;
+
+//     }
+//   }
+
+//   if(thenHour == 0) {
+//     thenHour = 12;
+//   }
+
+//   var thenMinutesFormatted = (thenMin < 10) ? '0' + thenMin : thenMin;
+      
+//   var thenTime = thenHour + ':' + thenMinutesFormatted + ' ' + ampm;
+
+
+//   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+//   const thenMonthAbbr = months[thenMonth-1];
+
+//   var thenDateFormatted = (thenDate < 10) ? '0' + thenDate : thenDate;
+
+//   if(nowYear > thenYear) {
+//     var message = 'Created ' + thenMonthAbbr + ' ' + thenDateFormatted + ' ' + thenYear;
+//     // document.getElementById(divId).setAttribute('data-bs-title', message);
+//   }
+//   else if(nowYear == thenYear && nowMonth == thenMonth && nowDate == thenDate) {
+//       var message = 'Created ' + thenTime;
+//       // document.getElementById(divId).innerHTML = message;
+//   }
+//   else if(nowYear == thenYear && nowMonth == thenMonth && nowDate == (thenDate+1)) {
+//       var message = 'Created yesterday, ' + thenTime;
+//       // document.getElementById(divId).innerHTML = message;
+//   }
+//   else if(nowYear == thenYear && nowMonth >= thenMonth && nowDate > (thenDate+1)) {
+//       var message = 'Created ' + thenMonthAbbr + ' ' + thenDateFormatted;
+//       // document.getElementById(divId).innerHTML = message;
+//   }
+//   else {
+//       var message = 'Created: error';
+//       // document.getElementById(divId).innerHTML = message;
+//   }
+
+//   document.getElementById(divId).setAttribute('data-bs-title', message);
+// }
+
+
+
+// setEditTimes();
+// setCreateTimes();
+// setInputTimes();
+
+// setInterval(setEditTimes, 3000);
+// setInterval(setCreateTimes, 3000);
+// setInterval(setInputTimes, 3000);
+
+
+
+
+
+
+// function setInputTimes() {
+//   const elements = document.getElementsByClassName('timeInput');
+//   // var elements = document.querySelectorAll('[var="editTime"]');
+
+
+//   for(var i = 0; i < elements.length; i++) {
+    
+//     // console.log(elements[i].id);
+//     // console.log(elements[i].dataset.value);
+   
+//     // setTimeEdited(elements[i].dataset.value, elements[i].id);
+
+//     elements[i].value = getNowFormatted();
+//     // console.log(elements[i].value);
+
+
+//   }
+// }
+
+
+
+// function getNowFormatted() {
+//     var now = new Date();
+
+//     // console.log(now);
+
+//     var nowYear = now.getFullYear();
+//     var nowMonth = parseInt(now.getMonth()+1);
+//     var nowDate = now.getDate();
+//     var nowHours = now.getHours();
+//     var nowMinutes = now.getMinutes();
+
+//     var monthFormatted = (nowMonth < 10) ? '0' + nowMonth : nowMonth;
+//     var dateFormatted = (nowDate < 10) ? '0' + nowDate : nowDate;
+//     var hoursFormatted = (nowHours < 10) ? '0' + nowHours : nowHours;
+//     var minutesFormatted = (nowMinutes < 10) ? '0' + nowMinutes : nowMinutes;
+
+//     var nowFormatted = monthFormatted + '-' + dateFormatted + '-' + nowYear + ',' + hoursFormatted + ':' + minutesFormatted;
+    
+//     console.log(nowFormatted);
+
+//     return nowFormatted;
+// }
+
+
+// document.addEventListener("DOMContentLoaded", function(){
+//             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+//             var tooltipList = tooltipTriggerList.map(function(element){
+//                 return new bootstrap.Tooltip(element);
+//             });
+//         });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//         function stopModals() {
+//   var modalBtns = document.querySelectorAll('[data-bs-toggle="modal"]');
+//   for(var i = 0; i < modalBtns.length; i++) {
+//     modalBtns[i].setAttribute('data-bs-toggle', '');
+//   }
+
+// }
+
+// function startModals() {
+//   var modalBtns = document.querySelectorAll('[data-bs-toggle=""]');
+//   for(var i = 0; i < modalBtns.length; i++) {
+//     modalBtns[i].setAttribute('data-bs-toggle', 'modal');
+//   }
+
+// }
+</script>
+<!-- <script>tinymce.init({
+  selector: 'textarea',  // change this value according to your HTML
+  plugins: 'image',
+  menubar: 'insert',
+  toolbar: 'image',
+  image_list: [
+    {title: 'My image 1', value: 'https://www.example.com/my1.gif'},
+    {title: 'My image 2', value: 'http://www.moxiecode.com/my2.gif'}
+  ]
+});</script> -->
+
+
+<%- include ('../partials/footer') %>

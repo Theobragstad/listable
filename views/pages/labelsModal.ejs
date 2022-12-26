@@ -9,12 +9,28 @@
         <div class="modal-dialog">
           <div class="modal-content mx-auto text-center justify-content-center" style="width:500px">
             <div style="padding-top:10px">
+              <a href="/lists">
+                <button title="Go to lists" class="btn rounded-10 zoom" style="position:absolute;left:20px;top:10px;border-color:#fb6fff;background-color:#ffe5ec;padding: 0;line-height: 1.25;width:30px"><img src="/img/list.png" style="width:20px" onmouseover="hover(this, 'listPink')" onmouseout="unhover(this, 'list')"></button>
+                </a>
+               
+              
+              <a href="/archive">
+              <button title="Go to archive" class="btn rounded-10 zoom" style="position:absolute;left:70px;top:10px;border-color:#b24bf3;background-color:#e6d4ff;padding: 0;line-height: 1.25;width:30px"><img src="/img/archive.png" style="width:20px" onmouseover="hover(this, 'archiveGreen')" onmouseout="unhover(this, 'archive')"></button>
+              </a>
+              
+              <a href="/labels">
+                <button title="Go to labels" class="btn rounded-10 zoom" style="position:absolute;left:120px;top:10px;border-color:#fb6fff;background-color:#ffe5ec;padding: 0;line-height: 1.25;width:30px"><img src="/img/label.png" style="width:20px" onmouseover="hover(this, 'labelPink')" onmouseout="unhover(this, 'label')"></button>
+                </a>
+            </div>
+            <div style="padding-top:40px">
               <h6>Create new label</h6>
             </div>
             <div style="padding-top:10px;padding-bottom:5px;padding:10px">
               <form action="/createNewLabel" method="POST">
+                <!-- <form action="/checkIfLabelExistsForUser" method="POST"> -->
+
                 <input class="form-control" name="listId" type="number" value='<%= listid %>' hidden>
-                <input class="form-control" type="text" name="label" maxlength="50" placeholder="enter a label name" oninvalid="this.setCustomValidity('Enter a label name')" oninput="setCustomValidity('')" required>
+                <input class="form-control" type="text" name="label" maxlength="50" placeholder="Add a new label..." oninvalid="this.setCustomValidity('Enter a label name')" oninput="setCustomValidity('')" required>
                 <!-- <input class="form-control" name="listIdToCollaborate" type="text" value="" hidden>  -->
                 <div style="padding-top:10px;">
                   <button class="btn rounded-pill zoom" style="border-color:black;font-size:10px">+</button>
@@ -36,19 +52,7 @@
               <% if(labels.length == 0) { %>
                 No labels
 
-                <% } else { %>
-                  <div style="padding-bottom:20px">
-                
-                    <form action="/deleteAllLabels" method="POST">
-                      <input class="form-control" name="listId" type="number" value='<%= listid %>' hidden>
-                      <button class="btn rounded-pill zoom" style="background-color:#ffe5ec;color:#fb6f92;border-color: #fb6f92;font-size:8px;padding:5px">Delete all</button>
-                    </form>
-                  
-                  
-                  </div>
-
-                  <% } %>
-
+                <% } %>
               <% labels.forEach(function(label) { %>
                   
                   <div style="padding-bottom:5px">

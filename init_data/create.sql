@@ -22,13 +22,9 @@ CREATE TABLE listsToUsers (
     owner BOOLEAN NOT NULL
 );
 
-
-
-
-
 CREATE TABLE labels (
     labelId SERIAL PRIMARY KEY,
-    label VARCHAR(50) NOT NULL UNIQUE
+    label VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE labelsToUsers (
@@ -40,7 +36,3 @@ CREATE TABLE labelsToLists (
     labelId INT NOT NULL REFERENCES labels(labelId),
     listId INT NOT NULL REFERENCES lists(listId)
 );
-
-
-
-

@@ -7,7 +7,28 @@
     <div data-bs-backdrop="static" data-bs-keyboard="false" class="modal fade" id="myModal" tabindex="-1" aria-labelledby="myModalLabel" aria-modal="true" role="dialog" style="display: block;">
         <div class="modal-dialog">
           <div class="modal-content">
-            <div class="modal-header">
+            <div style="padding-top:10px">
+              <a href="/lists">
+                <button title="Go to lists" class="btn rounded-10 zoom" style="position:absolute;left:20px;top:10px;border-color:#fb6fff;background-color:#ffe5ec;padding: 0;line-height: 1.25;width:30px"><img src="/img/list.png" style="width:20px" onmouseover="hover(this, 'listPink')" onmouseout="unhover(this, 'list')"></button>
+                </a>
+               
+              
+              <a href="/archive">
+              <button title="Go to archive" class="btn rounded-10 zoom" style="position:absolute;left:70px;top:10px;border-color:#b24bf3;background-color:#e6d4ff;padding: 0;line-height: 1.25;width:30px"><img src="/img/archive.png" style="width:20px" onmouseover="hover(this, 'archiveGreen')" onmouseout="unhover(this, 'archive')"></button>
+              </a>
+              
+              <a href="/labels">
+                <button title="Go to labels" class="btn rounded-10 zoom" style="position:absolute;left:120px;top:10px;border-color:#fb6fff;background-color:#ffe5ec;padding: 0;line-height: 1.25;width:30px"><img src="/img/label.png" style="width:20px" onmouseover="hover(this, 'labelPink')" onmouseout="unhover(this, 'label')"></button>
+                </a>
+
+
+                <!-- <a href="/lists"> -->
+                  <button type="button" data-id="<%= listid %>" data-bs-toggle="modal" data-bs-target="#addCollaborator<%= listid%>" href="#addCollaborator<%= listid%>" data-toggle="modal" title="Search again" class="btn rounded-10 zoom" style="position:absolute;left:170px;top:10px;border-color:#000000;background-color:#ececec;font-size:12px;padding: 0;line-height: 1.25;width:30px">←</button>
+                <!-- </a> -->
+
+
+            </div>
+            <div class="modal-header" style="padding-top:40px">
               <h5 class="modal-title" id="myModalLabel">Collaborator Search Results</h5>
             </div>
             <div class="modal-body">
@@ -22,6 +43,7 @@
                 <% users.forEach(function(user) { %>
                     <div style="padding-bottom:5px">
                         <form action="/addCollaborator" method="POST">
+                          <input class="timeInput" class="form-control" name="now" hidden>
                             <input class="form-control" name="collaboratorUserId" type="text" value="<%= user.userid %>" hidden>
                             <input class="form-control" name="listId" type="text" value="<%= listid %>" hidden>
                             <input class="form-control" name="email" type="text" value="<%= user.email %>" hidden>
@@ -147,7 +169,24 @@
   </div> -->
 
 
-   
+  <div  data-bs-backdrop="static" data-bs-keyboard="false" class="modal fade" id="addCollaborator<%= listid%>" tabindex="-1" aria-labelledby="addCollaborator" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content mx-auto text-center justify-content-center" style="width:500px">
+        <div style="padding-top:10px">
+          <h6>Add collaborator</h6>
+        </div>
+        <div style="padding-top:10px;padding-bottom:5px;padding:10px">
+          <form action="/searchUsers" method="POST">
+            <input class="form-control" type="text" name="q" placeholder="Search users..." oninvalid="this.setCustomValidity('Enter a name or email')" oninput="setCustomValidity('')" required>
+            <input class="form-control" name="listIdToCollaborate" type="text" value="<%= listid %>" hidden>   <!-- IDK -->
+            <div style="padding-top:10px;">
+              <button class="btn rounded-pill" style="border-color: #03a9f4;background-color: #b3e5fc;color:#03a9f4;font-size:12px">Search</button>
+            </div>
+          </form>
+        </div> 
+        </div>
+        </div>
+        </div>
   
    
 
@@ -168,10 +207,243 @@ window.onload = function () {
         // https://getbootstrap.com/docs/5.0/components/modal/#show
         myModal.show();
       };
+
+
+
+      function setEditTimes() {
+  const elements = document.getElementsByClassName('editTime');
+  // var elements = document.querySelectorAll('[var="editTime"]');
+
+
+  for(var i = 0; i < elements.length; i++) {
+    
+    // console.log(elements[i].id);
+    // console.log(elements[i].dataset.value);
+   
+    setTimeEdited(elements[i].dataset.value, elements[i].id);
+
+  }
+}
+
+
+function setCreateTimes() {
+  const elements = document.getElementsByClassName('createTime');
+  // var elements = document.querySelectorAll('[var="editTime"]');
+
+
+
+
+
+  for(var i = 0; i < elements.length; i++) {
+    
+    // console.log(elements[i].id);
+    // console.log(elements[i].dataset.value);
+   
+    setTimeCreated(elements[i].dataset.value, elements[i].id);
+
+  }
+}
+
+
+function setTimeEdited(editDateTime, divId) {
+  var now = new Date();
+  var nowYear = parseInt(now.getFullYear());
+  var nowMonth = parseInt(now.getMonth()+1);
+  var nowDate = parseInt(now.getDate());
+
+
+
+  var thenYear = parseInt(editDateTime.substring(6,10));
+  var thenMonth = parseInt(editDateTime.substring(0,2));
+  var thenDate = parseInt(editDateTime.substring(3,5));
+  var thenHour = parseInt(editDateTime.substring(11,13));
+  var thenMin = parseInt(editDateTime.substring(14));
+
+
+  var ampm = 'AM';
+
+  if(thenHour >= 12) {
+    ampm = 'PM';
+
+    if(thenHour > 12) {
+        thenHour -= 12;
+
+    }
+  }
+
+  if(thenHour == 0) {
+    thenHour = 12;
+  }
+
+  var thenMinutesFormatted = (thenMin < 10) ? '0' + thenMin : thenMin;
+      
+  var thenTime = thenHour + ':' + thenMinutesFormatted + ' ' + ampm;
+
+
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const thenMonthAbbr = months[thenMonth-1];
+
+  var thenDateFormatted = (thenDate < 10) ? '0' + thenDate : thenDate;
+  
+
+  if(nowYear > thenYear) {
+    var message = 'Edited ' + thenMonthAbbr + ' ' + thenDateFormatted + ' ' + thenYear;
+    document.getElementById(divId).innerHTML = message;
+  }
+  else if(nowYear == thenYear && nowMonth == thenMonth && nowDate == thenDate) {
+      var message = 'Edited ' + thenTime;
+      document.getElementById(divId).innerHTML = message;
+  }
+  else if(nowYear == thenYear && nowMonth == thenMonth && nowDate == (thenDate+1)) {
+      var message = 'Edited yesterday, ' + thenTime;
+      document.getElementById(divId).innerHTML = message;
+  }
+  else if(nowYear == thenYear && nowMonth >= thenMonth && nowDate > (thenDate+1)) {
+      var message = 'Edited ' + thenMonthAbbr + ' ' + thenDateFormatted;
+      document.getElementById(divId).innerHTML = message;
+  }
+  else {
+      var message = 'Edited: error';
+      document.getElementById(divId).innerHTML = message;
+  }
+}
+
+
+function setTimeCreated(createDateTime, divId) {
+  var now = new Date();
+  var nowYear = parseInt(now.getFullYear());
+  var nowMonth = parseInt(now.getMonth()+1);
+  var nowDate = parseInt(now.getDate());
+
+
+
+  var thenYear = parseInt(createDateTime.substring(6,10));
+  var thenMonth = parseInt(createDateTime.substring(0,2));
+  var thenDate = parseInt(createDateTime.substring(3,5));
+  var thenHour = parseInt(createDateTime.substring(11,13));
+  var thenMin = parseInt(createDateTime.substring(14));
+
+
+  var ampm = 'AM';
+
+  if(thenHour >= 12) {
+    ampm = 'PM';
+
+    if(thenHour > 12) {
+        thenHour -= 12;
+
+    }
+  }
+
+  if(thenHour == 0) {
+    thenHour = 12;
+  }
+
+  var thenMinutesFormatted = (thenMin < 10) ? '0' + thenMin : thenMin;
+      
+  var thenTime = thenHour + ':' + thenMinutesFormatted + ' ' + ampm;
+
+
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const thenMonthAbbr = months[thenMonth-1];
+
+  var thenDateFormatted = (thenDate < 10) ? '0' + thenDate : thenDate;
+
+  if(nowYear > thenYear) {
+    var message = 'Created ' + thenMonthAbbr + ' ' + thenDateFormatted + ' ' + thenYear;
+    // document.getElementById(divId).setAttribute('data-bs-title', message);
+  }
+  else if(nowYear == thenYear && nowMonth == thenMonth && nowDate == thenDate) {
+      var message = 'Created ' + thenTime;
+      // document.getElementById(divId).innerHTML = message;
+  }
+  else if(nowYear == thenYear && nowMonth == thenMonth && nowDate == (thenDate+1)) {
+      var message = 'Created yesterday, ' + thenTime;
+      // document.getElementById(divId).innerHTML = message;
+  }
+  else if(nowYear == thenYear && nowMonth >= thenMonth && nowDate > (thenDate+1)) {
+      var message = 'Created ' + thenMonthAbbr + ' ' + thenDateFormatted;
+      // document.getElementById(divId).innerHTML = message;
+  }
+  else {
+      var message = 'Created: error';
+      // document.getElementById(divId).innerHTML = message;
+  }
+
+  document.getElementById(divId).setAttribute('data-bs-title', message);
+}
+
+
+
+setEditTimes();
+setCreateTimes();
+setInputTimes();
+
+setInterval(setEditTimes, 3000);
+setInterval(setCreateTimes, 3000);
+setInterval(setInputTimes, 3000);
+
+
+
+
+
+
+      function setInputTimes() {
+  const elements = document.getElementsByClassName('timeInput');
+  // var elements = document.querySelectorAll('[var="editTime"]');
+
+
+  for(var i = 0; i < elements.length; i++) {
+    
+    // console.log(elements[i].id);
+    // console.log(elements[i].dataset.value);
+   
+    // setTimeEdited(elements[i].dataset.value, elements[i].id);
+
+    elements[i].value = getNowFormatted();
+    // console.log(elements[i].value);
+
+
+  }
+}
+
+
+function getNowFormatted() {
+    var now = new Date();
+
+    // console.log(now);
+
+    var nowYear = now.getFullYear();
+    var nowMonth = parseInt(now.getMonth()+1);
+    var nowDate = now.getDate();
+    var nowHours = now.getHours();
+    var nowMinutes = now.getMinutes();
+
+    var nowSeconds = now.getSeconds();
+
+    var monthFormatted = (nowMonth < 10) ? '0' + nowMonth : nowMonth;
+    var dateFormatted = (nowDate < 10) ? '0' + nowDate : nowDate;
+    var hoursFormatted = (nowHours < 10) ? '0' + nowHours : nowHours;
+    var minutesFormatted = (nowMinutes < 10) ? '0' + nowMinutes : nowMinutes;
+
+    var secondsFormatted = (nowSeconds < 10) ? '0' + nowSeconds : nowSeconds;
+
+    var nowFormatted = monthFormatted + '-' + dateFormatted + '-' + nowYear + ',' + hoursFormatted + ':' + minutesFormatted + ':' + secondsFormatted;
+    
+    // console.log(nowFormatted);
+
+    return nowFormatted;
+}
+
+
+
     
 </script>
 
    
+
+
+
 
 
 </main>

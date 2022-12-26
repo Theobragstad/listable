@@ -225,3 +225,10 @@ input#q:focus {
 
 }
 
+
+
+mark.a0 {
+  color: black;
+  padding: 5px;
+  background: greenyellow;
+}

@@ -16,12 +16,14 @@
         <h4 class="site-title" >archive</h4>
         <div style="padding-top:5px;padding-bottom:5px">
           <form action="/search?archive=true" method="POST">
-          <input type="text" id="q" name="q" class="search-hover zoom" placeholder="search archive">
+          <input type="text" id="q" name="q" class="search-hover zoom" placeholder="Search archive...">
         </form>
 
       </div>
 
-        <% if(lists.length == 1) { %>
+      <% if(lists.length == 0) { %>
+        <p id="listCount" style="font-size:12px;padding-top:16px">No lists</p>
+      <% } else if(lists.length == 1) { %>
           <p id="listCount" style="font-size:12px;padding-top:16px">1 list</p>
         <% } else { %>
           <p id="listCount" style="font-size:12px;padding-top:16px"><%= lists.length %> lists</p>
@@ -228,17 +230,19 @@
 <% if(search && lists.length == 0){ %>
   <div class="text-center" style="padding-top:100px">
 
-    <h6>no search results</h6>
+    <h6>No search results</h6>
     <img style="width:100px" src="/img/noResults.png">
 
   </div>
 <% } else if(lists.length == 0) { %>
-  <div class="text-center" style="padding-top:100px">
+  <div class="text-center" style="padding-top:145px">
 
     <h6>no lists in archive</h6>
     <img style="width:100px" src="/img/camping.png">
 
   </div>
+
+  
 
   <% } %>
 <!-- </div> -->
