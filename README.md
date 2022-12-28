@@ -27,5 +27,3 @@ Check it out to explore all the features!
 - Keep track of your lists with built-in edit and create times
 - Clean, appealing, intuitive, fast, and detail-oriented UI to help users be more productive
 - And many more!
-
-

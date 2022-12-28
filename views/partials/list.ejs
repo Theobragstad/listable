@@ -15,14 +15,16 @@
           <div title="Edit list" data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid%>" data-toggle="modal" id="<%= list.listid %>" class="col card card-body m-2" style="min-width: 400px;overflow-x:scroll;background-color:#<%= list.color %>;" color="<%= list.color %>">   
            
             <div class="row" style="font-weight:bold;padding-left:10px">
-              <div style="width:60%;text-overflow:ellipsis;
+              <!-- <div style="width:200px;text-overflow:ellipsis;
+              white-space: nowrap;
+              overflow: hidden; "> -->
+              
+              <div class="result" style="width:60%;text-overflow:ellipsis;
               white-space: nowrap;
               overflow: hidden; ">
-              
-              <div class="result">
               <%= list.title %> 
               </div> 
-            </div>
+            <!-- </div> -->
     
     
               
@@ -82,7 +84,7 @@
               
             <!-- </span> -->
     
-            <div class="col"><button title="Change color" onclick="setSelectedColor('<%= list.color %>')" type="button" class="btn rounded-10 zoom" data-id="<%= list.listid %>" data-bs-toggle="modal" data-bs-target="#listColors" style="position:absolute;right:50px;border-color:#fb6f92;padding: 0;line-height: .25;width:20px">
+            <div class="col"><button title="Change color" onclick="setSelectedColor('<%= list.color %>')" type="button" class="btn rounded-10 zoom" data-id="<%= list.listid %>" data-bs-toggle="modal" data-bs-target="#listColors" style="position:absolute;right:50px;border-color:#1e90ff;padding: 0;line-height: .25;width:20px">
               <img src="/img/palette.png" style="width:20px" onmouseover="hover(this, 'paletteColors')" onmouseout="unhover(this, 'palette')">
             </button>
           </div>
@@ -100,7 +102,7 @@
               <input class="form-control" type="text" name="color" value="<%= list.color %>" hidden>
     
     
-            <button title="Copy" class="btn rounded-10 zoom"  style="position:absolute;right:80px;border-color:#fb6f92;padding: 0;line-height: .25;width:20px">
+            <button title="Copy" class="btn rounded-10 zoom"  style="position:absolute;right:80px;border-color:#1e90ff;background-color:white;padding: 0;line-height: .25;width:20px">
             <img src="/img/copy.png" style="width:20px" onmouseover="hover(this, 'copyBlue')" onmouseout="unhover(this, 'copy')">
           </button>
         </form>
@@ -124,7 +126,7 @@
           <form action="/archiveList" method="POST">
             <input type="number" name="listId" value=<%= list.listid %> hidden>
             
-          <button title="Archive" class="btn rounded-10 zoom"  style="position:absolute;right:110px;border-color:#fb6f92;padding: 0;line-height: .25;width:20px">
+          <button title="Archive" class="btn rounded-10 zoom"  style="position:absolute;right:110px;border-color:#1e90ff;padding: 0;line-height: .25;width:20px">
           <img src="/img/archive.png" style="width:20px" onmouseover="hover(this, 'archiveGreen')" onmouseout="unhover(this, 'archive')">
         </button>
       </form>
@@ -182,7 +184,7 @@
     
     
             <% if(list.archive) {  %>
-              <button disabled class="btn rounded-pill" style="width:70px;font-size:10px;border-color:#b24bf3;color:#b24bf3;background-color:#e6d4ff">Archived</button>
+              <button disabled class="btn rounded-pill" style="width:70px;font-size:10px;border-color:#17d475;background-color:#e8fcec;">Archived</button>
     
             <% } %>
     

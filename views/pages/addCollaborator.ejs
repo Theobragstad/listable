@@ -9,16 +9,16 @@
           <div class="modal-content">
             <div style="padding-top:10px">
               <a href="/lists">
-                <button title="Go to lists" class="btn rounded-10 zoom" style="position:absolute;left:20px;top:10px;border-color:#fb6fff;background-color:#ffe5ec;padding: 0;line-height: 1.25;width:30px"><img src="/img/list.png" style="width:20px" onmouseover="hover(this, 'listPink')" onmouseout="unhover(this, 'list')"></button>
+                <button title="Go to lists" class="btn rounded-10 zoom" style="position:absolute;left:20px;top:10px;border-color:#fb6f92;background-color:#ffe5ec;padding: 0;line-height: 1.25;width:30px"><img src="/img/list.png" style="width:20px" onmouseover="hover(this, 'listPink')" onmouseout="unhover(this, 'list')"></button>
                 </a>
                
               
               <a href="/archive">
-              <button title="Go to archive" class="btn rounded-10 zoom" style="position:absolute;left:70px;top:10px;border-color:#b24bf3;background-color:#e6d4ff;padding: 0;line-height: 1.25;width:30px"><img src="/img/archive.png" style="width:20px" onmouseover="hover(this, 'archiveGreen')" onmouseout="unhover(this, 'archive')"></button>
+              <button title="Go to archive" class="btn rounded-10 zoom" style="position:absolute;left:70px;top:10px;border-color:#fb6f92;background-color:#ffe5ec;padding: 0;line-height: 1.25;width:30px"><img src="/img/archive.png" style="width:20px" onmouseover="hover(this, 'archiveGreen')" onmouseout="unhover(this, 'archive')"></button>
               </a>
               
               <a href="/labels">
-                <button title="Go to labels" class="btn rounded-10 zoom" style="position:absolute;left:120px;top:10px;border-color:#fb6fff;background-color:#ffe5ec;padding: 0;line-height: 1.25;width:30px"><img src="/img/label.png" style="width:20px" onmouseover="hover(this, 'labelPink')" onmouseout="unhover(this, 'label')"></button>
+                <button title="Go to labels" class="btn rounded-10 zoom" style="position:absolute;left:120px;top:10px;border-color:#fb6f92;background-color:#ffe5ec;padding: 0;line-height: 1.25;width:30px"><img src="/img/label.png" style="width:20px" onmouseover="hover(this, 'labelPink')" onmouseout="unhover(this, 'label')"></button>
                 </a>
 
 
@@ -35,7 +35,7 @@
 
 
                 <% if(users.length == 0) { %>
-                    No users found, or that person is already a collaborator.
+                    No users found, you've already shared this list with that person.
                 <% } else { %>
                     <div style="color:#fb6f92;font-weight: bold;font-size:12px;padding-bottom:10px" >Select a person to collaborate on this list with:</div>
                 <% } %>
@@ -47,8 +47,8 @@
                             <input class="form-control" name="collaboratorUserId" type="text" value="<%= user.userid %>" hidden>
                             <input class="form-control" name="listId" type="text" value="<%= listid %>" hidden>
                             <input class="form-control" name="email" type="text" value="<%= user.email %>" hidden>
-                    <button class="btn rounded-pill" style="background-color:#03a9f4;color:white;font-weight: bold;font-size:12px">
-                    <%= user.fullname %> < <%= user.email %> >
+                    <button class="btn rounded-pill" style=font-weight:bold;font-size:12px;background-color:#e6d4ff;">
+                      <img src="<%= user.profilephotourl %>" style="width:20px;border-radius: 50%;"><%= user.fullname %> < <%= user.email %> >
                 </button>
             </form>
 
