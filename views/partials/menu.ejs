@@ -1,94 +1,74 @@
+<div class="sticky-top" style="z-index:1">
+  <a href="/lists">
+    <div class="logo" style="position:absolute; top:10px; left:10px">
+      <img class="zoomSmall" src="/img/brain.svg" style="width:60px;">
+      <span style="padding-left:4px; font-weight: bold;color:#f289ca;font-size:28px">
+        lists
+      </span>
+    </div>
+  </a>
+  <a href="/lists">
+    <button title="Go to lists" class="btn rounded-10 zoom" style="position:absolute;right:366px;top:20px;border-color:#f289ca;background-color:#ffe6ee;padding: 0;line-height: 1.35;width:30px">
+      <img src="/img/list.png" style="width:20px" onmouseover="hover(this, 'listPink')" onmouseout="unhover(this, 'list')">
+    </button>
+  </a>
 
-
-    <div class="sticky-top" style="z-index:1">
-
-
-
-
-        <a href="/lists"> <div class="logo" style="position:absolute; top:10px; left:10px" >
-          <img class="zoomSmall" src="/img/brain.svg" style="width:60px;"><span style="padding-left:4px; font-weight: bold;color:#f289ca;font-size:24px">lists</span>
+  <div class="" style="float:right;margin-right: 357px;">
+    <div style="position:absolute;top:10px;">
+      <nav class="navbar">
+        <div class="container-fluid">
+          <ul class="nav navbar-nav">
+            <li class="dropdown">
+              <a title="Go to labels" class="dropdown-toggle btn rounded-10 zoom" href="/labels" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="border-color:#f289ca;background-color:#ffe6ee;padding: 0px;line-height: 1.35;width:45px">
+                <img src="/img/label.png" style="width:20px" onmouseover="hover(this, 'labelPink')" onmouseout="unhover(this, 'label')">
+                <span class="caret"></span>
+              </a>
+              <div class="dropdown-menu" style="padding-bottom:0px">
+                <% if(allLabels.length == 0) { %>
+                  <div style="font-weight: bold;font-size:12px;padding-left:5px">No labels yet</div>
+                <% } %>
+                <% allLabels.forEach(function(label) { %>
+                  <form action="/search?filterByLabel=true&labelId=<%= label.labelid %>" method="POST" style="padding-bottom:10px;padding-left:5px;padding-right: 5px;">
+                    <input class="form-control" name="labelId" value="<%= label.labelid %>" hidden>
+                    <button title="View lists with label" class="btn rounded-pill" style="border-color: #03a9f4;background-color: #b3e5fc;color:#03a9f4;font-weight: bold;font-size:12px;max-width: 330px;text-overflow:ellipsis;overflow:hidden">
+                      <%= label.label %>
+                    </button>
+                  </form>
+                <% }); %>
+              </div>
+            </li>
+          </ul>
         </div>
-        </a>
-        
-        
-        
-        
-        
-        <a href="/lists">
-          <button title="Go to lists" class="btn rounded-10 zoom" style="position:absolute;right:366px;top:20px;border-color:#f289ca;background-color:#ffe6ee;padding: 0;line-height: 1.35;width:30px"><img src="/img/list.png" style="width:20px" onmouseover="hover(this, 'listPink')" onmouseout="unhover(this, 'list')"></button>
-          </a>
-         
-        
-        
-          <!-- <a href="/labels">
-            <button title="Go to labels" class="btn rounded-10 zoom" style="position:absolute;right:300px;top:17px;border-color:#fb6fff;background-color:#ffe5ec;padding: 0;line-height: 1.25;width:30px"><img src="/img/label.png" style="width:20px" onmouseover="hover(this, 'labelPink')" onmouseout="unhover(this, 'label')"></button>
-            </a> -->
-            <div class="" style="float:right;margin-right: 357px;">
-                <div style="position:absolute;top:10px;">
-            <nav class="navbar">
-                <div class="container-fluid">
-                  <!-- Collect the nav links, forms, and other content for toggling -->
-                    <ul class="nav navbar-nav" >
-                      <li class="dropdown">
-                        
-                        <a title="Go to labels" class="dropdown-toggle btn rounded-10 zoom" href="/labels"  data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="border-color:#f289ca;background-color:#ffe6ee;padding: 0px;line-height: 1.35;width:45px"><img src="/img/label.png" style="width:20px" onmouseover="hover(this, 'labelPink')" onmouseout="unhover(this, 'label')"> <span class="caret"></span></a>
-                        <div class="dropdown-menu" style="padding-bottom:0px">
-                            <% if(allLabels.length == 0) { %>
-                                <div style="font-weight: bold;font-size:12px;padding-left:5px" >No labels yet</div>
-                            <% } %>
-                            <% allLabels.forEach(function(label) { %>
-                                <form action="/search?filterByLabel=true&labelId=<%= label.labelid %>" method="POST" style="padding-bottom:10px;padding-left:5px;padding-right: 5px;">
-                                    <input class="form-control" name="labelId" value="<%= label.labelid %>" hidden>
-                                    <button  title="View lists with label" class="btn rounded-pill" style="border-color: #03a9f4;background-color: #b3e5fc;color:#03a9f4;font-weight: bold;font-size:12px;max-width: 330px;text-overflow:ellipsis;overflow:hidden" >
-                    
-                                        <%= label.label %> </button>
-                                      </form>
-                            <% }); %>
-                                    </div>
-                      </li>
-                    </ul>
-                </div><!-- /.container-fluid -->
-              </nav>
-            </div>
-            </div>
-        
-        <a href="/archive">
-        <button title="Go to archive" class="btn rounded-10 zoom" style="position:absolute;right:250px;top:20px;border-color:#f289ca;background-color:#ffe6ee;padding: 0;line-height: 1.25;width:30px"><img src="/img/archive.png" style="width:20px" onmouseover="hover(this, 'archiveGreen')" onmouseout="unhover(this, 'archive')"></button>
-        </a>
-        
-        
-        
-        <a href="/trash">
-          <button title="Go to trash" class="btn rounded-10 zoom" style="position:absolute;right:200px;top:20px;border-color:#f289ca;background-color:#ffe6ee;padding: 0;line-height: 1.25;width:30px"><img src="/img/trash.png" style="width:20px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')"></button>
-          </a>
-          <button class="btn rounded-10 pull-right name " data-bs-toggle="tooltip"   data-bs-placement="bottom"
-          data-bs-custom-class="small-tooltip" data-bs-title="<%= user.email %>" style="border-color:#f289ca;background-color:#ffe6ee;position:absolute; top:10px; right:50px;font-size:12px" >
-            <img src="<%= user.profilePhoto %>" style="width:20px;border-radius: 50%;">
-            
-            <%= user.givenName %></button> 
-          <a title="Log out" href="/logout" class="btn rounded-10 pull-right logout"style="height:33.25px;position:absolute;top:10.5px; right:5px;border-color:#000000;background-color:#ececec;font-size:12px">←</a>
-          
-        
-        <%- include ('../partials/message') %>
-        
-        </div>
-        
-        
-        
-        
+      </nav>
+    </div>
+  </div>
 
+  <a href="/archive">
+    <button title="Go to archive" class="btn rounded-10 zoom" style="position:absolute;right:250px;top:20px;border-color:#f289ca;background-color:#ffe6ee;padding: 0;line-height: 1.25;width:30px">
+      <img src="/img/archive.png" style="width:20px" onmouseover="hover(this, 'archiveGreen')" onmouseout="unhover(this, 'archive')">
+    </button>
+  </a>
 
+  <a href="/trash">
+    <button title="Go to trash" class="btn rounded-10 zoom" style="position:absolute;right:200px;top:20px;border-color:#f289ca;background-color:#ffe6ee;padding: 0;line-height: 1.25;width:30px">
+      <img src="/img/trash.png" style="width:20px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')">
+    </button>
+  </a>
 
+  <button class="btn rounded-10 pull-right name " data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-custom-class="small-tooltip" data-bs-title="<%= user.email %>" style="border-color:#f289ca;background-color:#ffe6ee;position:absolute; top:10px; right:50px;font-size:12px">
+    <img src="<%= user.profilePhoto %>" style="width:20px;border-radius: 50%;">
+    <%= user.givenName %>
+  </button>
 
+  <a title="Log out" href="/logout" class="btn rounded-10 pull-right logout" style="height:33.25px;position:absolute;top:10.5px; right:5px;border-color:#000000;background-color:#ececec;font-size:12px">
+    ←
+  </a>
 
+  <%- include ('../partials/message') %>
+</div>
 
-
-
-  <style>
-    ul.nav li.dropdown:hover .dropdown-menu{ display: block;}
-
-
-  </style>
-
-
-
+<style>
+  ul.nav li.dropdown:hover .dropdown-menu {
+    display: block;
+  }
+</style>

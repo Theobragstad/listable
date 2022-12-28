@@ -22,7 +22,7 @@
 
         <div style="padding-top:5px;padding-bottom:5px">
           <form action="/search" method="POST" onsubmit="saveQuery()">
-          <input type="text" id="q" name="q" class="search-hover zoom" placeholder="Search all...">
+          <input type="text" id="q" name="q" class="search-hover zoom" placeholder="search all...">
         </form>
 
 
@@ -124,14 +124,12 @@
 <% if(search && lists.length == 0){ %>
   <div class="text-center" style="padding-top:69px">
 
-    <h6>No search results</h6>
     <img style="width:100px" src="/img/noResults.png">
 
   </div>
 <% } else if(lists.length == 0) { %>
   <div class="text-center" style="padding-top:100px">
 
-    <h6>No lists</h6>
     <img style="width:100px" src="/img/palmTree.png">
 
   </div>

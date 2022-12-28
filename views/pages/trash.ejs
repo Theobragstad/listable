@@ -22,7 +22,7 @@
         <% } %>
         <div style="padding-top:5px;padding-bottom:5px">
           <form action="/search?trash=true" method="POST">
-          <input type="text" id="q" name="q" class="search-hover zoom" placeholder="Search trash...">
+          <input type="text" id="q" name="q" class="search-hover zoom" placeholder="search trash...">
         </form>
 
       </div>
@@ -230,16 +230,12 @@
 <% if(search && lists.length == 0){ %>
   <div class="text-center" style="padding-top:106px">
 
-    <h6>No search results</h6>
     <img style="width:100px" src="/img/noResults.png">
 
   </div>
 <% } else if(lists.length == 0) { %>
   <div class="text-center" style="padding-top:137px">
-
-    <h6>no lists in trash</h6>
     <img style="width:100px" src="/img/cat.png">
-
   </div>
 
   <% } %>

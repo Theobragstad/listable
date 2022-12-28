@@ -3,84 +3,54 @@
 <link rel="stylesheet" href="/css/style.css">
 
 <main>
-
     <%- include ('../partials/message') %>
 
-    <!-- <div class="logo" style="position:absolute; top:10px; left:10px" data-bs-toggle="tooltip" title="Some text" data-bs-custom-class="custom-tooltip">
-        <img src="/img/brain.svg" style="width:40px;"><span style="padding-left:4px; font-weight: bold;color:#f289ca">lists</span>
-    </div> -->
-
-    <!-- <div class="logo" style="position:absolute; top:10px; left:10px">
-        <img class="zoom" src="/img/brain.svg" style="width:40px;"><span style="padding-left:4px; font-weight: bold;color:#f289ca">lists</span>
-    </div> -->
-    <a href="/lists"> <div class="logo" style="position:absolute; top:10px; left:10px" >
-        <img class="zoomSmall" src="/img/brain.svg" style="width:60px;"><span style="padding-left:4px; font-weight: bold;color:#f289ca;font-size:28px;">lists</span>
-      </div>
-      </a>
-
-    <a href='/auth' style="text-decoration:none;color:black;">
-        <button href="/auth" class="btn rounded-10 pull-right signin" style="border-color:#f289ca;background-color:#ffe6ee;position:absolute; top:10px; right:10px;font-size:12px;color:#f289ca"><img src="/img/google.png" style="width:25px;padding-right:6px">sign in</button>
+    <a href="/lists">
+        <div class="logo" style="position:absolute; top:10px; left:10px">
+            <img class="zoomSmall" src="/img/brain.svg" style="width:60px;">
+            <span style="padding-left:4px; font-weight: bold;color:#f289ca;font-size:28px;">
+                lists
+            </span>
+        </div>
     </a>
 
-
-    <!-- <div class="text-center">
-    <p>
-        <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
-            ?
-        </a>
-       
-    </p>
-      <div class="collapse" id="collapseExample" style="width:50px">
-        
-          Some placeholder content for the collapse component. This panel is hidden by default but revealed when the user activates the relevant trigger.
-      </div>
-
-    </div> -->
-
+    <a href='/auth' style="text-decoration:none;color:black;">
+        <button href="/auth" class="btn rounded-10 pull-right signin" style="border-color:#f289ca;background-color:#ffe6ee;position:absolute; top:10px; right:10px;font-size:12px;color:#f289ca">
+            <img src="/img/google.png" style="width:25px;padding-right:6px">
+            sign in
+        </button>
+    </a>
 
     <div class="text-center site-text" style="font-weight:bold; color:#f289ca;padding-top:100px;">
-    <p><span style="font-size:19px">keep track of everything.</span><br>
-        create simple and intuitive lists with useful features to save anything you want to remember.
-    </p>
-    <img src="/img/home.png" style="width:250px">
+        <p>
+            <span style="font-size:19px">keep track of everything.</span>
+            <br>
+            create simple and intuitive lists with useful features to save anything you want to remember.
+        </p>
 
+        <img src="/img/home.png" style="width:250px">
 
+        <div class="text-center" style="padding-top:60vh;">
+            <button data-bs-toggle="tooltip" data-bs-html="true" data-bs-custom-class="custom-tooltip" data-bs-title="made by <br> <a class='text-decoration-none' href='https://github.com/Theobragstad'>Theo Bragstad</a>" class="btn rounded-10 zoom text-center" style="border-color:#9c9cac;background-color:#dedee3;padding-top:12px;line-height: .75;">
+                &#9432;
+            </button>
+        </div>
 
-    <div class="text-center" style="padding-top:60vh;">
-        <button data-bs-toggle="tooltip"   data-bs-html="true"
-        data-bs-custom-class="custom-tooltip"
-        data-bs-title="made by <br> <a class='text-decoration-none' href='https://github.com/Theobragstad'>Theo Bragstad</a>" class="btn rounded-10 zoom text-center" style="border-color:#9c9cac;background-color:#dedee3;padding-top:12px;line-height: .75;">&#9432;</button>
+        <script>
+            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+        </script>
 
     </div>
 
-   
     <script>
-        
-        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
-    </script>
-      
-
-</div>
-
-
-
-    
-
-
-
-    
-
-      <script>
-        document.addEventListener("DOMContentLoaded", function(){
+        document.addEventListener("DOMContentLoaded", function () {
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            var tooltipList = tooltipTriggerList.map(function(element){
+            var tooltipList = tooltipTriggerList.map(function (element) {
                 return new bootstrap.Tooltip(element);
             });
         });
-        </script>
+    </script>
 </main>
 
 <%- include ('../partials/footer') %>
-
-

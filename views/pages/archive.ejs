@@ -22,7 +22,7 @@
 
         <div style="padding-top:5px;padding-bottom:5px">
           <form action="/search?archive=true" method="POST">
-          <input type="text" id="q" name="q" class="search-hover zoom" placeholder="Search archive...">
+          <input type="text" id="q" name="q" class="search-hover zoom" placeholder="search archive...">
         </form>
 
       </div>
@@ -412,16 +412,12 @@
 <% if(search && lists.length == 0){ %>
   <div class="text-center" style="padding-top:120px">
 
-    <h6>No search results</h6>
     <img style="width:100px" src="/img/noResults.png">
 
   </div>
 <% } else if(lists.length == 0) { %>
   <div class="text-center" style="padding-top:145px">
-
-    <h6>no lists in archive</h6>
     <img style="width:100px" src="/img/camping.png">
-
   </div>
 
   
