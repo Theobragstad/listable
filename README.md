@@ -20,7 +20,7 @@ Check it out to explore all the features!
 - Change list background colors
 - Create and assign labels to lists
 - Search lists
-- Share lists and collaborate with other users
+- Share lists to collaborate with other users
     - Users are notified via email when a list is shared with them
 - Select lists to perform actions on multiple lists at once
 - Copy lists
