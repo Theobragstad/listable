@@ -18,7 +18,7 @@ Check it out to explore all the features!
 - Create and edit lists and notes in a full-feature text editor
 - Delete and archive lists
 - Change list background colors
-- Create and label lists
+- Create and assign labels to lists
 - Search lists
 - Share lists and collaborate with other users
     - Users are notified via email when a list is shared with them
