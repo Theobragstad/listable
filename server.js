@@ -36,8 +36,11 @@ db.connect()
 app.set('view engine', 'ejs');
 
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+// app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({extended: true}));
+app.use(express.json({limit: '25mb'}));
+app.use(express.urlencoded({limit: '25mb', extended: true}));
+
 app.use(express.static('resources'));
 
 app.use(
@@ -63,7 +66,25 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
     
-  
+
+
+
+app.get('/pureText', (req , res) => {
+    db.any(`SELECT * FROM lists;`)
+
+    // db.any(`SELECT LOWER(regexp_replace(list, '<[^>]+>|&([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-fA-F]{1,6});|(\\r\\n|\\r|\\n)', '', 'gi') ) FROM lists;`)
+        .then((rows) => {
+            return res.send(rows);
+
+        })
+        .catch((error) => {
+            console.log(error);
+            return res.send(rows);
+        });
+});
+
+
+
 app.get('/', (req, res) => {
 
     if(req.session.user) {
@@ -245,17 +266,21 @@ app.get('/lists', function(req, res) {
 
 
 
-// YES
     db.tx(t => {
-        const lists = db.any(`SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') AND trash = FALSE AND archive = FALSE ORDER BY editDateTime DESC;`);
+        // DONE  
+        const lists = db.any(`SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}' AND archive = FALSE) AND trash = FALSE ORDER BY editDateTime DESC;`);
+
+        // const lists = db.any(`SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') AND trash = FALSE AND archive = FALSE ORDER BY editDateTime DESC;`);
         const collaborators = db.any(`SELECT users.email, users.profilePhotoUrl, users.fullname, users.userId, listsToUsers.listId, listsToUsers.owner FROM listsToUsers INNER JOIN users ON listsToUsers.userId = users.userId;`);
         const labels = db.any(`CREATE OR REPLACE VIEW labelsJoinlabelsToLists AS (SELECT labels.labelId, labels.label, labelsToLists.listId FROM labelsToLists INNER JOIN labels ON labelsToLists.labelId = labels.labelId);SELECT * FROM labelsJoinlabelsToLists WHERE labelId IN(SELECT labelId from labelsToUsers where userId = '${req.session.user.id}');`);
         
+        const allLabels = db.any(`SELECT * FROM labels WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userID = '${req.session.user.id}') ORDER BY label ASC;`);
 
-        return t.batch([lists, collaborators, labels]); 
+
+        return t.batch([lists, collaborators, labels, allLabels]); 
     })
         .then((data) => {
-            return res.render("pages/lists", {lists: data[0], collaborators: data[1], labels: data[2], user: req.session.user, search: false, error, message});
+            return res.render("pages/lists", {lists: data[0], collaborators: data[1], labels: data[2], allLabels: data[3], user: req.session.user, search: false, error, message});
         })
         .catch((error) => {
             console.log(error);
@@ -518,31 +543,37 @@ app.post('/search', function(req, res) {
     if(req.body.q) {
         q = req.body.q.toLowerCase().replace(/'/g, "''");
     }
-    else {
+    else if(!(req.query.filterByLabel && req.query.filterByLabel == 'true')){
         return res.redirect('/lists');
     }
-
-
+//regexp_replace(list, '<[^>]+>|&([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-fA-F]{1,6});|(\\r\\n|\\r|\\n)', '', 'gi')
     // var searchQuery = `SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') AND trash = FALSE AND (LOWER(title) LIKE '%${q}%' OR LOWER(list) LIKE '%${q}%' OR listId IN(SELECT listId FROM listsToUsers WHERE userId IN(SELECT userId FROM emails_and_names WHERE LOWER(email) LIKE '%${q}%' OR LOWER(fullname) LIKE '%${q}%'))) ORDER BY editDateTime DESC;`;
     var searchQuery = `SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') AND trash = FALSE AND (LOWER(title) LIKE '%${q}%' OR LOWER(list) LIKE '%${q}%' OR listId IN(SELECT listId FROM listsToUsers WHERE userId IN(SELECT userId FROM emails_and_names WHERE LOWER(email) LIKE '%${q}%' OR LOWER(fullname) LIKE '%${q}%')) OR listId IN(SELECT listId FROM labelsToLists WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userId = '${req.session.user.id}' AND labelId IN(SELECT labelID FROM labels WHERE LOWER(label) LIKE '%${q}%')))) ORDER BY editDateTime DESC;`;
 
     var renderPage = 'lists';
 
+    console.log(req.query.filterByLabel);
     if(req.query.filterByLabel && req.query.filterByLabel == 'true') {
+        console.log("YES");
         searchQuery = `SELECT * FROM lists WHERE trash = FALSE AND listId IN(SELECT listId FROM labelsToLists WHERE labelId = '${req.query.labelId}') ORDER BY editDateTime DESC;`;
     }
-    // YES
-    if(req.query.archive && req.query.archive == 'true') {
-        searchQuery = `SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') AND trash = FALSE AND archive = TRUE AND (LOWER(title) LIKE '%${q}%' OR LOWER(list) LIKE '%${q}%' OR listId IN(SELECT listId FROM listsToUsers WHERE userId IN(SELECT userId FROM emails_and_names WHERE LOWER(email) LIKE '%${q}%' OR LOWER(fullname) LIKE '%${q}%')) OR listId IN(SELECT listId FROM labelsToLists WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userId = '${req.session.user.id}' AND labelId IN(SELECT labelID FROM labels WHERE LOWER(label) LIKE '%${q}%')))) ORDER BY editDateTime DESC;`;
+    // DONE
+    else if(req.query.archive && req.query.archive == 'true') {
+        
+        searchQuery = `SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}' AND archive = TRUE) AND trash = FALSE AND (LOWER(title) LIKE '%${q}%' OR LOWER(list) LIKE '%${q}%' OR listId IN(SELECT listId FROM listsToUsers WHERE userId IN(SELECT userId FROM emails_and_names WHERE LOWER(email) LIKE '%${q}%' OR LOWER(fullname) LIKE '%${q}%')) OR listId IN(SELECT listId FROM labelsToLists WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userId = '${req.session.user.id}' AND labelId IN(SELECT labelID FROM labels WHERE LOWER(label) LIKE '%${q}%')))) ORDER BY editDateTime DESC;`;
+
+        // searchQuery = `SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') AND trash = FALSE AND archive = TRUE AND (LOWER(title) LIKE '%${q}%' OR LOWER(list) LIKE '%${q}%' OR listId IN(SELECT listId FROM listsToUsers WHERE userId IN(SELECT userId FROM emails_and_names WHERE LOWER(email) LIKE '%${q}%' OR LOWER(fullname) LIKE '%${q}%')) OR listId IN(SELECT listId FROM labelsToLists WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userId = '${req.session.user.id}' AND labelId IN(SELECT labelID FROM labels WHERE LOWER(label) LIKE '%${q}%')))) ORDER BY editDateTime DESC;`;
         renderPage = 'archive';
     }
-    // YES
+    // DONE
     else if(req.query.trash && req.query.trash == 'true') {
-        searchQuery = `SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') AND trash = TRUE AND archive = FALSE AND (LOWER(title) LIKE '%${q}%' OR LOWER(list) LIKE '%${q}%' OR listId IN(SELECT listId FROM listsToUsers WHERE userId IN(SELECT userId FROM emails_and_names WHERE LOWER(email) LIKE '%${q}%' OR LOWER(fullname) LIKE '%${q}%')) OR listId IN(SELECT listId FROM labelsToLists WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userId = '${req.session.user.id}' AND labelId IN(SELECT labelID FROM labels WHERE LOWER(label) LIKE '%${q}%')))) ORDER BY editDateTime DESC;`;
+        
+        searchQuery = `SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}' AND archive = FALSE) AND trash = TRUE AND (LOWER(title) LIKE '%${q}%' OR LOWER(list) LIKE '%${q}%' OR listId IN(SELECT listId FROM listsToUsers WHERE userId IN(SELECT userId FROM emails_and_names WHERE LOWER(email) LIKE '%${q}%' OR LOWER(fullname) LIKE '%${q}%')) OR listId IN(SELECT listId FROM labelsToLists WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userId = '${req.session.user.id}' AND labelId IN(SELECT labelID FROM labels WHERE LOWER(label) LIKE '%${q}%')))) ORDER BY editDateTime DESC;`;
+
+        // searchQuery = `SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') AND trash = TRUE AND archive = FALSE AND (LOWER(title) LIKE '%${q}%' OR LOWER(list) LIKE '%${q}%' OR listId IN(SELECT listId FROM listsToUsers WHERE userId IN(SELECT userId FROM emails_and_names WHERE LOWER(email) LIKE '%${q}%' OR LOWER(fullname) LIKE '%${q}%')) OR listId IN(SELECT listId FROM labelsToLists WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userId = '${req.session.user.id}' AND labelId IN(SELECT labelID FROM labels WHERE LOWER(label) LIKE '%${q}%')))) ORDER BY editDateTime DESC;`;
         renderPage = 'trash';
     }
 
-           // hello
     var viewQuery = `CREATE OR REPLACE VIEW emails_and_names AS (SELECT userId, email, fullname FROM users WHERE userId IN(SELECT userId FROM listsToUsers WHERE userId != '${req.session.user.id}' AND listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}')));`;
     db.any(viewQuery+searchQuery)
         .then((lists) => {
@@ -558,7 +589,8 @@ app.post('/search', function(req, res) {
                 })
                 .catch((error) => {
                     console.log(error);
-                    return res.render('pages/' + renderPage, {search: true, lists, collaborators: [], email: req.session.user.email, profilePhoto: req.session.user.profilePhoto, givenName: req.session.user.givenName, currentUserId: req.session.user.id, message: `results for '` + q + `'`});
+
+                    return res.render('pages/' + renderPage, {search: true, lists, collaborators: [],user: req.session.user, email: req.session.user.email, profilePhoto: req.session.user.profilePhoto, givenName: req.session.user.givenName, currentUserId: req.session.user.id, message: `results for '` + q + `'`});
 
     
                 });
@@ -569,7 +601,8 @@ app.post('/search', function(req, res) {
         })
         .catch((error) => {
             console.log(error);
-            return res.render('pages/lists', {search: true, error: true, lists: [], email: req.session.user.email, profilePhoto: req.session.user.profilePhoto, givenName: req.session.user.givenName, currentUserId: req.session.user.id, message: 'search error'});
+
+            return res.render('pages/lists', {search: true, error: true, lists: [], user: req.session.user,email: req.session.user.email, profilePhoto: req.session.user.profilePhoto, givenName: req.session.user.givenName, currentUserId: req.session.user.id, message: 'search error'});
         });
 });
 
@@ -601,6 +634,22 @@ app.get('/allIdsAssocWithCurrentUserLists', (req , res) => {
             return res.send(rows);
         });
 });
+
+
+app.get('/menuTest', (req , res) => {
+    db.any(`SELECT * FROM labels;`)
+        .then((labels) => {
+            return res.render('pages/menuTest', {labels});
+
+        })
+        .catch((error) => {
+            console.log(error);
+            return res.render('pages/menuTest', {labels: []});
+        });
+});
+
+
+
 
 
 
@@ -653,10 +702,17 @@ app.get('/searchByEmailOrName', (req , res) => {
 
 
 app.post('/emptyTrash', function(req, res) {
-    // get all ids assoc. with all lists for the current user.
-    // `SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}';` // we have all listids assoc with this user
-    // `SELECT userId FROM listsToUsers WHERE listId IN(^);` // collect all user ids that may also be assoc with any of these listids
-    db.any(`DELETE FROM listsToUsers WHERE userId IN(SELECT userId FROM listsToUsers WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}')) AND listId IN(SELECT listId FROM lists WHERE trash = TRUE) RETURNING listId;`)
+
+
+
+    // `DELETE FROM labelsToLists WHERE listId IN(SELECT listId FROM lists WHERE trash = TRUE AND listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}'));`;
+    // `DELETE FROM listsToUsers WHERE userId = '${req.session.user.id}' AND listId IN(SELECT listId FROM lists WHERE trash = TRUE);`;
+
+    db.any(`DELETE FROM labelsToLists WHERE listId IN(SELECT listId FROM lists WHERE trash = TRUE AND listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}')); 
+            DELETE FROM listsToUsers WHERE userId = '${req.session.user.id}' AND listId IN(SELECT listId FROM lists WHERE trash = TRUE) RETURNING listId;`)
+
+
+    // db.any(`DELETE FROM listsToUsers WHERE userId IN(SELECT userId FROM listsToUsers WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}')) AND listId IN(SELECT listId FROM lists WHERE trash = TRUE) RETURNING listId;`)
 
     // db.any(`DELETE FROM listsToUsers WHERE userId = '${req.session.user.id}' AND listId IN(SELECT listId FROM lists WHERE trash = TRUE) RETURNING listId;`)
         .then((ids) => {
@@ -667,8 +723,9 @@ app.post('/emptyTrash', function(req, res) {
 
         
 
+            db.any(`DELETE FROM lists WHERE listId IN(${array});`)
 
-            db.any(`DELETE FROM lists WHERE trash = TRUE AND listId IN(${array});`)
+            // db.any(`DELETE FROM lists WHERE trash = TRUE AND listId IN(${array});`)
                 .then(() => {
                     return res.redirect('/trash?empty=success');
                     // return res.render('pages/trash', {lists: [], error: false, message: 'emptied trash', givenName: req.session.user.givenName})
@@ -695,11 +752,12 @@ app.post('/addList', function(req, res) {
     var title = (!req.body.title) ? '' : req.body.title;
 
 
+// DONE
+db.any(`INSERT INTO lists (title, list, color, trash, editDateTime, createDateTime) VALUES ('${title.replace(/'/g, "''")}', '${req.body.list.replace(/'/g, "''")}', 'ffffff', FALSE, '${req.body.now}', '${req.body.now}') RETURNING listId;`)
 
-
-    db.any(`INSERT INTO lists (title, list, color, trash, archive, editDateTime, createDateTime) VALUES ('${title.replace(/'/g, "''")}', '${req.body.list.replace(/'/g, "''")}', 'ffffff', FALSE, FALSE, '${req.body.now}', '${req.body.now}') RETURNING listId;`)
+    // db.any(`INSERT INTO lists (title, list, color, trash, archive, editDateTime, createDateTime) VALUES ('${title.replace(/'/g, "''")}', '${req.body.list.replace(/'/g, "''")}', 'ffffff', FALSE, FALSE, '${req.body.now}', '${req.body.now}') RETURNING listId;`)
         .then((listId) => {
-            db.any(`INSERT INTO listsToUsers (listId, userId, owner) VALUES (${listId[0].listid}, '${req.session.user.id}', TRUE);`)
+            db.any(`INSERT INTO listsToUsers (listId, userId, owner, archive) VALUES (${listId[0].listid}, '${req.session.user.id}', TRUE, FALSE);`)
                 .then(() => {
                     return res.redirect('/lists?add=success');
                 })
@@ -757,8 +815,10 @@ app.post('/deleteList', function(req, res) {
 });
 
 app.post('/unarchiveList', function(req, res) {
-    // YES
-    db.any(`UPDATE lists SET archive = FALSE WHERE listId = ${req.body.listId};`)
+    // DONE
+    db.any(`UPDATE listsToUsers SET archive = FALSE WHERE listId = ${req.body.listId} AND userId = '${req.session.user.id}';`)
+
+    // db.any(`UPDATE lists SET archive = FALSE WHERE listId = ${req.body.listId};`)
         .then(() => {
             return res.redirect('/lists?unarchive=success');
         })
@@ -969,10 +1029,10 @@ app.post('/restoreAll', function(req, res) {
 app.post('/copy', function(req, res) {
     // var nowFormatted = getNowFormatted();
 
-
-    db.any(`INSERT INTO lists (title, list, color, trash, archive, editDateTime, createDateTime) VALUES ('${req.body.title.replace(/'/g, "''")}', '${req.body.list.replace(/'/g, "''")}', '${req.body.color}', FALSE, FALSE, '${req.body.now}', '${req.body.now}') RETURNING listId;`)
+    // DONE
+    db.any(`INSERT INTO lists (title, list, color, trash, editDateTime, createDateTime) VALUES ('${req.body.title.replace(/'/g, "''")}', '${req.body.list.replace(/'/g, "''")}', '${req.body.color}', FALSE, '${req.body.now}', '${req.body.now}') RETURNING listId;`)
     .then((listId) => {
-        db.any(`INSERT INTO listsToUsers (listId, userId, owner) VALUES (${listId[0].listid}, '${req.session.user.id}', TRUE);`)
+        db.any(`INSERT INTO listsToUsers (listId, userId, owner, archive) VALUES (${listId[0].listid}, '${req.session.user.id}', TRUE, FALSE);`)
             .then(() => {
                 if(req.query.archived && req.query.archived == 'true') {
                     return res.redirect('/lists?copyArchived=success');
@@ -1053,8 +1113,10 @@ app.get('/archive', (req , res) => {
     }
 
     db.tx(t => {
-        // YES
-        const lists = db.any(`SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') AND archive = TRUE AND trash = FALSE ORDER BY editDateTime DESC;`);
+        // DONE
+        const lists = db.any(`SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}' AND archive = TRUE) AND trash = FALSE ORDER BY editDateTime DESC;`);
+
+        // const lists = db.any(`SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') AND archive = TRUE AND trash = FALSE ORDER BY editDateTime DESC;`);
         const collaborators = db.any(`SELECT users.email, users.profilePhotoUrl, users.fullname, users.userId, listsToUsers.listId, listsToUsers.owner FROM listsToUsers INNER JOIN users ON listsToUsers.userId = users.userId;`);
         const labels = db.any(`CREATE OR REPLACE VIEW labelsJoinlabelsToLists AS (SELECT labels.labelId, labels.label, labelsToLists.listId FROM labelsToLists INNER JOIN labels ON labelsToLists.labelId = labels.labelId);SELECT * FROM labelsJoinlabelsToLists WHERE labelId IN(SELECT labelId from labelsToUsers where userId = '${req.session.user.id}');`);
         
@@ -1134,8 +1196,10 @@ app.get('/archive', (req , res) => {
 app.post('/archiveList', function(req, res) {
     // var title = (!req.body.title) ? 'edited list' : req.body.title;
 
-    // YES
-    db.any(`UPDATE lists SET archive = TRUE WHERE listId = ${req.body.listId};`)
+    // DONE
+    db.any(`UPDATE listsToUsers SET archive = TRUE WHERE listId = ${req.body.listId} AND userId = '${req.session.user.id}';`)
+
+    // db.any(`UPDATE lists SET archive = TRUE WHERE listId = ${req.body.listId};`)
         .then(() => {
             return res.redirect('/lists?archive=success');
         })
@@ -1163,18 +1227,45 @@ app.post('/removeCollaborator', function(req, res) {
 
 
 
-
-
-
-
-app.get('/labels', function(req, res) {
-    db.any(`SELECT * FROM labels WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userID = '${req.session.user.id}') ORDER BY labelId ASC;`)
-        .then((labels) => {
-            return res.render('pages/labels', {labels, user: req.session.user});
+app.get('/labelCounts', function(req, res) {
+    db.any(`SELECT labelId, COUNT(*)
+    FROM labelsToLists
+    GROUP BY labelId;`)
+        .then((rows) => {
+            return res.send(rows);
         })
         .catch((error) => {
             console.log(error);
-            return res.render('pages/labels', {labels: [], user: req.session.user});
+            return res.send(rows);
+        });
+
+
+})
+
+
+app.get('/labels', function(req, res) {
+    db.any(`SELECT * FROM labels WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userID = '${req.session.user.id}') ORDER BY label ASC;`)
+        .then((allLabels) => {
+                db.any(`SELECT labelId, COUNT(*)
+                FROM labelsToLists
+                GROUP BY labelId;`)
+                .then((labelCounts) => {
+                    return res.render('pages/labels', {allLabels, labelCounts, user: req.session.user});
+
+                })
+                .catch((error) => {
+                    console.log(error);
+                    return res.render('pages/labels', {allLabels, labelCounts: [], user: req.session.user});
+
+                });
+
+
+
+            // return res.render('pages/labels', {allLabels, user: req.session.user});
+        })
+        .catch((error) => {
+            console.log(error);
+            return res.render('pages/labels', {allLabels: [], user: req.session.user});
         });
 
 
@@ -1273,11 +1364,34 @@ app.post('/searchUsers', function(req, res) {
 
 app.get('/labelsModal', function(req, res) {
 
-    db.any(`SELECT * FROM labels WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userID = '${req.session.user.id}');`)
+    db.any(`SELECT * FROM labels WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userID = '${req.session.user.id}') ORDER BY label ASC;`)
         .then((labels) => {
             // return res.render('pages/horizontal', {users});
             // console.log(labels);
-            return res.render('pages/labelsModal', {labels, listid: req.query.listId});
+            
+
+            db.any(`SELECT labelId FROM labels WHERE labelID IN(SELECT labelId FROM labelsToLists WHERE listId = '${req.query.listId}');`)
+            .then((labelIdsForThisList) => {
+                // console.log(labelIdsForThisList);
+                var arr = [];
+                for(var i = 0; i < labelIdsForThisList.length; i++) {
+                    arr.push(labelIdsForThisList[i].labelid);
+                }
+                // console.log(arr);
+
+                return res.render('pages/labelsModal', {labels, labelIdsForThisList: arr, listid: req.query.listId});
+
+    
+    
+            })
+            .catch((error) => {
+                console.log(error);
+                return res.render('pages/labelsModal', {labels: [], labelsForThisList: [], listid: req.query.listId});
+            });
+
+
+
+            // return res.render('pages/labelsModal', {labels, listid: req.query.listId});
 
 
 
@@ -1285,7 +1399,8 @@ app.get('/labelsModal', function(req, res) {
         .catch((error) => {
             console.log(error);
             // return res.render('pages/horizontal', {users: []});
-            return res.render('pages/labelsModal', {error: true, labels: [], listid: req.query.listId});
+            // return res.render('pages/labelsModal', {error: true, labels: [], listid: req.query.listId});
+            return res.render('pages/labelsModal', {labels: [], labelsForThisList: [], listid: req.query.listId});
         });
 });
 
@@ -1449,9 +1564,9 @@ app.post('/addCollaborator', function(req, res) {
     // console.log(req.body.listId);
     // console.log(req.body.collaboratorUserId);
     // INSERT INTO listsToUsers (listId, userId) VALUES ('${req.body.listId}', '${req.body.collaboratorUserId}');
-    db.any(`INSERT INTO listsToUsers (listId, userId, owner) SELECT '${req.body.listId}', '${req.body.collaboratorUserId}', FALSE WHERE NOT EXISTS (SELECT 1 FROM listsToUsers WHERE listId = '${req.body.listId}' AND userId = '${req.body.collaboratorUserId}');UPDATE lists SET editDateTime = '${req.body.now}' WHERE listId = '${req.body.listId}';`)
+    db.any(`INSERT INTO listsToUsers (listId, userId, owner, archive) SELECT '${req.body.listId}', '${req.body.collaboratorUserId}', FALSE, FALSE WHERE NOT EXISTS (SELECT 1 FROM listsToUsers WHERE listId = '${req.body.listId}' AND userId = '${req.body.collaboratorUserId}');UPDATE lists SET editDateTime = '${req.body.now}' WHERE listId = '${req.body.listId}';`)
         .then(() => {
-            sendCollaborationEmail(req.body.email);
+            sendCollaborationEmail(req.body.email, req.session.user.email, req.session.user.displayName);
             return res.redirect('/lists?addCollaborator=success');
         })
         .catch((error) => {
@@ -1462,7 +1577,7 @@ app.post('/addCollaborator', function(req, res) {
 
 
 
-function sendCollaborationEmail(email) {
+function sendCollaborationEmail(emailTo, emailFrom, nameFrom) {
     let transporter = nodemailer.createTransport({
         service: 'gmail',
         host: 'smtp.gmail.com',
@@ -1479,9 +1594,9 @@ function sendCollaborationEmail(email) {
 
       let mailOptions = {
         from: 'lists.communications@gmail.com',
-        to: email,
+        to: emailTo,
         subject: 'A lists user shared their list with you',
-        text: 'Hello! A lists user has shared a list with you. Log in to your account to collaborate on it with them.'
+        text: 'Hello! ' + nameFrom + ' (' + emailFrom + ')' + ' has shared a list with you. Log in to your lists account to collaborate on it with them.'
       };
 
       transporter.sendMail(mailOptions, (error, info) => {

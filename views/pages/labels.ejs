@@ -6,20 +6,20 @@
 
 <main>
 
-
     <%- include ('../partials/menu') %>
+
 
 
     <div class="text-center" style="padding-top:50px;color:#f289ca">
       
         <h4 class="site-title">labels</h4>
 
-        <% if(labels.length == 0) { %>
+        <% if(allLabels.length == 0) { %>
             <p id="labelCount" style="font-size:12px;padding-top:16px">No labels</p>
-          <% } else if(labels.length == 1) { %>
+          <% } else if(allLabels.length == 1) { %>
             <p id="labelCount" style="font-size:12px;padding-top:16px">1 label</p>
           <% } else { %>
-            <p id="labelCount" style="font-size:12px;padding-top:16px"><%= labels.length %> labels</p>
+            <p id="labelCount" style="font-size:12px;padding-top:16px"><%= allLabels.length %> labels</p>
           <% } %>
         
 
@@ -40,8 +40,8 @@
                 </div>
               </form>
 
-              <% if(labels.length == 0) { %>
-                <div class="text-center" style="padding-top:205px">
+              <% if(allLabels.length == 0) { %>
+                <div class="text-center" style="padding-top:150px">
               
                   <h6>No labels</h6>
                   <img style="width:100px" src="/img/house.png">
@@ -51,7 +51,7 @@
                 <% } %>
 
 
-            <% if(labels.length != 0) { %>
+            <% if(allLabels.length != 0) { %>
               
     
                 <div style="padding-top:20px;padding-left:60px">
@@ -72,7 +72,7 @@
                 <div style="padding-top:30px;">
 
 
-        <% labels.forEach(function(label) { %>
+        <% allLabels.forEach(function(label) { %>
             <div style="padding-left:60px">
                 <form action="/search?filterByLabel=true&labelId=<%= label.labelid %>" method="POST">
                 <input class="form-control" name="labelId" value="<%= label.labelid %>" hidden>
@@ -80,6 +80,15 @@
 
                   <!-- <button  type="text" title="" class="btn rounded-pill" style="border-color: #03a9f4;background-color: #b3e5fc;color:#03a9f4;font-weight: bold;font-size:12px" disabled> -->
                     <%= label.label %> </button>
+
+
+
+                    <% labelCounts.forEach(function(labelCount) { %>
+                        <% if(label.labelid == labelCount.labelid) { %>
+                            <button disabled title="List count" class="btn rounded-pill" style="border-color:#f289ca;background-color:#ffe6ee;font-weight: bold;font-size:10px" >(<%= labelCount.count %>)</button>
+                            <% } %>
+                        <% }) %>
+                        
                   </form>
 
                   <form class="editActions" action="/updateLabel" method="POST" style="padding-top:10px;">

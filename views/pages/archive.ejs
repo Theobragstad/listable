@@ -13,7 +13,13 @@
 
     <div class="text-center" style="padding-top:50px;color:#f289ca">
       
-        <h4 class="site-title" >archive</h4>
+      <% if(search){ %>
+        <h4 class="site-title">archive</h4>
+        <h6 class="site-title">search results</h6>
+      <% } else {%>
+        <h4 class="site-title">archive</h4>
+        <% } %>
+
         <div style="padding-top:5px;padding-bottom:5px">
           <form action="/search?archive=true" method="POST">
           <input type="text" id="q" name="q" class="search-hover zoom" placeholder="Search archive...">
@@ -113,7 +119,7 @@
         
     <button title="Select list" id="" value=<%= list.listid %> class="btn rounded-10 zoom" style="padding:0;position:relative;left:26px;top:10px;z-index: 2;line-height: .25;width:15px;height:15px"><img class="listSelector" src="/img/colors/white.png" style="width:15px" onclick="changeImage(this, 'colors/white', 'colors/ffffffSelected')"></button>
 
-      <div title="Edit list" data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid%>" data-toggle="modal" id="<%= list.listid %>" class="col card card-body m-2" style="min-width: 250px;overflow-x:scroll;background-color:#<%= list.color %>;">   
+      <div title="Edit list" data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid%>" data-toggle="modal" id="<%= list.listid %>" class="col card card-body m-2" style="min-width: 400px;overflow-x:scroll;background-color:#<%= list.color %>;">   
        
         <div class="row" style="font-weight:bold;padding-left:10px"><%= list.title %>  
 
@@ -186,7 +192,10 @@
 
         </div>        
         <br>
-        <%- list.list %>
+        <div class="result">
+          <%- list.list %>
+        </div>
+  
 
 
 
@@ -315,7 +324,7 @@
             </div>
           </div>
         </div>
-
+      </div>
       
 
 
@@ -334,7 +343,7 @@
 
       <input class="form-control" type="text" name="listId" value="<%= list.listid %>" hidden>
 
-                  <input tabindex="-1" class="form-control rounded-10 text-center" type="text" maxlength="20" name="title" value="<%= list.title%>">
+                  <input tabindex="-1" class="form-control rounded-10 text-center" type="text" maxlength="20" name="title" value="<%= list.title%>" placeholder="Title">
       
           <div class="text-center" style="padding-bottom:4px">
               <button class="btn rounded-10 " style="border-color:#17d475;background-color:#e8fcec;padding: .25rem .4rem;line-height: .75;">Update</button>
@@ -401,7 +410,7 @@
 
 
 <% if(search && lists.length == 0){ %>
-  <div class="text-center" style="padding-top:100px">
+  <div class="text-center" style="padding-top:120px">
 
     <h6>No search results</h6>
     <img style="width:100px" src="/img/noResults.png">

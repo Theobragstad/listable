@@ -13,7 +13,13 @@
 
 
     <div class="text-center" style="padding-top:50px;color:#f289ca">
-        <h4 class="site-title">your lists</h4>
+      <% if(search){ %>
+        <h4 class="site-title">lists</h4>
+        <h6 class="site-title">search results</h6>
+      <% } else {%>
+        <h4 class="site-title">lists</h4>
+        <% } %>
+
         <div style="padding-top:5px;padding-bottom:5px">
           <form action="/search" method="POST" onsubmit="saveQuery()">
           <input type="text" id="q" name="q" class="search-hover zoom" placeholder="Search all...">
@@ -116,7 +122,7 @@
 <!-- <input id="n" value="<%=  %>" hidden> -->
 
 <% if(search && lists.length == 0){ %>
-  <div class="text-center" style="padding-top:100px">
+  <div class="text-center" style="padding-top:69px">
 
     <h6>No search results</h6>
     <img style="width:100px" src="/img/noResults.png">

@@ -234,3 +234,6 @@ mark.a0 {
 }
 
 
+.card:hover {
+  filter: brightness(97%);
+}

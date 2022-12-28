@@ -56,12 +56,24 @@
               <% labels.forEach(function(label) { %>
                   
                   <div style="padding-bottom:5px">
+                    <% if(labelIdsForThisList.includes(label.labelid)) { %>
+                        
+                      <button disabled="true" class="btn rounded-pill" style="border-color: #03a9f4;background-color: #b3e5fc;color:#03a9f4;font-weight: bold;font-size:12px">
+                        <%= label.label %></button>
+                    <% } else {%>
                     <form action="/assignLabelToList" method="POST">
                     <input class="form-control" name="listId" type="number" value='<%= listid %>' hidden>
                     <input class="form-control" name="labelId" type="text" value="<%= label.labelid %>" hidden>
                       <button title="Add label" class="btn rounded-pill" style="border-color: #03a9f4;background-color: #b3e5fc;color:#03a9f4;font-weight: bold;font-size:12px">
                         <%= label.label %></button>
+                       
                       </form>
+                      <% } %>
+
+
+                      
+
+                      
                     </div>
                     
 
@@ -71,6 +83,14 @@
 
                       
               </div>
+
+                 
+             
+              
+
+
+
+
             </div>
           </div>
         </div>

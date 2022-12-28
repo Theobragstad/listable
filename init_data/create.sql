@@ -11,7 +11,6 @@ CREATE TABLE lists (
     list TEXT NOT NULL,
     color VARCHAR(6) NOT NULL,
     trash BOOLEAN NOT NULL,
-    archive BOOLEAN NOT NULL, 
     editDateTime VARCHAR(19) NOT NULL,
     createDateTime VARCHAR(19) NOT NULL
 );
