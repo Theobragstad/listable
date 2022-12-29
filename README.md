@@ -35,3 +35,5 @@ Check it out to explore all the features!
 - Navigate to the project folder in the terminal
 - Run 'docker compose up' in the terminal
 - Go to localhost:3000 on a browser to begin!
+
+    - (Note that to use the collaboration features that require other users, you will need to register another account through an alternate Google account first, as the app is not deployed and therefore user base is limited to local sessions.)
