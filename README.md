@@ -30,7 +30,7 @@ Check it out to explore all the features!
 - And many more!
 
 ## **How to run**:  
-- Make sure you have Docker Desktop downloaded
+- Make sure you have Docker Desktop downloaded and running
 - Clone or download this repository
 - Navigate to the project folder in the terminal
 - Run 'docker compose up' in the terminal
