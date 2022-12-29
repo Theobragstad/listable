@@ -190,15 +190,22 @@ app.get('/lists', function(req, res) {
         const collaborators = db.any(`SELECT users.email, users.profilePhotoUrl, users.fullname, users.userId, listsToUsers.listId, listsToUsers.owner FROM listsToUsers INNER JOIN users ON listsToUsers.userId = users.userId;`);
         const labels = db.any(`CREATE OR REPLACE VIEW labelsJoinlabelsToLists AS (SELECT labels.labelId, labels.label, labelsToLists.listId FROM labelsToLists INNER JOIN labels ON labelsToLists.labelId = labels.labelId);SELECT * FROM labelsJoinlabelsToLists WHERE labelId IN(SELECT labelId from labelsToUsers where userId = '${req.session.user.id}');`);
         const allLabels = db.any(`SELECT * FROM labels WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userID = '${req.session.user.id}') ORDER BY label ASC;`);
+        const archivedLists = db.any(`SELECT listId FROM listsToUsers WHERE archive = TRUE AND userId = '${req.session.user.id}';`);
 
-        return t.batch([lists, collaborators, labels, allLabels]); 
+        return t.batch([lists, collaborators, labels, allLabels, archivedLists]); 
     })
         .then((data) => {
-            return res.render("pages/lists", {lists: data[0], collaborators: data[1], labels: data[2], allLabels: data[3], user: req.session.user, search: false, error, message});
+            var archivedListIds = [];
+            var archivedListIdsRaw = data[4];
+            for(var i = 0; i < archivedListIdsRaw.length; i++) {
+                archivedListIds.push(archivedListIdsRaw[i].listid)
+            }
+
+            return res.render("pages/lists", {lists: data[0], collaborators: data[1], labels: data[2], allLabels: data[3], archivedListIds, user: req.session.user, search: false, error, message, filterByLabel: false, label: null, labelid: null});
         })
         .catch((error) => {
             console.log(error);
-            return res.render("pages/lists", {lists: [], collaborators: [], labels: [], user: req.session.user, search: false, error: true, message: 'error loading lists'});
+            return res.render("pages/lists", {lists: [], collaborators: [], labels: [], archivedListIds: [], user: req.session.user, search: false, error: true, message: 'error loading lists', filterByLabel: false, label: null, labelid: null});
         });
 });
 
@@ -224,6 +231,7 @@ app.post('/search', function(req, res) {
         return res.redirect('/lists');
     }
 
+
     var searchQuery = `SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') AND trash = FALSE AND (LOWER(title) LIKE '%${q}%' OR LOWER(list) LIKE '%${q}%' OR listId IN(SELECT listId FROM listsToUsers WHERE userId IN(SELECT userId FROM emails_and_names WHERE LOWER(email) LIKE '%${q}%' OR LOWER(fullname) LIKE '%${q}%')) OR listId IN(SELECT listId FROM labelsToLists WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userId = '${req.session.user.id}' AND labelId IN(SELECT labelID FROM labels WHERE LOWER(label) LIKE '%${q}%')))) ORDER BY editDateTime DESC;`;
     var renderPage = 'lists';
 
@@ -246,15 +254,25 @@ app.post('/search', function(req, res) {
         const collaborators = db.any(`SELECT users.email, users.profilePhotoUrl, users.fullname, users.userId, listsToUsers.listId, listsToUsers.owner FROM listsToUsers INNER JOIN users ON listsToUsers.userId = users.userId;`);
         const labels = db.any(`CREATE OR REPLACE VIEW labelsJoinlabelsToLists AS (SELECT labels.labelId, labels.label, labelsToLists.listId FROM labelsToLists INNER JOIN labels ON labelsToLists.labelId = labels.labelId);SELECT * FROM labelsJoinlabelsToLists WHERE labelId IN(SELECT labelId from labelsToUsers where userId = '${req.session.user.id}');`);
         const allLabels = db.any(`SELECT * FROM labels WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userID = '${req.session.user.id}') ORDER BY label ASC;`);
+        const archivedLists = db.any(`SELECT listId FROM listsToUsers WHERE archive = TRUE AND userId = '${req.session.user.id}';`);
 
-        return t.batch([lists, collaborators, labels, allLabels]); 
+        return t.batch([lists, collaborators, labels, allLabels, archivedLists]); 
     })
         .then((data) => {
-            return res.render('pages/' + renderPage, {lists: data[0], collaborators: data[1], labels: data[2], allLabels: data[3], user: req.session.user, search: true, message: `results for '` + q + `'`});
+            var archivedListIds = [];
+            var archivedListIdsRaw = data[4];
+            for(var i = 0; i < archivedListIdsRaw.length; i++) {
+                archivedListIds.push(archivedListIdsRaw[i].listid)
+            }
+
+            if(req.query.filterByLabel && req.query.filterByLabel == 'true') {
+                return res.render('pages/' + renderPage, {lists: data[0], collaborators: data[1], labels: data[2], allLabels: data[3], archivedListIds, user: req.session.user, search: false, message: `filtering by label '` + req.body.label + `'`, filterByLabel: true, label: req.body.label, labelid: req.query.labelId});
+            }
+            return res.render('pages/' + renderPage, {lists: data[0], collaborators: data[1], labels: data[2], allLabels: data[3],  archivedListIds, user: req.session.user, search: true, message: `results for '` + q + `'`, filterByLabel: false, label: null, labelid: null});
         })
         .catch((error) => {
             console.log(error);
-            return res.render('pages/' + renderPage, {lists: [], collaborators: [], labels: [], allLabels: [], user: req.session.user, search: true, error: true, message: 'search error'});
+            return res.render('pages/' + renderPage, {lists: [], collaborators: [], labels: [], allLabels: [], archivedListIds: [], user: req.session.user, search: true, error: true, message: 'search error', filterByLabel: false, label: null, labelid: null});
         });
     // db.any(viewQuery + searchQuery)
     //     .then((lists) => {
@@ -282,6 +300,63 @@ app.post('/permanentlyDeleteList', function(req, res) {
         .catch((error) => {
             console.log(error);
             return res.redirect('/trash?permanentlyDeleted=failure');
+        });
+});
+
+
+app.post('/addListWithThisLabel', function(req, res) {
+    var title = (!req.body.title) ? '' : req.body.title;
+    var labelId = req.body.labelId;
+
+    db.any(`INSERT INTO lists (title, list, color, trash, editDateTime, createDateTime) VALUES ('${title.replace(/'/g, "''")}', '${req.body.list.replace(/'/g, "''")}', 'ffffff', FALSE, '${req.body.now}', '${req.body.now}') RETURNING listId;`)
+        .then((listId) => {
+            db.any(`INSERT INTO listsToUsers (listId, userId, owner, archive) VALUES (${listId[0].listid}, '${req.session.user.id}', TRUE, FALSE); INSERT INTO labelsToLists (labelId, listId) VALUES (${labelId}, ${listId[0].listid});`)
+                .then(() => {
+                    return res.redirect('/search?filterByLabel=true&labelId='+ labelId +'&add=success');
+                })
+                .catch((error) => {
+                    console.log(error);
+                    return res.redirect('/search?filterByLabel=true&labelId='+ labelId +'&add=failure');
+                });
+        })
+        .catch((error) => {
+            console.log(error);
+            return res.redirect('/search?filterByLabel=true&labelId='+ labelId +'&add=failure');
+        });
+});
+
+// This special GET version of /search is only to be called as a redirect from /addListWithThisLabel because a GET route was needed to render the resulting page.
+app.get('/search', function(req, res) {
+    var searchQuery = `SELECT * FROM lists WHERE trash = FALSE AND listId IN(SELECT listId FROM labelsToLists WHERE labelId = '${req.query.labelId}') ORDER BY editDateTime DESC;`;
+    var viewQuery = `CREATE OR REPLACE VIEW emails_and_names AS (SELECT userId, email, fullname FROM users WHERE userId IN(SELECT userId FROM listsToUsers WHERE userId != '${req.session.user.id}' AND listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}')));`;
+    
+    db.tx(t => {
+        const lists = db.any(viewQuery + searchQuery);
+        const collaborators = db.any(`SELECT users.email, users.profilePhotoUrl, users.fullname, users.userId, listsToUsers.listId, listsToUsers.owner FROM listsToUsers INNER JOIN users ON listsToUsers.userId = users.userId;`);
+        const labels = db.any(`CREATE OR REPLACE VIEW labelsJoinlabelsToLists AS (SELECT labels.labelId, labels.label, labelsToLists.listId FROM labelsToLists INNER JOIN labels ON labelsToLists.labelId = labels.labelId);SELECT * FROM labelsJoinlabelsToLists WHERE labelId IN(SELECT labelId from labelsToUsers where userId = '${req.session.user.id}');`);
+        const allLabels = db.any(`SELECT * FROM labels WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userID = '${req.session.user.id}') ORDER BY label ASC;`);
+
+        const label = db.any(`SELECT label FROM labels WHERE labelId = '${req.query.labelId}' LIMIT 1;`);
+        const archivedLists = db.any(`SELECT listId FROM listsToUsers WHERE archive = TRUE AND userId = '${req.session.user.id}';`);
+
+        
+        return t.batch([lists, collaborators, labels, allLabels, label, archivedLists]); 
+    })
+        .then((data) => {
+            var archivedListIds = [];
+            var archivedListIdsRaw = data[5];
+            for(var i = 0; i < archivedListIdsRaw.length; i++) {
+                archivedListIds.push(archivedListIdsRaw[i].listid)
+            }
+
+            if(req.query.filterByLabel && req.query.filterByLabel == 'true') {
+                return res.render('pages/lists', {lists: data[0], collaborators: data[1], labels: data[2], allLabels: data[3], archivedListIds, user: req.session.user, search: false, message: `filtering by label '` + data[4][0].label + `'`, filterByLabel: true, label: data[4][0].label, labelid: req.query.labelId});
+            }
+            return res.redirect('/lists');
+        })
+        .catch((error) => {
+            console.log(error);
+            return res.redirect('/lists');
         });
 });
 
@@ -817,6 +892,7 @@ app.use((req, res, next) => {
 })
 
 app.listen(3000);
+
 console.log('Server is listening on port 3000');
 
 

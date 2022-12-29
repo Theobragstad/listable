@@ -142,7 +142,7 @@ input#q:focus {
   /* Style rules for dark mode */
 @media (prefers-color-scheme: dark) {
     body {
-      background-color: #121212;
+      background-color: #171717;
       
       /* filter: brightness(50%); */
       /* color: white; */
@@ -160,12 +160,12 @@ input#q:focus {
     }
 
     textarea {
-      background-color: #000000 !important;
+      background-color: #171717 !important;
     }
 
 
     .card {
-      background-color: #121212 !important;
+      background-color: #171717 !important;
       border-color: #ffffff ;
     }
 
@@ -174,7 +174,7 @@ input#q:focus {
     }
 
     .modal-content {
-      background-color: #000000;
+      background-color: #171717;
       color:white;
     }
 

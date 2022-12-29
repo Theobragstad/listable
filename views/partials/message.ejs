@@ -15,6 +15,10 @@
 <script>
     var message = document.querySelector(".btn.message");
     if(message !== null) {
-        setTimeout(function() {bootstrap.Alert.getOrCreateInstance(message).close();}, 6000);
+        setTimeout(
+            function() {
+                bootstrap.Alert.getOrCreateInstance(message).close();
+            }, 
+            6000);
     }
 </script>

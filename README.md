@@ -3,13 +3,14 @@
 ## **lists is a full-featured list/note/to-do web app!** 
 ## **Save and keep track of everything you want to remember**.
 
-It was built using:  
-**PostgreSQL** (database)  
-**JavaScript**, **Node.js**, **Express** (backend)  
-**EJS**, **HTML**, **CSS**, **Bootstrap** (frontend)  
+It uses:  
+**PostgreSQL**   
+**JavaScript**, **Node.js**, **Express**   
+**EJS**, **HTML**, **CSS**, **Bootstrap**  
 
 And uses the **Google OAuth2 API** with the **Passport.js** module for user authentication.  
-It also uses the **TinyMCE** text editor, and the **Nodemailer** module.
+It also uses the **TinyMCE** text editor, and the **Nodemailer** module.  
+**Docker** is used to containerize the app.  
 
 Check it out to explore all the features!
 
@@ -27,3 +28,10 @@ Check it out to explore all the features!
 - Keep track of your lists with built-in edit and create times
 - Clean, appealing, intuitive, fast, and detail-oriented UI to help users be more productive
 - And many more!
+
+## **How to run**:  
+- Make sure you have Docker Desktop downloaded
+- Clone or download this repository
+- Navigate to the project folder in the terminal
+- Run 'docker compose up' in the terminal
+- Go to localhost:3000 on a browser to begin!

@@ -3,541 +3,220 @@
 <link rel="stylesheet" href="/css/style.css">
 <script src="/js/script.js"></script>
 
-
-
-
-
 <main>
-
   <%- include ('../partials/menu') %>
-
-
-    <div class="text-center" style="padding-top:50px;color:#f289ca">
-      
-      <% if(search){ %>
-        <h4 class="site-title">trash</h4>
-        <h6 class="site-title">search results</h6>
-      <% } else {%>
-        <h4 class="site-title">trash</h4>
-        <% } %>
-        <div style="padding-top:5px;padding-bottom:5px">
-          <form action="/search?trash=true" method="POST">
-          <input type="text" id="q" name="q" class="search-hover zoom" placeholder="search trash...">
-        </form>
-
-      </div>
-
-      <% if(lists.length == 0) { %>
-        <p id="listCount" style="font-size:12px;padding-top:16px">No lists</p>
-      <% } else if(lists.length == 1) { %>
-          <p id="listCount" style="font-size:12px;padding-top:16px">1 list</p>
-        <% } else { %>
-          <p id="listCount" style="font-size:12px;padding-top:16px"><%= lists.length %> lists</p>
-        <% } %>
-
-
-
-        <!-- <div style="padding-top:5px;padding-bottom:5px">
-          <form action="/search" method="POST">
-          <input type="text" id="q" name="q" class="search-hover zoom" placeholder="search by title or content">
-        </form>
-
-      </div>
-      <div style="padding-top:10px;">
-        <button data-bs-toggle="modal" data-bs-target="#exampleModal" type="button" href="#addListModal" data-toggle="modal" class="btn rounded-10 zoom" style="border-color:#f289ca;background-color:#ffe6ee;padding: .25rem .4rem;line-height: .75;">+</button>
-      </div>
-      </div> -->
-
-
-      <% if(lists.length > 0) { %>
-        <button      title="Empty trash" data-bs-toggle="modal" data-bs-target="#confirmEmpty" href="#confirmEmpty" data-toggle="modal"
-         class="btn" style="position:absolute;right:43px;font-size:12px;border-radius:10;background-color:#ffe6ee;color:#f289ca;border-color:#f289ca">
-                Empty
+  <div class="text-center" style="padding-top:50px;color:#f289ca">
+    <% if(search) { %>
+      <h4 class="site-title">trash</h4>
+      <h6 class="site-title">search results</h6>
+    <% } else { %>
+      <h4 class="site-title">trash</h4>
+    <% } %>
+    <div style="padding-top:5px;padding-bottom:5px">
+      <form action="/search?trash=true" method="POST">
+        <input type="text" id="q" name="q" class="search-hover zoom" placeholder="search trash...">
+      </form>
+    </div>
+    <% if(lists.length == 0) { %>
+      <p id="listCount" style="font-size:12px;padding-top:16px">No lists</p>
+    <% } else if(lists.length==1) { %>
+      <p id="listCount" style="font-size:12px;padding-top:16px">1 list</p>
+    <% } else { %>
+      <p id="listCount" style="font-size:12px;padding-top:16px">
+        <%= lists.length %> lists
+      </p>
+    <% } %>
+    <% if(lists.length> 0) { %>
+      <button title="Empty trash" data-bs-toggle="modal" data-bs-target="#confirmEmpty" href="#confirmEmpty" data-toggle="modal" class="btn" style="position:absolute;right:43px;font-size:12px;border-radius:10;background-color:#ffe6ee;color:#f289ca;border-color:#f289ca">
+        Empty
+      </button>
+      <form action="/restoreAll" method="POST">
+        <button title="Recover all" class="btn" style="position:absolute;right:120px;font-size:12px;border-radius:10;background-color:#e8fcec;color:#17d475;border-color:#17d475">
+          Recover All
         </button>
-
-        <form action="/restoreAll" method="POST">
-        <button      title="Recover all" 
-         class="btn" style="position:absolute;right:120px;font-size:12px;border-radius:10;background-color:#e8fcec;color:#17d475;border-color:#17d475">
-                Recover All
+      </form>
+    <% } %>
+    <div style="padding-left:44px;">
+      <button disabled id="numSelectedLists" class="btn" style="font-size:12px;border-radius:10;background-color:#e8fcec;color:#17d475;border-color:#17d475;display: none;padding-left:20px">
+        <button onclick="unselectAll()" title="Unselect all" id="unselectAll" class="btn" style="padding:0;position:absolute;top:115px;left:47px;display: none;z-index: 2;">
+          <img src="/img/x.png" style="width:10px" onmouseover="hover(this, 'pinkX')" onmouseout="unhover(this, 'x')">
         </button>
-    </form>
-        <% } %>
-
-
-        <div style="padding-left:44px;">
-            <button disabled id="numSelectedLists" class="btn" style="font-size:12px;border-radius:10;background-color:#e8fcec;color:#17d475;border-color:#17d475;display: none;padding-left:20px">
-              <button onclick="unselectAll()" title="Unselect all" id="unselectAll" class="btn" style="padding:0;position:absolute;top:115px;left:47px;display: none;z-index: 2;"><img src="/img/x.png" style="width:10px" onmouseover="hover(this, 'pinkX')" onmouseout="unhover(this, 'x')"></button>
-        
-            </button>  
-          </div>
-        
-        
-        
-          <!-- TEST -->
-          <div style="padding-top:10px;padding-left:44px;">
-            <button  data-id="" data-bs-toggle="modal" data-bs-target="#confirmPermanentlyDeleteSelected" href="#confirmPermanentlyDeleteSelected" data-toggle="modal"
-            title="Permanently delete selected" id="delSelectedLists" name="listIds" class="btn rounded-10 zoom" style="border-color:#fb6f92;background-color:#ffe5ec;padding: 0;line-height: .25;width:20px;display: none;"><img src="/img/trash.png" style="width:15px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')"></button>
-
-          <!-- <div style="padding-left:30px;"> -->
-
-          <form style="display:inline" action="/restoreSelectedLists" method="POST">
-            <button id="restoreSelectedLists" title="Recover selected" class="btn rounded-10 zoom" name="listIds" style="position:absolute;top:163px;left:73px;border-color:#17d475;background-color:#e8fcec;padding: 0;line-height: .25;width:20px;display:none"><img src="/img/restore.png" style="width:15px" onmouseover="hover(this, 'restorePink')" onmouseout="unhover(this, 'restore')"></button>
-          </form>
-          
-          <!-- </div> -->
-
-
-          
-        </div>
-
-
-
-
-          
-
-      
-
-
-  <!-- <div class="modal"  id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" >
-    <div class="modal-dialog "style="" >
-      <div class="modal-content rounded-10">
-        <form action="/addList" method="POST">
-
-
-            <input  tabindex="-1" class="form-control rounded-10 text-center" type="text" maxlength="25" name="title" value="new list" required>
-
-    <div class="text-center" style="padding-bottom:4px">
-        <button class="btn rounded-10 " style="border-color:#17d475;background-color:#e8fcec;padding: .25rem .4rem;line-height: .75;">Save</button>
-      </div> -->
-        <!-- <textarea  name="list"  id="textarea" class="form-control rounded-0" rows="27" ></textarea> -->
-        <!-- <textarea name="list"  id="textarea" class="form-control rounded-10" >
-        
-       </textarea> -->
-
-            <!-- <textarea  name="list" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}" onkeyup="handleInput(event)"  id="textarea" class="form-control rounded-0" rows="27" required></textarea> -->
-        <!-- </form>
-          </div>
-
-      </div>
-      
-    </div> -->
+      </button>
+    </div>
+    <div style="padding-top:10px;padding-left:44px;">
+      <button data-id="" data-bs-toggle="modal" data-bs-target="#confirmPermanentlyDeleteSelected" href="#confirmPermanentlyDeleteSelected" data-toggle="modal" title="Permanently delete selected" id="delSelectedLists" name="listIds" class="btn rounded-10 zoom" style="border-color:#fb6f92;background-color:#ffe5ec;padding: 0;line-height: .25;width:20px;display: none;">
+        <img src="/img/trash.png" style="width:15px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')">
+      </button>
+      <form style="display:inline" action="/restoreSelectedLists" method="POST">
+        <button id="restoreSelectedLists" title="Recover selected" class="btn rounded-10 zoom" name="listIds" style="position:absolute;top:163px;left:73px;border-color:#17d475;background-color:#e8fcec;padding: 0;line-height: .25;width:20px;display:none">
+          <img src="/img/restore.png" style="width:15px" onmouseover="hover(this, 'restorePink')" onmouseout="unhover(this, 'restore')">
+        </button>
+      </form>
+    </div>  
   </div>
 
-<!-- <div class="text-center" style="padding-top:20px"> -->
-    
-    <div class="row" style="overflow:auto;padding-top:50px;padding-left:20px;display:block">
-      <div class="d-flex" >
-        
-    <% lists.forEach(function(list) { %>
-      <!-- THIS IS A TEST -->
-      <!-- <div data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid%>" data-toggle="modal" class="btn rounded-10 zoom" style="border-color:#f289ca;background-color:#ffe6ee;padding: .25rem .4rem;line-height: .75;"> -->
-        <!-- <button data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid%>" data-toggle="modal" class="btn rounded-10 zoom" style="border-color:#f289ca;background-color:#ffe6ee;padding: .25rem .4rem;line-height: .75;"> -->
-        
-    <button title="Select list" id="" value=<%= list.listid %> class="btn rounded-10 zoom" style="padding:0;position:relative;left:26px;top:10px;z-index: 2;line-height: .25;width:15px;height:15px"><img class="listSelector" src="/img/colors/white.png" style="width:15px" onclick="changeImage(this, 'colors/white', 'colors/ffffffSelected')"></button>
-
-      <div title="Lists in trash cannot be edited" data-bs-toggle="" data-bs-target="#editList<%= list.listid%>" type="" href="#editList<%= list.listid%>" data-toggle="modal" id="<%= list.listid %>" class="col card card-body m-2" style="min-width: 250px;overflow-x:scroll;background-color:#<%= list.color %>;">   
-       
-
+  <div class="row" style="overflow:auto;padding-top:50px;padding-left:20px;display:block">
+    <div class="d-flex">
+      <% lists.forEach(function(list) { %>
+        <button title="Select list" id="" value=<%=list.listid %> class="btn rounded-10 zoom" style="padding:0;position:relative;left:26px;top:10px;z-index: 2;line-height:.25;width:15px;height:15px">
+          <img class="listSelector" src="/img/colors/white.png" style="width:15px" onclick="changeImage(this, 'colors/white', 'colors/ffffffSelected')">
+        </button>
+        <div title="Lists in trash cannot be edited" data-bs-toggle="" data-bs-target="#editList<%= list.listid%>" type="" href="#editList<%= list.listid%>" data-toggle="modal" id="<%= list.listid %>" class="col card card-body m-2" style="min-width: 250px;overflow-x:scroll;background-color:#<%= list.color %>;">
           <div class="row" style="font-weight:bold;padding-left:10px">
-            <div style="width:70%;text-overflow:ellipsis;
-            white-space: nowrap;
-            overflow: hidden; ">
-            
-            <%= list.title %>  
-          </div>
-
-            
-          <span class="col">
-
-
-            <% if(list.archive) {  %>
-              <form action="/restoreList?archived=true" method="POST">
-                <% } else { %>
-              <form action="/restoreList" method="POST">
-                <% } %>
-            <input type="number" name="listId" value=<%= list.listid %> hidden>
-            <button title="Recover list" class="btn rounded-10 zoom" style="position:absolute;right:40px;border-color:#17d475;background-color:#e8fcec;padding: 0;line-height: 1;width:20px"><img src="/img/restore.png" style="width:15px" onmouseover="hover(this, 'restorePink')" onmouseout="unhover(this, 'restore')"></button>
-          </form>
-
-
-
-          <button data-id="<%= list.listid %>" data-bs-toggle="modal" data-bs-target="#confirmPermanentDelete" href="#confirmPermanentDelete" data-toggle="modal"
-           title="Permanently delete" class="btn rounded-10 zoom" style="position:absolute;right:10px;border-color:#fb6f92;background-color:#ffe5ec;padding: 0;line-height: .25;width:20px"><img src="/img/trash.png" style="width:15px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')"></button>
-          
-        </span>
-
-        <!-- <div class="col"><button onclick="setSelectedColor('<%= list.color %>')" type="button" class="btn rounded-10 zoom" data-id="<%= list.listid %>" data-bs-toggle="modal" data-bs-target="#listColors" style="position:absolute;right:50px;border-color:#fb6f92;padding: 0;line-height: .25;width:20px" disabled>
-          <img src="/img/palette.png" style="width:20px" onmouseover="hover(this, 'paletteColors')" onmouseout="unhover(this, 'palette')">
-        </button>
-      </div> -->
-        
-
-        </div>        
-        <br>
-        <%- list.list %>
-
-        <div class="row g-0" style="padding-top:20px">
-    
-    
-    
-          <% labels.forEach(function(label) { %>
-            <% if(label.listid == list.listid){ %>
-              <div class="col auto" style="padding-right:0;
-              padding-left:10px;padding-bottom:5px;">
-              
-
-                <button  class="btn rounded-pill" style="vertical-align:middle;border-color: #03a9f4;background-color: #b3e5fc;color:#03a9f4;font-size:12px;padding:5px"><%=label.label %> 
-                </button>
-
-              </div>
-
-              
-              
-              
-              
-              <% } %>
-        <% }); %>
-        </div>
-
-
-        <div data-bs-toggle="tooltip" data-bs-custom-class="timeTooltip" class="createTime" id="createTime<%= list.listid%>" data-value="<%= list.createdatetime %>" style="text-align:center;padding-top:5px;font-size:12px;font-weight: bold;">
-                    
-          <button class="editTime btn" id="editTime<%= list.listid%>" data-value="<%= list.editdatetime %>" style="text-align:center;padding-top:5px;font-size:12px;font-weight: bold;"></button>
-
-        
-        </div>
-
-
-
-        
-      </div>
-
-
-
-      
-
-
-      
-      <!-- THIS IS A TEST -->
-    <!-- </button> -->
-    <% }); %>
-    <div style="padding-right:20px"></div>
-  </div>
-</div>
-
-<!-- TEST -->
-
-<% if(search && lists.length == 0){ %>
-  <div class="text-center" style="padding-top:106px">
-
-    <img style="width:100px" src="/img/noResults.png">
-
-  </div>
-<% } else if(lists.length == 0) { %>
-  <div class="text-center" style="padding-top:137px">
-    <img style="width:100px" src="/img/cat.png">
-  </div>
-
-  <% } %>
-<!-- </div> -->
-
-<!-- <div class="modal fade" id="listColors" tabindex="-1" aria-labelledby="listColors" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-
-      <div id="modalListId" value="1"></div> 
- 
-      <form action="/changeListColor" method="POST">
-        <input id="modalListId" name="listId" value="" hidden>
-        <button class="btn"  name="color" value="ffffff" style="padding-right:0"><img id="ffffff" src="/img/colors/white.png" style="width:20px"></button>
-        <button class="btn" name="color"  value="fdf5c1" style="padding-right:0"><img id="fdf5c1" src="/img/colors/yellow.png" style="width:20px"></button>
-        <button class="btn" name="color" value="f7cdc2" style="padding-right:0"><img id="f7cdc2" src="/img/colors/orange.png" style="width:20px"></button>
-      <button class="btn" name="color" value="cafbc8" style="padding-right:0"><img id="cafbc8" src="/img/colors/green.png" style="width:20px"></button>
-      <button class="btn" name="color" value="bdf6d9" style="padding-right:0"><img id="bdf6d9" src="/img/colors/greenBlue.png" style="width:20px"></button>
-      <button class="btn" name="color" value="bae6fc" style="padding-right:0"><img id="bae6fc" src="/img/colors/lightBlue.png" style="width:20px"></button>
-      <button class="btn" name="color" value="b4c9fa" style="padding-right:0"><img id="b4c9fa" src="/img/colors/lavender.png" style="width:20px"></button>
-      <button class="btn"  name="color" value="f4c3fb" style="padding-right:0"><img id="f4c3fb" src="/img/colors/pink.png" style="width:20px"></button>
-      <button class="btn"name="color" value="d0adfa"  ><img id="d0adfa" src="/img/colors/purple.png" style="width:20px"></button>
-      </form> --> 
-
-      <!-- <div class="btn-group">
-
-
-      <button class="btn" onclick="changeListColor('#ffffff', 'whiteSelected', '')" style="padding-right:0"><img id="whiteSelected" src="/img/colors/white.png" style="width:20px"></button>
-      <button class="btn" onclick="changeListColor('#fdf5c1', 'yellowSelected', '')" style="padding-right:0"><img id="yellowSelected" src="/img/colors/yellow.png" style="width:20px"></button>
-      <button class="btn" onclick="changeListColor('#f7cdc2', 'orangeSelected', '')" style="padding-right:0"><img id="orangeSelected" src="/img/colors/orange.png" style="width:20px"></button>
-      <button class="btn" onclick="changeListColor('#cafbc8', 'greenSelected', '')" style="padding-right:0"><img id="greenSelected" src="/img/colors/green.png" style="width:20px"></button>
-      <button class="btn" onclick="changeListColor('#bdf6d9', 'greenBlueSelected', '')" style="padding-right:0"><img id="greenBlueSelected" src="/img/colors/greenBlue.png" style="width:20px"></button>
-      <button class="btn" onclick="changeListColor('#bae6fc', 'lightBlueSelected', '')" style="padding-right:0"><img id="lightBlueSelected" src="/img/colors/lightBlue.png" style="width:20px"></button>
-      <button class="btn" onclick="changeListColor('#b4c9fa', 'lavenderSelected', '')" style="padding-right:0"><img id="lavenderSelected" src="/img/colors/lavender.png" style="width:20px"></button>
-      <button class="btn" onclick="changeListColor('#f4c3fb', 'pinkSelected', '')" style="padding-right:0"><img id="pinkSelected" src="/img/colors/pink.png" style="width:20px"></button>
-      <button class="btn" onclick="changeListColor('#d0adfa', 'purpleSelected', '')"><img id="purpleSelected" src="/img/colors/purple.png" style="width:20px"></button>
- 
- 
- 
-    </div> -->
-<!--       
-    </div>
-  </div>
-</div> -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div class="modal" id="confirmEmpty" tabindex="-1" aria-labelledby="confirmEmpty" aria-hidden="true">
-    <div class="modal-dialog ">
-
-        <!-- <div class="modal-content  mx-auto" style="max-width:93px;">
-            Empty trash?
-            <button class="btn rounded-10" data-bs-dismiss="modal"  style="background:#e8fcec;color:#17d475;border-color: #17d475;">Cancel</button>
-            <form action="/emptyTrash" method="POST" style="padding-top:10px">
-    
-            <button  class="btn rounded-10" style="background:#ffe5ec;color:#fb6f92;border-color: #fb6f92;">Continue</button>
-        </form>
-        -->
-        <div class="modal-content  mx-auto text-center" style="max-width:200px;padding:10px">
-            Empty trash?
-            <div class="mx-auto" style="padding-top:10px">
-            <button class="btn rounded-10" data-bs-dismiss="modal"  style="width:90px;background:#e8fcec;color:#17d475;border-color: #17d475;">Cancel</button>
-            <form action="/emptyTrash" method="POST" style="padding-top:10px">
-    
-                <button  class="btn rounded-10" style="background:#ffe5ec;color:#fb6f92;border-color: #fb6f92;">Continue</button>
-            </form>
-    </div>
-
-            
-            
-            <!-- <div class="btn-group" style="padding-left:100px;padding-bottom: 10px;">
-                <div style="padding-right:10px">
-            <button class="card" data-bs-dismiss="modal"  style="background:#e8fcec;color:#17d475;border-color: #17d475;">Cancel</button>
-        </div>
-        <div style="padding-left:10px">
-            <form action="/emptyTrash" method="POST" >
-
-            <button  class="card" style="background:#ffe5ec;color:#fb6f92;border-color: #fb6f92;">Continue</button>
-        </form>
-
+            <div style="width:70%;text-overflow:ellipsis;white-space: nowrap;overflow: hidden; ">
+              <%= list.title %>
             </div>
-        </div> -->
-        
-      </div>
+            <span class="col">
+              <% if(list.archive) { %>
+                <form action="/restoreList?archived=true" method="POST">
+              <% } else { %>
+                <form action="/restoreList" method="POST">
+              <% } %>
+                <input type="number" name="listId" value=<%=list.listid %> hidden>
+                <button title="Recover list" class="btn rounded-10 zoom" style="position:absolute;right:40px;border-color:#17d475;background-color:#e8fcec;padding: 0;line-height: 1;width:20px">
+                  <img src="/img/restore.png" style="width:15px" onmouseover="hover(this, 'restorePink')" onmouseout="unhover(this, 'restore')">
+                </button>
+              </form>
+              <button data-id="<%= list.listid %>" data-bs-toggle="modal"
+              data-bs-target="#confirmPermanentDelete" href="#confirmPermanentDelete" data-toggle="modal"
+              title="Permanently delete" class="btn rounded-10 zoom"
+              style="position:absolute;right:10px;border-color:#fb6f92;background-color:#ffe5ec;padding: 0;line-height: .25;width:20px"><img
+              src="/img/trash.png" style="width:15px" onmouseover="hover(this, 'trashPink')"
+              onmouseout="unhover(this, 'trash')"></button>
+            </span>
+          </div>
+          <br>
+          <%- list.list %>
+          <div class="row g-0" style="padding-top:20px">
+            <% labels.forEach(function(label) { %>
+              <% if(label.listid==list.listid){ %>
+                <div class="col auto" style="padding-right:0;padding-left:10px;padding-bottom:5px;">
+                  <button class="btn rounded-pill" style="vertical-align:middle;border-color: #03a9f4;background-color: #b3e5fc;color:#03a9f4;font-size:12px;padding:5px">
+                    <%=label.label %>
+                  </button>
+                </div>
+              <% } %>
+            <% }); %>
+          </div>
+          <div data-bs-toggle="tooltip" data-bs-custom-class="timeTooltip" class="createTime" id="createTime<%= list.listid%>" data-value="<%= list.createdatetime %>" style="text-align:center;padding-top:5px;font-size:12px;font-weight: bold;">
+            <button class="editTime btn" id="editTime<%= list.listid%>" data-value="<%= list.editdatetime %>" style="text-align:center;padding-top:5px;font-size:12px;font-weight: bold;"></button>
+          </div>
+        </div>
+      <% }); %>
+      <div style="padding-right:20px"></div>
     </div>
   </div>
 
+  <% if(search && lists.length == 0){ %>
+    <div class="text-center" style="padding-top:106px">
+      <img style="width:100px" src="/img/noResults.png">
+    </div>
+  <% } else if(lists.length == 0) { %>
+    <div class="text-center" style="padding-top:137px">
+      <img style="width:100px" src="/img/cat.png">
+    </div>
+  <% } %>
+
+  <div class="modal" id="confirmEmpty" tabindex="-1" aria-labelledby="confirmEmpty" aria-hidden="true">
+    <div class="modal-dialog ">
+      <div class="modal-content  mx-auto text-center" style="max-width:200px;padding:10px">
+        Empty trash?
+        <div class="mx-auto" style="padding-top:10px">
+          <button class="btn rounded-10" data-bs-dismiss="modal" style="width:90px;background:#e8fcec;color:#17d475;border-color: #17d475;">
+            Cancel
+          </button>
+          <form action="/emptyTrash" method="POST" style="padding-top:10px">
+            <button class="btn rounded-10" style="background:#ffe5ec;color:#fb6f92;border-color: #fb6f92;">
+              Continue
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <div class="modal" id="confirmPermanentlyDeleteSelected" tabindex="-1" aria-labelledby="confirmPermanentlyDeleteSelected" aria-hidden="true">
-    <div class="modal-dialog" >
-      <!-- <div class="modal-content  mx-auto" style="max-width:93px;">
-        Permanently delete selected lists?
-        <button class="btn rounded-10" data-bs-dismiss="modal"  style="background:#e8fcec;color:#17d475;border-color: #17d475;">Cancel</button>
-        <form action="/permanentlyDeleteSelected" method="POST" style="padding-top:10px">
-            <input id="modalListIds" name="listIds" value="" hidden>
-
-        <button  class="btn rounded-10" style="background:#ffe5ec;color:#fb6f92;border-color: #fb6f92;">Continue</button>
-    </form> -->
-
-
-    <div class="modal-content  mx-auto text-center" style="max-width:300px;padding:10px">
-
+    <div class="modal-dialog">
+      <div class="modal-content  mx-auto text-center" style="max-width:300px;padding:10px">
         <div id="permanentlyDeleteSelectedMessage"></div>
-
         <div class="mx-auto" style="padding-top:10px">
-        <button class="btn rounded-10" data-bs-dismiss="modal"  style="width:90px;background:#e8fcec;color:#17d475;border-color: #17d475;">Cancel</button>
-        <form action="/permanentlyDeleteSelected" method="POST" style="padding-top:10px">
+          <button class="btn rounded-10" data-bs-dismiss="modal" style="width:90px;background:#e8fcec;color:#17d475;border-color: #17d475;">
+            Cancel
+          </button>
+          <form action="/permanentlyDeleteSelected" method="POST" style="padding-top:10px">
             <input id="modalListIds" name="listIds" value="" hidden>
-
-            
-
-        <button  class="btn rounded-10" style="background:#ffe5ec;color:#fb6f92;border-color: #fb6f92;">Continue</button>
-    </form>
-</div>
-
-
-        
-
-<!--             
-            
-            <div class="btn-group" style="padding-left:100px;padding-bottom: 10px;">
-                <div style="padding-right:10px">
-            <button class="card" data-bs-dismiss="modal"  style="background:#e8fcec;color:#17d475;border-color: #17d475;">Cancel</button>
+            <button class="btn rounded-10" style="background:#ffe5ec;color:#fb6f92;border-color: #fb6f92;">
+              Continue
+            </button>
+          </form>
         </div>
-        <div style="padding-left:10px">
-            <form action="/permanentlyDeleteSelected" method="POST" >
-                <input id="modalListIds" name="listIds" value="" hidden>
-
-            <button  class="card" style="background:#ffe5ec;color:#fb6f92;border-color: #fb6f92;">Continue</button>
-        </form>
-
-            </div>
-        </div> -->
-        
       </div>
     </div>
   </div>
-
 
   <div class="modal" id="confirmPermanentDelete" tabindex="-1" aria-labelledby="confirmPermanentDelete" aria-hidden="true">
     <div class="modal-dialog">
-
-        <div class="modal-content  mx-auto text-center" style="max-width:200px;padding:10px">
-            Permanently delete list?
-            <div class="mx-auto" style="padding-top:10px">
-            <button class="btn rounded-10" data-bs-dismiss="modal"  style="width:90px;background:#e8fcec;color:#17d475;border-color: #17d475;">Cancel</button>
-            <form action="/permanentlyDeleteList" method="POST" style="padding-top:10px">
-                <input id="modalListId" name="listId" value="" hidden>
-    
-            <button  class="btn rounded-10" style="background:#ffe5ec;color:#fb6f92;border-color: #fb6f92;">Continue</button>
-        </form>
-    </div>
-            
-
-        
-       
-        
-
-            
-            
-            <!-- <div class="btn-group" style="padding-left:100px;padding-bottom: 10px;">
-                <div style="padding-right:10px">
-            <button class="card" data-bs-dismiss="modal"  style="background:#e8fcec;color:#17d475;border-color: #17d475;">Cancel</button>
+      <div class="modal-content  mx-auto text-center" style="max-width:200px;padding:10px">
+        Permanently delete list?
+        <div class="mx-auto" style="padding-top:10px">
+          <button class="btn rounded-10" data-bs-dismiss="modal" style="width:90px;background:#e8fcec;color:#17d475;border-color: #17d475;">
+            Cancel
+          </button>
+          <form action="/permanentlyDeleteList" method="POST" style="padding-top:10px">
+            <input id="modalListId" name="listId" value="" hidden>
+            <button class="btn rounded-10"cstyle="background:#ffe5ec;color:#fb6f92;border-color: #fb6f92;">
+              Continue
+            </button>
+          </form>
         </div>
-        <div style="padding-left:10px">
-            <form action="/permanentlyDeleteList" method="POST" >
-                <input id="modalListId" name="listId" value="" hidden>
-                <button  class="card" style="background:#ffe5ec;color:#fb6f92;border-color: #fb6f92;">Continue</button>
-        </form>
-
-            </div>
-        </div> -->
-        
       </div>
     </div>
   </div>
-
-
-
-
-
-
 </main>
+
+
+
+
 
 <script src="https://cdn.tiny.cloud/1/is0q015mgv0512rfhujg2w9j8h17y7kkgn7ntlxua0p4pzbx/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 
-  
 <script>
-
-// document.getElementById('listColors').addEventListener('show.bs.modal', (e) => {
-//     // console.log(e.relatedTarget);
-//     console.log(e.relatedTarget.dataset.id);
-
-//     // var element = document.createElement("div");
-//     // element.innerHTML = e.relatedTarget.dataset.id;
-//     // document.getElementById('listColorsContent').appendChild(element);  
-//     // document.getElementById('modalListId').innerHTML = e.relatedTarget.dataset.id;
-
-//     document.getElementById('modalListId').value = e.relatedTarget.dataset.id;
-//     console.log(document.getElementById('modalListId').value);
-
-
-
-// });
-
-
-
-
-
-
-
-document.getElementById('confirmPermanentDelete').addEventListener('show.bs.modal', (e) => {
-    // console.log(e.relatedTarget);
-    // console.log(e.relatedTarget.dataset.id);
-
-    // var element = document.createElement("div");
-    // element.innerHTML = e.relatedTarget.dataset.id;
-    // document.getElementById('listColorsContent').appendChild(element);  
-    // document.getElementById('modalListId').innerHTML = e.relatedTarget.dataset.id;
-
+  document.getElementById('confirmPermanentDelete').addEventListener('show.bs.modal', (e) => {
     document.getElementById('modalListId').value = e.relatedTarget.dataset.id;
-    // console.log(document.getElementById('modalListId').value);
+  });
 
-
-
-});
-
-
-
-
-
-document.getElementById('confirmPermanentlyDeleteSelected').addEventListener('show.bs.modal', (e) => {
-    // console.log(e.relatedTarget);
-    // console.log(e.relatedTarget.dataset.id);
-
-    // var element = document.createElement("div");
-    // element.innerHTML = e.relatedTarget.dataset.id;
-    // document.getElementById('listColorsContent').appendChild(element);  
-    // document.getElementById('modalListId').innerHTML = e.relatedTarget.dataset.id;
-
+  document.getElementById('confirmPermanentlyDeleteSelected').addEventListener('show.bs.modal', (e) => {
     document.getElementById('modalListIds').value = e.relatedTarget.dataset.id;
-    // console.log(document.getElementById('modalListId').value);
-
-
     var numLists = e.relatedTarget.dataset.id.split(",").length;
     document.getElementById('permanentlyDeleteSelectedMessage').innerHTML = (numLists == 1) ? 'Permanently delete 1 selected list?' : 'Permanently delete ' + numLists + ' selected lists?';
+  });
 
-});
+  function setSelectedColor(color) {
+    var imgs = ['white', 'yellow', 'orange', 'green', 'greenBlue', 'lightBlue', 'lavender', 'pink', 'purple'];
+    var ids = ['ffffff', 'fdf5c1', 'f7cdc2', 'cafbc8', 'bdf6d9', 'bae6fc', 'b4c9fa', 'f4c3fb', 'd0adfa'];
+    for (var i = 0; i < 9; i++) {
+      document.getElementById(ids[i]).src = '/img/colors/' + imgs[i] + '.png';
+    }
 
-
-
-
-function setSelectedColor(color) {
-  var imgs = ['white','yellow','orange','green','greenBlue','lightBlue','lavender','pink','purple'];
-        var ids = ['ffffff','fdf5c1','f7cdc2','cafbc8','bdf6d9','bae6fc','b4c9fa','f4c3fb','d0adfa']; 
-
-        for(var i = 0; i < 9; i++) {
-            document.getElementById(ids[i]).src='/img/colors/'+imgs[i]+'.png';
-        }
-        
-  document.getElementById(color).src = '/img/colors/'+color+'Selected.png';
-}
-
+    document.getElementById(color).src = '/img/colors/' + color + 'Selected.png';
+  }
 
   function hover(element, src) {
-  element.setAttribute('src', '/img/'+src+'.png');
-}
+    element.setAttribute('src', '/img/' + src + '.png');
+  }
 
-function unhover(element, src) {
-  element.setAttribute('src', '/img/'+src+'.png');
-}
+  function unhover(element, src) {
+    element.setAttribute('src', '/img/' + src + '.png');
+  }
 
   tinymce.init({
     selector: 'textarea',
     plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed linkchecker a11ychecker tinymcespellchecker permanentpen powerpaste advtable advcode editimage tinycomments tableofcontents footnotes mergetags autocorrect typography inlinecss textcolor colorpicker',
     toolbar: 'blocks fontfamily fontsize | bold italic underline strikethrough forecolor backcolor | link image media table mergetags | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
     image_list: [
-    {title: 'My image 1', value: 'http://t2.gstatic.com/licensed-image?q=tbn:ANd9GcQOO0X7mMnoYz-e9Zdc6Pe6Wz7Ow1DcvhEiaex5aSv6QJDoCtcooqA7UUbjrphvjlIc'},
-    {title: 'My image 2', value: 'http://www.moxiecode.com/my2.gif'}
-  ],
+      { title: 'My image 1', value: 'http://t2.gstatic.com/licensed-image?q=tbn:ANd9GcQOO0X7mMnoYz-e9Zdc6Pe6Wz7Ow1DcvhEiaex5aSv6QJDoCtcooqA7UUbjrphvjlIc' },
+      { title: 'My image 2', value: 'http://www.moxiecode.com/my2.gif' }
+    ],
     tinycomments_mode: 'embedded',
     tinycomments_author: 'Author name',
     mergetags_list: [
@@ -546,408 +225,223 @@ function unhover(element, src) {
     ]
   });
 
-//   function changeListColor(val, id, listId){
-//     var targetId = document.getElementById('modalListId').value;
-//     console.log(targetId);
-//     var list = document.getElementById(targetId).style.backgroundColor = val;
+  function changeImage(element, img1, img2) {
+    if (element.getAttribute('src') == '/img/' + img1 + '.png') {
+      element.setAttribute('src', '/img/' + img2 + '.png');
+    }
+    else {
+      element.setAttribute('src', '/img/' + img1 + '.png');
+    }
 
-//         // var list = document.getElementById(listId);
-//         // list.style.backgroundColor = val;
-
-//         // document.body.style.backgroundColor = val;
-
-
-
-        
-//         var imgs = ['white','yellow','orange','green','greenBlue','lightBlue','lavender','pink','purple'];
-//         var ids = ['whiteSelected','yellowSelected','orangeSelected','greenSelected','greenBlueSelected','lightBlueSelected','lavenderSelected','pinkSelected','purpleSelected']; 
-
-//         for(var i = 0; i < 9; i++) {
-//             document.getElementById(ids[i]).src='/img/colors/'+imgs[i]+'.png';
-//         }
-
-//         document.getElementById(id).src='/img/colors/'+id+'.png';
-//     }
-
-
-function changeImage(element, img1, img2) {
-  if(element.getAttribute('src') == '/img/'+img1+'.png') {
-    element.setAttribute('src', '/img/'+img2+'.png');
+    countSelectedLists();
   }
-  else {
-    element.setAttribute('src', '/img/'+img1+'.png');
-  }  
 
-  countSelectedLists();
-}
+  function countSelectedLists() {
+    const elements = document.getElementsByClassName('listSelector');
 
-function countSelectedLists() {
-  const elements = document.getElementsByClassName('listSelector');
-  
-  var n = 0;
-  var selectedListIds = [];
-  for(var i = 0; i < elements.length; i++) {
-    // console.log(elements[i].src)
-    // console.log(window.location.origin+'/img/colors/ffffffSelected.png');
-    if(elements[i].src == window.location.origin+'/img/colors/ffffffSelected.png') {
-      n++;
-      // console.log(elements[i].parentElement.value);
-      selectedListIds.push(elements[i].parentElement.value);
+    var n = 0;
+    var selectedListIds = [];
+    for(var i = 0; i < elements.length; i++) {
+      if (elements[i].src == window.location.origin + '/img/colors/ffffffSelected.png') {
+        n++;
+        selectedListIds.push(elements[i].parentElement.value);
+      }
+    }
+
+    if(n > 0) {
+      document.getElementById('numSelectedLists').innerHTML = n + ' selected';
+      document.getElementById('numSelectedLists').style.display = 'block';
+      document.getElementById('delSelectedLists').style.display = 'block';
+      document.getElementById('delSelectedLists').setAttribute('data-id', selectedListIds);
+      document.getElementById('restoreSelectedLists').style.display = 'block';
+      document.getElementById('restoreSelectedLists').value = selectedListIds;
+      document.getElementById('unselectAll').style.display = 'block';
+    } 
+    else {
+      document.getElementById('numSelectedLists').style.display = 'none';
+      document.getElementById('delSelectedLists').style.display = 'none';
+      document.getElementById('unselectAll').style.display = 'none';
+      document.getElementById('restoreSelectedLists').style.display = 'none';
     }
   }
 
-  // console.log('num selected: '+n);
-  // for(var i=0; i < selectedListIds.length;i++) {
-  //   console.log(selectedListIds[i]);
-  // }
+  function unselectAll() {
+    var selected = document.querySelectorAll('[src="/img/colors/ffffffSelected.png"]');
+    for (var i = 0; i < selected.length; i++) {
+      selected[i].src = '/img/colors/white.png';
+    }
 
-
-  if(n >0) {
-document.getElementById('numSelectedLists').innerHTML = n+' selected';
-document.getElementById('numSelectedLists').style.display = 'block';
-
-document.getElementById('delSelectedLists').style.display = 'block';
-
-// document.getElementById('delSelectedLists').value = selectedListIds;
-document.getElementById('delSelectedLists').setAttribute('data-id' , selectedListIds); 
-
-
-document.getElementById('restoreSelectedLists').style.display = 'block';
-document.getElementById('restoreSelectedLists').value = selectedListIds;
-
-
-// console.log(document.getElementById('delSelectedLists').value);
-
-document.getElementById('unselectAll').style.display = 'block';
-
-
-
-
-  } else {
-    document.getElementById('numSelectedLists').style.display = 'none';
-    // document.getElementById('numSelectedLists').innerHTML = '';
-
-    document.getElementById('delSelectedLists').style.display = 'none';
-
-    document.getElementById('unselectAll').style.display = 'none';
-
-    document.getElementById('restoreSelectedLists').style.display = 'none';
-
-    
-
-
-
-  }
-  
-}
-
-function unselectAll() {
-  var selected = document.querySelectorAll('[src="/img/colors/ffffffSelected.png"]');
-
-  // console.log(selected[0].src);
-
-  for(var i = 0; i < selected.length; i++) {
-    selected[i].src = '/img/colors/white.png';
+    countSelectedLists();
   }
 
-  countSelectedLists();
-  
-  
-}
+  document.addEventListener("keydown", function (e) {
+    if (!e.metaKey || e.metaKey && e.keyCode == 82 || e.metaKey && e.keyCode == 87) {
+      return true;
+    }
 
+    e.preventDefault();
 
+    var selectedListIds = [];
 
-document.addEventListener("keydown", function(e) {
+    if(e.metaKey && e.keyCode == 65) {
+      const elements = document.getElementsByClassName('listSelector');
+      for (var i = 0; i < elements.length; i++) {
+        if (elements[i].src !== window.location.origin + '/img/colors/ffffffSelected.png') {
+          elements[i].src = '/img/colors/ffffffSelected.png';
+        }
+        selectedListIds.push(elements[i].parentElement.value);
+      }
+    }
+    if(selectedListIds.length > 0) {
+      document.getElementById('numSelectedLists').innerHTML = selectedListIds.length + ' selected';
 
-if(!e.metaKey || e.metaKey && e.keyCode == 82 || e.metaKey && e.keyCode == 87) {
-  return true;
-}
-e.preventDefault();
+      document.getElementById('numSelectedLists').style.display = 'block';
+      document.getElementById('delSelectedLists').style.display = 'block';
 
-var selectedListIds = [];
+      document.getElementById('delSelectedLists').setAttribute('data-id', selectedListIds);
 
+      document.getElementById('restoreSelectedLists').style.display = 'block';
 
-if(e.metaKey && e.keyCode == 65) {
-  // console.log('cmd a')
+      document.getElementById('restoreSelectedLists').value = selectedListIds;
 
-  const elements = document.getElementsByClassName('listSelector');
+      document.getElementById('unselectAll').style.display = 'block';
+    }
+  })
 
-for(var i = 0; i < elements.length; i++) {
-  // console.log(elements[i].src)
-  // console.log(window.location.origin+'/img/colors/ffffffSelected.png');
-  if(elements[i].src !== window.location.origin+'/img/colors/ffffffSelected.png') {
-    // console.log(elements[i].parentElement.value);
-    elements[i].src = '/img/colors/ffffffSelected.png';
+  function setEditTimes() {
+    const elements = document.getElementsByClassName('editTime');
+    for(var i = 0; i < elements.length; i++) {
+      setTimeEdited(elements[i].dataset.value, elements[i].id);
+    }
   }
-  selectedListIds.push(elements[i].parentElement.value);
 
-} 
-
-console.log(selectedListIds)
-
-}
-
-
-
-if(selectedListIds.length > 0) {
-document.getElementById('numSelectedLists').innerHTML = selectedListIds.length+' selected';
-document.getElementById('numSelectedLists').style.display = 'block';
-
-document.getElementById('delSelectedLists').style.display = 'block';
-
-//
-// document.getElementById('delSelectedLists').value = selectedListIds;
-document.getElementById('delSelectedLists').setAttribute('data-id' , selectedListIds); 
-
-
-document.getElementById('restoreSelectedLists').style.display = 'block';
-document.getElementById('restoreSelectedLists').value = selectedListIds;
-
-document.getElementById('unselectAll').style.display = 'block';
-
-
-
-console.log(document.getElementById('delSelectedLists').value);
-}
-
-// if (e.keyCode >= 65 && e.keyCode <= 90) {
-//   var char = (e.metaKey ? '⌘-' : '') + String.fromCharCode(e.keyCode)
-//   // document.getElementById('keydown').innerHTML += '<kbd>' + char + '</kbd>'
-  
-// }
-})
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function setEditTimes() {
-  const elements = document.getElementsByClassName('editTime');
-  // var elements = document.querySelectorAll('[var="editTime"]');
-
-
-  for(var i = 0; i < elements.length; i++) {
-    
-    // console.log(elements[i].id);
-    // console.log(elements[i].dataset.value);
-   
-    setTimeEdited(elements[i].dataset.value, elements[i].id);
-
+  function setCreateTimes() {
+    const elements = document.getElementsByClassName('createTime');
+    for(var i = 0; i < elements.length; i++) {
+      setTimeCreated(elements[i].dataset.value, elements[i].id);
+    }
   }
-}
 
+  function setTimeEdited(editDateTime, divId) {
+    var now = new Date();
+    var nowYear = parseInt(now.getFullYear());
+    var nowMonth = parseInt(now.getMonth() + 1);
+    var nowDate = parseInt(now.getDate());
 
-function setCreateTimes() {
-  const elements = document.getElementsByClassName('createTime');
-  // var elements = document.querySelectorAll('[var="editTime"]');
+    var thenYear = parseInt(editDateTime.substring(6, 10));
+    var thenMonth = parseInt(editDateTime.substring(0, 2));
+    var thenDate = parseInt(editDateTime.substring(3, 5));
+    var thenHour = parseInt(editDateTime.substring(11, 13));
+    var thenMin = parseInt(editDateTime.substring(14));
 
+    var ampm = 'AM';
 
+    if (thenHour >= 12) {
+      ampm = 'PM';
 
-
-
-  for(var i = 0; i < elements.length; i++) {
-    
-    // console.log(elements[i].id);
-    // console.log(elements[i].dataset.value);
-   
-    setTimeCreated(elements[i].dataset.value, elements[i].id);
-
-  }
-}
-
-
-function setTimeEdited(editDateTime, divId) {
-  var now = new Date();
-  var nowYear = parseInt(now.getFullYear());
-  var nowMonth = parseInt(now.getMonth()+1);
-  var nowDate = parseInt(now.getDate());
-
-
-
-  var thenYear = parseInt(editDateTime.substring(6,10));
-  var thenMonth = parseInt(editDateTime.substring(0,2));
-  var thenDate = parseInt(editDateTime.substring(3,5));
-  var thenHour = parseInt(editDateTime.substring(11,13));
-  var thenMin = parseInt(editDateTime.substring(14));
-
-
-  var ampm = 'AM';
-
-  if(thenHour >= 12) {
-    ampm = 'PM';
-
-    if(thenHour > 12) {
+      if (thenHour > 12) {
         thenHour -= 12;
 
+      }
     }
-  }
 
-  if(thenHour == 0) {
-    thenHour = 12;
-  }
+    if (thenHour == 0) {
+      thenHour = 12;
+    }
 
-  var thenMinutesFormatted = (thenMin < 10) ? '0' + thenMin : thenMin;
-      
-  var thenTime = thenHour + ':' + thenMinutesFormatted + ' ' + ampm;
+    var thenMinutesFormatted = (thenMin < 10) ? '0' + thenMin : thenMin;
+
+    var thenTime = thenHour + ':' + thenMinutesFormatted + ' ' + ampm;
+
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const thenMonthAbbr = months[thenMonth - 1];
+
+    var thenDateFormatted = (thenDate < 10) ? '0' + thenDate : thenDate;
 
 
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  const thenMonthAbbr = months[thenMonth-1];
+    var message = 'Edited: error';
 
-  var thenDateFormatted = (thenDate < 10) ? '0' + thenDate : thenDate;
-  
+    if (nowYear > thenYear) {
+      message = 'Edited ' + thenMonthAbbr + ' ' + thenDateFormatted + ' ' + thenYear;
+    }
+    else if (nowYear == thenYear && nowMonth == thenMonth && nowDate == thenDate) {
+      message = 'Edited ' + thenTime;
+    }
+    else if (nowYear == thenYear && nowMonth == thenMonth && nowDate == (thenDate + 1)) {
+      message = 'Edited yesterday, ' + thenTime;
+    }
+    else if (nowYear == thenYear && nowMonth >= thenMonth && nowDate > (thenDate + 1)) {
+      message = 'Edited ' + thenMonthAbbr + ' ' + thenDateFormatted;
+    }
 
-  if(nowYear > thenYear) {
-    var message = 'Edited ' + thenMonthAbbr + ' ' + thenDateFormatted + ' ' + thenYear;
     document.getElementById(divId).innerHTML = message;
   }
-  else if(nowYear == thenYear && nowMonth == thenMonth && nowDate == thenDate) {
-      var message = 'Edited ' + thenTime;
-      document.getElementById(divId).innerHTML = message;
-  }
-  else if(nowYear == thenYear && nowMonth == thenMonth && nowDate == (thenDate+1)) {
-      var message = 'Edited yesterday, ' + thenTime;
-      document.getElementById(divId).innerHTML = message;
-  }
-  else if(nowYear == thenYear && nowMonth >= thenMonth && nowDate > (thenDate+1)) {
-      var message = 'Edited ' + thenMonthAbbr + ' ' + thenDateFormatted;
-      document.getElementById(divId).innerHTML = message;
-  }
-  else {
-      var message = 'Edited: error';
-      document.getElementById(divId).innerHTML = message;
-  }
-}
 
+  function setTimeCreated(createDateTime, divId) {
+    var now = new Date();
+    var nowYear = parseInt(now.getFullYear());
+    var nowMonth = parseInt(now.getMonth() + 1);
+    var nowDate = parseInt(now.getDate());
 
-function setTimeCreated(createDateTime, divId) {
-  var now = new Date();
-  var nowYear = parseInt(now.getFullYear());
-  var nowMonth = parseInt(now.getMonth()+1);
-  var nowDate = parseInt(now.getDate());
+    var thenYear = parseInt(createDateTime.substring(6, 10));
+    var thenMonth = parseInt(createDateTime.substring(0, 2));
+    var thenDate = parseInt(createDateTime.substring(3, 5));
+    var thenHour = parseInt(createDateTime.substring(11, 13));
+    var thenMin = parseInt(createDateTime.substring(14));
 
+    var ampm = 'AM';
 
+    if (thenHour >= 12) {
+      ampm = 'PM';
 
-  var thenYear = parseInt(createDateTime.substring(6,10));
-  var thenMonth = parseInt(createDateTime.substring(0,2));
-  var thenDate = parseInt(createDateTime.substring(3,5));
-  var thenHour = parseInt(createDateTime.substring(11,13));
-  var thenMin = parseInt(createDateTime.substring(14));
-
-
-  var ampm = 'AM';
-
-  if(thenHour >= 12) {
-    ampm = 'PM';
-
-    if(thenHour > 12) {
+      if (thenHour > 12) {
         thenHour -= 12;
 
+      }
     }
-  }
 
-  if(thenHour == 0) {
-    thenHour = 12;
-  }
+    if (thenHour == 0) {
+      thenHour = 12;
+    }
 
-  var thenMinutesFormatted = (thenMin < 10) ? '0' + thenMin : thenMin;
-      
-  var thenTime = thenHour + ':' + thenMinutesFormatted + ' ' + ampm;
+    var thenMinutesFormatted = (thenMin < 10) ? '0' + thenMin : thenMin;
 
+    var thenTime = thenHour + ':' + thenMinutesFormatted + ' ' + ampm;
 
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  const thenMonthAbbr = months[thenMonth-1];
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const thenMonthAbbr = months[thenMonth - 1];
 
-  var thenDateFormatted = (thenDate < 10) ? '0' + thenDate : thenDate;
+    var thenDateFormatted = (thenDate < 10) ? '0' + thenDate : thenDate;
 
-  if(nowYear > thenYear) {
-    var message = 'Created ' + thenMonthAbbr + ' ' + thenDateFormatted + ' ' + thenYear;
-    // document.getElementById(divId).setAttribute('data-bs-title', message);
-  }
-  else if(nowYear == thenYear && nowMonth == thenMonth && nowDate == thenDate) {
+    if (nowYear > thenYear) {
+      var message = 'Created ' + thenMonthAbbr + ' ' + thenDateFormatted + ' ' + thenYear;
+    }
+    else if (nowYear == thenYear && nowMonth == thenMonth && nowDate == thenDate) {
       var message = 'Created ' + thenTime;
-      // document.getElementById(divId).innerHTML = message;
-  }
-  else if(nowYear == thenYear && nowMonth == thenMonth && nowDate == (thenDate+1)) {
+    }
+    else if (nowYear == thenYear && nowMonth == thenMonth && nowDate == (thenDate + 1)) {
       var message = 'Created yesterday, ' + thenTime;
-      // document.getElementById(divId).innerHTML = message;
-  }
-  else if(nowYear == thenYear && nowMonth >= thenMonth && nowDate > (thenDate+1)) {
+    }
+    else if (nowYear == thenYear && nowMonth >= thenMonth && nowDate > (thenDate + 1)) {
       var message = 'Created ' + thenMonthAbbr + ' ' + thenDateFormatted;
-      // document.getElementById(divId).innerHTML = message;
-  }
-  else {
+    }
+    else {
       var message = 'Created: error';
-      // document.getElementById(divId).innerHTML = message;
+    }
+
+    document.getElementById(divId).setAttribute('data-bs-title', message);
   }
 
-  document.getElementById(divId).setAttribute('data-bs-title', message);
-}
+  setEditTimes();
+  setCreateTimes();
+  setInterval(setEditTimes, 3000);
+  setInterval(setCreateTimes, 3000);
 
-
-
-setEditTimes();
-setCreateTimes();
-// setInputTimes();
-
-setInterval(setEditTimes, 3000);
-setInterval(setCreateTimes, 3000);
-// setInterval(setInputTimes, 3000);
-
-
-
-
-
-
-// function setInputTimes() {
-//   const elements = document.getElementsByClassName('timeInput');
-//   // var elements = document.querySelectorAll('[var="editTime"]');
-
-
-//   for(var i = 0; i < elements.length; i++) {
-    
-//     // console.log(elements[i].id);
-//     // console.log(elements[i].dataset.value);
-   
-//     // setTimeEdited(elements[i].dataset.value, elements[i].id);
-
-//     elements[i].value = getNowFormatted();
-//     // console.log(elements[i].value);
-
-
-//   }
-// }
-
-
-
-function getNowFormatted() {
+  function getNowFormatted() {
     var now = new Date();
 
-    // console.log(now);
-
     var nowYear = now.getFullYear();
-    var nowMonth = parseInt(now.getMonth()+1);
+    var nowMonth = parseInt(now.getMonth() + 1);
     var nowDate = now.getDate();
     var nowHours = now.getHours();
     var nowMinutes = now.getMinutes();
@@ -958,32 +452,16 @@ function getNowFormatted() {
     var minutesFormatted = (nowMinutes < 10) ? '0' + nowMinutes : nowMinutes;
 
     var nowFormatted = monthFormatted + '-' + dateFormatted + '-' + nowYear + ',' + hoursFormatted + ':' + minutesFormatted;
-    
-    console.log(nowFormatted);
 
     return nowFormatted;
-}
+  }
 
-
-document.addEventListener("DOMContentLoaded", function(){
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            var tooltipList = tooltipTriggerList.map(function(element){
-                return new bootstrap.Tooltip(element);
-            });
-        });
+  document.addEventListener("DOMContentLoaded", function () {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (element) {
+      return new bootstrap.Tooltip(element);
+    });
+  });
 </script>
-<!-- <script>tinymce.init({
-  selector: 'textarea',  // change this value according to your HTML
-  plugins: 'image',
-  menubar: 'insert',
-  toolbar: 'image',
-  image_list: [
-    {title: 'My image 1', value: 'https://www.example.com/my1.gif'},
-    {title: 'My image 2', value: 'http://www.moxiecode.com/my2.gif'}
-  ]
-});</script> -->
-
 
 <%- include ('../partials/footer') %>
-
-
