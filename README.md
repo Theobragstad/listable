@@ -2,6 +2,8 @@
 
 ## **lists is a full-featured list/note/to-do web app!** 
 ## **Save and keep track of everything you want to remember**.
+### All with a productivity-focused UI that is clean, appealing, intuitive, fast, detail-oriented, and enjoyable to use! 
+
 
 It uses:  
 **PostgreSQL**   
@@ -26,6 +28,7 @@ Check it out to explore all the features!
 - Select lists to perform actions on multiple lists at once
 - Copy lists
 - Keep track of your lists with built-in edit and create times
+- Automatic dark mode  
 - Clean, appealing, intuitive, fast, and detail-oriented UI to help users be more productive
 - And many more!
 
@@ -36,4 +39,4 @@ Check it out to explore all the features!
 - Run 'docker compose up' in the terminal
 - Go to localhost:3000 on a browser to begin!
 
-    - (Note that to use the collaboration features that require other users, you will need to register another account through an alternate Google account first, as the app is not deployed and therefore user base is limited to local sessions.)
+    - (Note that to use the collaboration features that require other users, you will need to register another account through an alternate Google account first, as the app is not deployed and therefore the user base is limited to local sessions.)

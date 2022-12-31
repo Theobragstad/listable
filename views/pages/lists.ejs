@@ -11,14 +11,29 @@
 
   <%- include ('../partials/menu') %>
 
+  <form action="/changeListView" method="POST">
+    <% if(listViewType == 'column') { %>
+    <button title="Switch to row view" class="btn zoom" style="padding:2px;padding-top:0px;padding-bottom:0px;position:absolute;top:150px;left:20px;border-color:#000000;background-color:#ececec;">
+      <img src="/img/row.png" style="width:15px">
+    </button>
+    <% } else if(listViewType == 'row') { %>
+      <button title="Switch to column view" class="btn zoom" style="padding:2px;padding-top:0px;padding-bottom:0px;position:absolute;top:150px;left:20px;border-color:#000000;background-color:#ececec;">
+        <img src="/img/column.png" style="width:15px">
+      </button>
+    <% } %>
+  </form>
+
 
     <div class="text-center" style="padding-top:50px;color:#f289ca">
-      <% if(search){ %>
+      <% if(search) { %>
         <h4 class="site-title">lists</h4>
         <h6 class="site-title">search results</h6>
       <% } else if(filterByLabel) { %>
         <h4 class="site-title"><%= label %></h4>
         <h6 class="site-title">label</h6>
+        <% if(searchInLabel) { %>
+          <h6 class="site-title">search results</h6>
+        <% } %>
       <% } else { %>
         <h4 class="site-title">lists</h4>
         <% } %>
@@ -27,8 +42,15 @@
         
 
         <div style="padding-top:5px;padding-bottom:5px">
-          <form action="/search" method="POST" onsubmit="saveQuery()">
-          <input type="text" id="q" name="q" class="search-hover zoom" placeholder="search all...">
+          <% if(filterByLabel) { %>
+            <form action="/search?searchInLabel=true&labelId=<%= labelid %>" method="POST" onsubmit="saveQuery()">
+              <input class="form-control" name="label" value="<%= label %>" hidden>
+              <input type="text" id="q" name="q" class="search-hover zoom" placeholder="search this label...">
+              <input type="submit" hidden>
+          <% } else { %>
+            <form action="/search" method="POST" onsubmit="saveQuery()">
+            <input type="text" id="q" name="q" class="search-hover zoom" placeholder="search all...">
+          <% } %>
         </form>
       </div>
       
@@ -111,24 +133,35 @@
 
 
 
-          <div id="overflowArrow" class="zoom" style="display:none;position:absolute;right:20px;top:220px"><img src="/img/rightArrow.png" style="width:30px"></div>
+          <div id="overflowArrow" class="zoom" style="display:none;position:absolute;right:20px;top:200px"><img src="/img/rightArrow.png" style="width:30px"></div>
 
 
 
-    <div class="row" id="list" style="overflow:auto;padding-top:50px;padding-left:20px;display:block">
+    <div class="row" id="list" style="overflow:auto;padding-top:0px;padding-left:20px;display:block">
 
-      <div class="d-flex" >
+      <!-- <div class="d-flex" > -->
         <!-- <% let count = 1 %>  -->
 
+        <% if(listViewType == 'column') { %>
+          <div class="d-flex" >
+        <%- include ('../partials/list1') %>
+        <div style="padding-right:20px"></div>
 
+      </div>
+      <div style="padding-bottom:100px"></div>
+      
+        <% } else { %>
+          <div class="row">
+          <%- include ('../partials/listVertical') %>
+        </div>
+        <% } %>
+        
+        
+        
+       
 
-
-     
-
-        <%- include ('../partials/list') %>
-
-    <div style="padding-right:20px"></div>
-  </div>
+    <!-- <div style="padding-right:20px"></div>
+  </div> -->
 </div>
 
 <!-- TEST -->
@@ -138,6 +171,9 @@
 <% if((search || filterByLabel) && lists.length == 0){ %>
   <div class="text-center" style="padding-top:69px">
 
+    <% if(filterByLabel) { %>
+      <h6>Filters do not show labeled lists that are in trash.</h6>
+    <% } %>
     <img style="width:100px" src="/img/noResults.png">
 
   </div>
@@ -433,7 +469,7 @@ function setInnerHtml(element, text) {
   tinymce.init({
     selector: 'textarea',
     height: 600,
-    plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed linkchecker a11ychecker tinymcespellchecker permanentpen powerpaste advtable advcode editimage tinycomments tableofcontents footnotes mergetags autocorrect typography inlinecss  ',
+    plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed linkchecker a11ychecker permanentpen powerpaste advtable advcode editimage tinycomments tableofcontents footnotes mergetags autocorrect typography  ',
     toolbar: 'blocks fontfamily fontsize | bold italic underline strikethrough forecolor backcolor | link image media table mergetags | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
     image_list: [
     {title: 'My image 1', value: 'http://t2.gstatic.com/licensed-image?q=tbn:ANd9GcQOO0X7mMnoYz-e9Zdc6Pe6Wz7Ow1DcvhEiaex5aSv6QJDoCtcooqA7UUbjrphvjlIc'},
@@ -444,9 +480,22 @@ function setInnerHtml(element, text) {
     mergetags_list: [
       { value: 'First.Name', title: 'First Name' },
       { value: 'Email', title: 'Email' },
-    ]
+    ],
+
+    setup: function(editor) {
+	  	var max = 20000;
+	    editor.on('submit', function(event) {
+		  var numChars = tinymce.activeEditor.plugins.wordcount.body.getCharacterCount();
+		  if (numChars > max) {
+			alert("Maximum " + max + " characters allowed.");
+			event.preventDefault();
+			return false;
+		  }
+		});
+  }
   });
 
+  
   function changeListColor(val, id, listId){
     var targetId = document.getElementById('modalListId').value;
     // console.log(targetId);
@@ -920,6 +969,10 @@ function saveQuery() {
     // highlightResults('result', 'I am');
     highlightResults('result', localStorage.getItem("q"));
   }
+
+
+
+
 
        
 </script>

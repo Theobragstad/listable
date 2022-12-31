@@ -1,0 +1,272 @@
+<% lists.forEach(function(list) { %>
+    <!-- <div class="col-4"> -->
+      <div class="" style="padding-left:20px;">
+  
+      <div>
+        <button title="Select list" id="" value=<%=list.listid %> class="btn rounded-10 zoom" style="position:relative;left:9px;top:28px;z-index: 2;line-height: .25;width:15px;padding: 0px;">
+          <img class="listSelector" src="/img/colors/white.png" style="width:15px" onclick="changeImage(this, 'colors/white', 'colors/ffffffSelected')">
+        </button>
+      </div>
+  
+      <!-- <div title="Edit list" data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid %>" data-toggle="modal" id="<%= list.listid %>" class="col card card-body m-2" style="max-width: 75%;overflow-x:scroll;background-color:#<%= list.color %>;" color="<%= list.color %>"> -->
+        <div title="Edit list" data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid %>" data-toggle="modal" id="<%= list.listid %>" class="list col card card-body m-2" style="max-width: 100%;overflow-x:scroll;background-color:#<%= list.color %>;" color="<%= list.color %>">
+
+      <!-- <div title="Edit list" data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid %>" data-toggle="modal" id="<%= list.listid %>" class="col card card-body m-2" style="min-width: 400px;overflow-x:scroll;background-color:#<%= list.color %>;" color="<%= list.color %>"> -->
+        <div class="buttonSet row" style="font-weight:bold;padding-left:10px">
+          <% var canDelete = false; %>
+          <% for(var i=0; i < collaborators.length; i++) { %>
+            <% if(list.listid == collaborators[i].listid && collaborators[i].owner && collaborators[i].userid == user.id) { %>
+              <% canDelete = true; %>
+              <% break; %>
+            <% } %>
+          <% } %>
+  
+          <% var n = 0; %>
+          <% collaborators.forEach(function(collaborator) { %>
+            <% if(list.listid == collaborator.listid) { %>
+              <% n++; %>
+            <% } %>
+          <%}) %>
+  
+          <% if(canDelete) { %>
+            <div>
+              <% if(n > 1) { %>
+                <button data-bs-toggle="modal" data-bs-target="#confirmDeleteShared<%= list.listid %>" href="#confirmDeleteShared<%= list.listid %>" data-toggle="modal" title="Delete shared list" class="btn rounded-10 zoom" style="position:absolute;right:10px;background-color:#ffe5ec;padding: 0px;line-height: .25;width:20px">
+                  <img id="confirmDeleteShared" src="/img/trash.png" data-bs-dismiss="" style="width:15px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')">
+                </button>
+              <% } else { %>
+                <form action="/deleteList" method="POST">
+                  <input type="number" name="listId" value=<%= list.listid %> hidden>
+                  <button title="Delete list" class="btn rounded-10 zoom" style="position:absolute;right:10px;background-color:#ffe5ec;padding: 0px;line-height: .25;width:20px">
+                    <img src="/img/trash.png" data-bs-dismiss="" style="width:15px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')">
+                  </button>
+                </form>
+              <% } %>
+            </div>
+          <% } else { %>
+          <div>
+            <form action="/removeCollaborator" method="POST">
+              <input class="timeInput" class="form-control" name="now" hidden>
+              <input type="number" name="listId" value=<%=list.listid %> hidden>
+              <input type="number" name="userId" value=<%=user.id %> hidden>
+              <button title="Remove myself" class="btn rounded-10 zoom" style="position:absolute;right:10px;background-color:white;padding: 0px;line-height: .25;width:20px">
+                <img src="/img/removeMyself.png" data-bs-dismiss="" style="width:15px" onmouseover="hover(this, 'removeMyselfRed')" onmouseout="unhover(this, 'removeMyself')">
+              </button>
+            </form>
+          </div>
+          <% } %>
+  
+          <div class="col">
+            <button title="Change color" onclick="setSelectedColor('<%= list.color %>')" type="button" class="btn rounded-10 zoom" data-id="<%= list.listid %>" data-bs-toggle="modal" data-bs-target="#listColors" style="background-color:white;position:absolute;right:50px;padding: 0px;line-height: .25;width:20px">
+              <img src="/img/palette.png" style="width:20px" onmouseover="hover(this, 'paletteColors')" onmouseout="unhover(this, 'palette')">
+            </button>
+          </div>
+  
+          <div class="col">
+            <% if(archivedListIds.includes(list.listid)) { %>
+              <form action="/copy?archived=true" method="POST">
+            <% } else { %>
+              <form action="/copy" method="POST">
+            <% } %>
+            
+              <input class="timeInput" class="form-control" name="now" hidden>
+              <input class="form-control" type="text" name="title" value="<%= list.title %>" hidden>
+              <input class="form-control" type="text" name="list" value="<%= list.list %>" hidden>
+              <input class="form-control" type="text" name="color" value="<%= list.color %>" hidden>
+              <button title="Copy" class="btn rounded-10 zoom" style="position:absolute;right:80px;background-color:white;padding: 0px;line-height: .25;width:20px">
+                <img src="/img/copy.png" style="width:20px" onmouseover="hover(this, 'copyBlue')" onmouseout="unhover(this, 'copy')">
+              </button>
+            </form>
+          </div>
+          <% if(archivedListIds.includes(list.listid)) { %>
+            <div class="col">
+              <form action="/unarchiveList" method="POST">
+                <input type="number" name="listId" value=<%= list.listid %> hidden>
+                <button title="Unarchive" class="btn rounded-10 zoom" style="position:absolute;right:110px;background-color:white;padding: 0px;line-height: .25;width:20px">
+                  <img src="/img/unarchive.png" style="width:20px" onmouseover="hover(this, 'unarchivePink')" onmouseout="unhover(this, 'unarchive')">
+                </button>
+              </form>
+            </div>
+          <% } else { %>
+            <div class="col">
+              <form action="/archiveList" method="POST">
+                <input type="number" name="listId" value=<%=list.listid %> hidden>
+                <button title="Archive" class="btn rounded-10 zoom" style="background-color:white;position:absolute;right:110px;padding: 0px;line-height: .25;width:20px">
+                  <img src="/img/archive.png" style="width:20px" onmouseover="hover(this, 'archiveGreen')" onmouseout="unhover(this, 'archive')">
+                </button>
+              </form>
+            </div>
+          <% } %>
+  
+          <div class="col">
+            <button title="Add collaborator" type="button" class="btn rounded-10 zoom" data-id="<%= list.listid %>" data-bs-toggle="modal" data-bs-target="#addCollaborator<%= list.listid %>" href="#addCollaborator<%= list.listid %>" data-toggle="modal" style="background-color:white;position:absolute;right:140px;padding: 2px;line-height: .25;width:20px">
+              <img src="/img/addCollaborator.png" style="width:15px" onmouseover="hover(this, 'addCollaboratorBlue')" onmouseout="unhover(this, 'addCollaborator')">
+            </button>
+          </div>
+  
+          <div class="col">
+            <form action="/labelsModal" method="GET">
+              <input class="form-control" name="listId" type="number" value=<%= list.listid %> hidden>
+              <button title="Label" type="submit" class="btn rounded-10 zoom" style="background-color:white;position:absolute;right:170px;padding: 2px;line-height: .25;width:20px">
+                <img src="/img/label.png" style="width:15px" onmouseover="hover(this, 'labelPink')" onmouseout="unhover(this, 'label')">
+              </button>
+            </form>
+          </div>
+        </div>
+  
+        <% if(archivedListIds.includes(list.listid)) { %>
+          <button disabled class="btn rounded-pill" style="width:70px;font-size:10px;border-color:#17d475;background-color:#e8fcec;">
+            Archived
+          </button>
+        <% } %>
+  
+        <div>
+          <% collaborators.forEach(function(collaborator) { %>
+            <% var owner = (collaborator.owner) ? ' (owner)' : '' ; %>
+            <% if(collaborator.listid == list.listid && user.email !== collaborator.email) { %>
+              <span data-id="<%= list.listid %>" data-bs-toggle="modal" data-bs-target="#addCollaborator<%= list.listid %>" href="#addCollaborator<%= list.listid %>" data-toggle="modal">
+                <button data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="small-tooltip" data-bs-title="<%= collaborator.email %><%= owner %>" class="btn zoom">
+                  <img src="<%= collaborator.profilephotourl %>" style="width:20px;border-radius: 50%;">
+                </button>
+              </span>
+            <% } %>
+          <% }); %>
+        </div>
+  
+        <div class="row g-0" style="padding-top:40px;">
+          <% labels.forEach(function(label) { %>
+            <% if(label.listid == list.listid) { %>
+              <div class="col auto" style="padding-right:0; padding-left:10px;padding-bottom:5px;">
+                <form action="/removeLabelFromList" method="POST">
+                  <input class="form-control" name="listId" type="number" value="<%= list.listid %>" hidden>
+                  <input class="form-control" name="labelId" type="text" value="<%= label.labelid %>" hidden>
+                  <% if(list.color == 'bae6fc' ) { %>
+                    <button title="Remove label" onmouseover="setInnerHtml(this,'x')" onmouseout="setInnerHtml(this,'<%=label.label %>')" class="btn rounded-pill" style="vertical-align:middle;border-color: #03a9f4;background-color: white;color:#03a9f4;font-size:12px;padding:5px">
+                      <%= label.label %>
+                  <% } else { %>
+                    <button title="Remove label" onmouseover="setInnerHtml(this,'x')" onmouseout="setInnerHtml(this,'<%=label.label %>')" class="btn rounded-pill" style="vertical-align:middle;border-color: #03a9f4;background-color: #b3e5fc;color:#03a9f4;font-size:12px;padding:5px">
+                      <%= label.label %>
+                  <% } %>
+                  </button>
+                </form>
+              </div>
+            <% } %>
+          <% }); %>
+        </div>
+  
+        <!-- text-overflow:ellipsis;white-space: nowrap;overflow: hidden; -->
+        <div class="result" style="padding-top:20px;font-weight:bold;width:90%;overflow-wrap: break-word;">    
+          <%= list.title %>
+        </div>
+  
+        <div class="result">
+          <% if(list.list) { %>
+            <%- list.list %>
+          <% } else if(!list.title) {%>
+            Empty list
+          <% } %>
+        </div>
+      </div>
+  
+      <div class="modal fade" id="addCollaborator<%= list.listid %>" tabindex="-1" aria-labelledby="addCollaborator" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content mx-auto text-center justify-content-center" style="width:500px">
+            <div style="padding-top:10px">
+              <h6>Add collaborator</h6>
+            </div>
+            <div style="padding-top:10px;padding-bottom:5px;padding:10px">
+              <form action="/searchUsers" method="POST">
+                <input class="form-control" type="text" name="q" placeholder="Search users..." oninvalid="this.setCustomValidity('Enter a name or email')" oninput="setCustomValidity('')" required>
+                <input class="form-control" name="listIdToCollaborate" type="text" value="<%= list.listid %>" hidden>
+                <div style="padding-top:10px;">
+                  <button class="btn rounded-pill" style="border-color: #03a9f4;background-color: #b3e5fc;color:#03a9f4;font-size:12px">
+                    Search
+                  </button>
+                </div>
+              </form>
+            </div>
+            <div style="padding-top:10px;padding-bottom:5px;padding:10px">
+              <h6>Current collaborators</h6>
+              <% var deletePrivileges = false; %>
+              <% collaborators.forEach(function(collaborator) { %>
+                <% if(collaborator.listid == list.listid) { %>
+                  <div class="row g-0" style="padding-bottom:5px;">
+                    <div class="col-10" style="margin-left:0px">
+                      <button class="btn rounded-pill" style="right:100px;font-weight:bold;font-size:12px;background-color:#e6d4ff;">
+                        <img src="<%= collaborator.profilephotourl %>" style="width:20px;border-radius: 50%;">
+                        <%= collaborator.fullname %>
+                        < <%= collaborator.email %> >
+                        <% if(collaborator.owner) { %>
+                          <% deletePrivileges = (collaborator.userid == user.id) ? true : false; %>
+                          (owner)
+                      </button>
+                    </div>
+                      <% } else { %>
+                      </button>
+                    </div>
+                  <% } %>
+                  <% if(deletePrivileges && collaborator.userid != user.id) { %>
+                    <div class="col-2">
+                      <form action="/removeCollaborator" method="POST">
+                        <input class="timeInput" class="form-control" name="now" hidden>
+                        <input type="number" name="listId" value=<%=list.listid %> hidden>
+                        <input type="number" name="userId" value=<%=collaborator.userid %> hidden>
+                        <button title="Remove collaborator" class="btn zoom rounded-10" style="padding:0px">
+                          <img src="/img/redX.png" style="width:15px;">
+                        </button>
+                      </form>
+                    </div>
+                  <% } %>
+                </div>
+              <% } %>
+            <% }) %>
+          </div>
+        </div>
+      </div>
+  
+    </div>
+  
+    <div class="modal modal-lg" id="editList<%= list.listid %>" tabindex="-1" aria-labelledby="editList<%= list.listid %>" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content rounded-10">
+          <form action="/updateList" method="POST">
+            <input class="timeInput" class="form-control" name="now" hidden>
+            <input class="form-control" type="text" name="listId" value="<%= list.listid %>" hidden>
+            <input tabindex="-1" class="form-control rounded-10 text-center" type="text" maxlength="500" name="title" value="<%= list.title%>" placeholder="Title">
+            <div class="text-center" style="padding-bottom:4px">
+              <button class="btn rounded-10" style="border-color:#17d475;background-color:#e8fcec;padding: .25rem .4rem;line-height: .75;">
+                Save
+              </button>
+            </div>
+            <textarea name="list" id="textarea" class="form-control rounded-10"><%- list.list %></textarea>
+          </form>
+          <div data-bs-toggle="tooltip" data-bs-custom-class="timeTooltip" class="createTime" id="createTime<%= list.listid %>" data-value="<%= list.createdatetime %>" style="text-align:center;padding-top:5px;font-size:12px;font-weight: bold;">
+            <button class="editTime btn" id="editTime<%= list.listid %>" data-value="<%= list.editdatetime %>" style="text-align:center;padding-top:5px;font-size:12px;font-weight: bold;"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="modal" id="confirmDeleteShared<%= list.listid %>" tabindex="-1" aria-labelledby="confirmDeleteShared<%= list.listid %>" aria-hidden="true">
+      <div class="modal-dialog ">
+        <div class="modal-content  mx-auto text-center" style="max-width:200px;padding:10px">
+          Delete shared list?
+          <br>
+          All collaborators will lose access.
+          <div class="mx-auto" style="padding-top:10px">
+            <button class="btn rounded-10" data-bs-dismiss="modal" style="width:90px;background:#e8fcec;color:#17d475;border-color: #17d475;">
+              Cancel
+            </button>
+            <form action="/deleteList" method="POST" style="padding-top:10px">
+              <input type="number" name="listId" value=<%=list.listid %> hidden>
+              <button class="btn rounded-10" style="background:#ffe5ec;color:#fb6f92;border-color: #fb6f92;">
+                Continue
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <% }); %>
+  <div style="padding-bottom:80px"></div>

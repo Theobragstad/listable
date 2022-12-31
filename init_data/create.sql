@@ -2,7 +2,8 @@ CREATE TABLE users (
     userId TEXT PRIMARY KEY,
     email TEXT NOT NULL,
     fullname TEXT NOT NULL,
-    profilePhotoUrl TEXT NOT NULL
+    profilePhotoUrl TEXT NOT NULL,
+    listViewType TEXT NOT NULL
 );
 
 CREATE TABLE lists (

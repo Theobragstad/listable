@@ -85,7 +85,7 @@ app.get('/auth/callback/success' , (req , res) => {
         res.redirect('/auth/callback/failure');
     }
     else {
-        db.any(`INSERT INTO users (userId, email, fullname, profilePhotoUrl) SELECT '${req.user.id}', '${req.user.email}', '${req.user.displayName}', '${req.user.photos[0].value}' WHERE NOT EXISTS (SELECT 1 FROM users WHERE userId = '${req.user.id}' AND email = '${req.user.email}' AND fullname = '${req.user.displayName}' AND profilePhotoUrl = '${req.user.photos[0].value}');`)
+        db.any(`INSERT INTO users (userId, email, fullname, profilePhotoUrl, listViewType) SELECT '${req.user.id}', '${req.user.email}', '${req.user.displayName}', '${req.user.photos[0].value}', 'column' WHERE NOT EXISTS (SELECT 1 FROM users WHERE userId = '${req.user.id}' AND email = '${req.user.email}' AND fullname = '${req.user.displayName}' AND profilePhotoUrl = '${req.user.photos[0].value}');`)
             .then(() => {
                 req.session.user = {id: req.user.id, givenName: req.user.name.givenName, email: req.user.email, profilePhoto: req.user.photos[0].value, displayName: req.user.displayName};
                 req.session.save();
@@ -189,10 +189,14 @@ app.get('/lists', function(req, res) {
         const lists = db.any(`SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}' AND archive = FALSE) AND trash = FALSE ORDER BY editDateTime DESC;`);
         const collaborators = db.any(`SELECT users.email, users.profilePhotoUrl, users.fullname, users.userId, listsToUsers.listId, listsToUsers.owner FROM listsToUsers INNER JOIN users ON listsToUsers.userId = users.userId;`);
         const labels = db.any(`CREATE OR REPLACE VIEW labelsJoinlabelsToLists AS (SELECT labels.labelId, labels.label, labelsToLists.listId FROM labelsToLists INNER JOIN labels ON labelsToLists.labelId = labels.labelId);SELECT * FROM labelsJoinlabelsToLists WHERE labelId IN(SELECT labelId from labelsToUsers where userId = '${req.session.user.id}');`);
-        const allLabels = db.any(`SELECT * FROM labels WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userID = '${req.session.user.id}') ORDER BY label ASC;`);
+        // const allLabels = db.any(`SELECT * FROM labels WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userID = '${req.session.user.id}') ORDER BY label ASC;`);
+        const allLabels = db.any(`SELECT * FROM labels WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userID = '${req.session.user.id}') AND labelID IN(SELECT labels.labelId AS "numberOfLists" FROM labels LEFT JOIN labelsToLists ON labels.labelId = labelsToLists.labelId GROUP BY labels.labelId ORDER BY COUNT(labelsToLists.labelId) DESC);`)
+
         const archivedLists = db.any(`SELECT listId FROM listsToUsers WHERE archive = TRUE AND userId = '${req.session.user.id}';`);
 
-        return t.batch([lists, collaborators, labels, allLabels, archivedLists]); 
+        const listViewType = db.any(`SELECT listViewType FROM users WHERE userId = '${req.session.user.id}';`);
+
+        return t.batch([lists, collaborators, labels, allLabels, archivedLists, listViewType]); 
     })
         .then((data) => {
             var archivedListIds = [];
@@ -201,11 +205,11 @@ app.get('/lists', function(req, res) {
                 archivedListIds.push(archivedListIdsRaw[i].listid)
             }
 
-            return res.render("pages/lists", {lists: data[0], collaborators: data[1], labels: data[2], allLabels: data[3], archivedListIds, user: req.session.user, search: false, error, message, filterByLabel: false, label: null, labelid: null});
+            return res.render("pages/lists", {lists: data[0], collaborators: data[1], labels: data[2], allLabels: data[3], archivedListIds, listViewType: data[5][0].listviewtype, user: req.session.user, search: false, error, message, filterByLabel: false, label: null, labelid: null, searchInLabel: false});
         })
         .catch((error) => {
             console.log(error);
-            return res.render("pages/lists", {lists: [], collaborators: [], labels: [], archivedListIds: [], user: req.session.user, search: false, error: true, message: 'error loading lists', filterByLabel: false, label: null, labelid: null});
+            return res.render("pages/lists", {lists: [], collaborators: [], labels: [], archivedListIds: [], listViewType: null, user: req.session.user, search: false, error: true, message: 'error loading lists', filterByLabel: false, label: null, labelid: null, searchInLabel: false});
         });
 });
 
@@ -223,11 +227,12 @@ app.get('/logout', function (req, res, next) {
 
 app.post('/search', function(req, res) {
     var q;
-
+    
+    console.log(req.body.label);
     if(req.body.q) {
         q = req.body.q.toLowerCase().replace(/'/g, "''");
     }
-    else if(!(req.query.filterByLabel && req.query.filterByLabel == 'true')){
+    else if(!(req.query.filterByLabel && req.query.filterByLabel == 'true') && !(req.query.searchInLabel && req.query.searchInLabel == 'true')){
         return res.redirect('/lists');
     }
 
@@ -235,7 +240,10 @@ app.post('/search', function(req, res) {
     var searchQuery = `SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') AND trash = FALSE AND (LOWER(title) LIKE '%${q}%' OR LOWER(list) LIKE '%${q}%' OR listId IN(SELECT listId FROM listsToUsers WHERE userId IN(SELECT userId FROM emails_and_names WHERE LOWER(email) LIKE '%${q}%' OR LOWER(fullname) LIKE '%${q}%')) OR listId IN(SELECT listId FROM labelsToLists WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userId = '${req.session.user.id}' AND labelId IN(SELECT labelID FROM labels WHERE LOWER(label) LIKE '%${q}%')))) ORDER BY editDateTime DESC;`;
     var renderPage = 'lists';
 
-    if(req.query.filterByLabel && req.query.filterByLabel == 'true') {
+    if(req.query.searchInLabel && req.query.searchInLabel == 'true') {
+        searchQuery = `SELECT * FROM lists WHERE listId IN(SELECT listId FROM labelsToLists WHERE labelId = '${req.query.labelId}') AND trash = FALSE AND (LOWER(title) LIKE '%${q}%' OR LOWER(list) LIKE '%${q}%' OR listId IN(SELECT listId FROM listsToUsers WHERE userId IN(SELECT userId FROM emails_and_names WHERE LOWER(email) LIKE '%${q}%' OR LOWER(fullname) LIKE '%${q}%'))) ORDER BY editDateTime DESC;`;
+    }
+    else if(req.query.filterByLabel && req.query.filterByLabel == 'true') {
         searchQuery = `SELECT * FROM lists WHERE trash = FALSE AND listId IN(SELECT listId FROM labelsToLists WHERE labelId = '${req.query.labelId}') ORDER BY editDateTime DESC;`;
     }
     else if(req.query.archive && req.query.archive == 'true') {
@@ -253,10 +261,14 @@ app.post('/search', function(req, res) {
         const lists = db.any(viewQuery + searchQuery);
         const collaborators = db.any(`SELECT users.email, users.profilePhotoUrl, users.fullname, users.userId, listsToUsers.listId, listsToUsers.owner FROM listsToUsers INNER JOIN users ON listsToUsers.userId = users.userId;`);
         const labels = db.any(`CREATE OR REPLACE VIEW labelsJoinlabelsToLists AS (SELECT labels.labelId, labels.label, labelsToLists.listId FROM labelsToLists INNER JOIN labels ON labelsToLists.labelId = labels.labelId);SELECT * FROM labelsJoinlabelsToLists WHERE labelId IN(SELECT labelId from labelsToUsers where userId = '${req.session.user.id}');`);
-        const allLabels = db.any(`SELECT * FROM labels WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userID = '${req.session.user.id}') ORDER BY label ASC;`);
+        // const allLabels = db.any(`SELECT * FROM labels WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userID = '${req.session.user.id}') ORDER BY label ASC;`);
+        const allLabels = db.any(`SELECT * FROM labels WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userID = '${req.session.user.id}') AND labelID IN(SELECT labels.labelId AS "numberOfLists" FROM labels LEFT JOIN labelsToLists ON labels.labelId = labelsToLists.labelId GROUP BY labels.labelId ORDER BY COUNT(labelsToLists.labelId) DESC);`)
+
         const archivedLists = db.any(`SELECT listId FROM listsToUsers WHERE archive = TRUE AND userId = '${req.session.user.id}';`);
 
-        return t.batch([lists, collaborators, labels, allLabels, archivedLists]); 
+        const listViewType = db.any(`SELECT listViewType FROM users WHERE userId = '${req.session.user.id}';`);
+
+        return t.batch([lists, collaborators, labels, allLabels, archivedLists, listViewType]); 
     })
         .then((data) => {
             var archivedListIds = [];
@@ -265,14 +277,17 @@ app.post('/search', function(req, res) {
                 archivedListIds.push(archivedListIdsRaw[i].listid)
             }
 
-            if(req.query.filterByLabel && req.query.filterByLabel == 'true') {
-                return res.render('pages/' + renderPage, {lists: data[0], collaborators: data[1], labels: data[2], allLabels: data[3], archivedListIds, user: req.session.user, search: false, message: `filtering by label '` + req.body.label + `'`, filterByLabel: true, label: req.body.label, labelid: req.query.labelId});
+            if(req.query.searchInLabel && req.query.searchInLabel == 'true') {
+                return res.render('pages/' + renderPage, {lists: data[0], collaborators: data[1], labels: data[2], allLabels: data[3], archivedListIds, listViewType: data[5][0].listviewtype, user: req.session.user, search: false, message: `results for '` + q + `' within label '` + req.body.label + `'`, filterByLabel: true, label: req.body.label, labelid: req.query.labelId, searchInLabel: true});
             }
-            return res.render('pages/' + renderPage, {lists: data[0], collaborators: data[1], labels: data[2], allLabels: data[3],  archivedListIds, user: req.session.user, search: true, message: `results for '` + q + `'`, filterByLabel: false, label: null, labelid: null});
+            else if(req.query.filterByLabel && req.query.filterByLabel == 'true') {
+                return res.render('pages/' + renderPage, {lists: data[0], collaborators: data[1], labels: data[2], allLabels: data[3], archivedListIds, listViewType: data[5][0].listviewtype, user: req.session.user, search: false, message: `filtering by label '` + req.body.label + `'`, filterByLabel: true, label: req.body.label, labelid: req.query.labelId, searchInLabel: false});
+            }
+            return res.render('pages/' + renderPage, {lists: data[0], collaborators: data[1], labels: data[2], allLabels: data[3],  archivedListIds, listViewType: data[5][0].listviewtype, user: req.session.user, search: true, message: `results for '` + q + `'`, filterByLabel: false, label: null, labelid: null, searchInLabel: false});
         })
         .catch((error) => {
             console.log(error);
-            return res.render('pages/' + renderPage, {lists: [], collaborators: [], labels: [], allLabels: [], archivedListIds: [], user: req.session.user, search: true, error: true, message: 'search error', filterByLabel: false, label: null, labelid: null});
+            return res.render('pages/' + renderPage, {lists: [], collaborators: [], labels: [], allLabels: [], archivedListIds: [], listViewType: null, user: req.session.user, search: true, error: true, message: 'search error', filterByLabel: false, label: null, labelid: null, searchInLabel: false});
         });
     // db.any(viewQuery + searchQuery)
     //     .then((lists) => {
@@ -304,6 +319,8 @@ app.post('/permanentlyDeleteList', function(req, res) {
 });
 
 
+
+
 app.post('/addListWithThisLabel', function(req, res) {
     var title = (!req.body.title) ? '' : req.body.title;
     var labelId = req.body.labelId;
@@ -325,7 +342,7 @@ app.post('/addListWithThisLabel', function(req, res) {
         });
 });
 
-// This special GET version of /search is only to be called as a redirect from /addListWithThisLabel because a GET route was needed to render the resulting page.
+// This special GET version of /search is only to be used in very specific cases such as from /addListWithThisLabel
 app.get('/search', function(req, res) {
     var searchQuery = `SELECT * FROM lists WHERE trash = FALSE AND listId IN(SELECT listId FROM labelsToLists WHERE labelId = '${req.query.labelId}') ORDER BY editDateTime DESC;`;
     var viewQuery = `CREATE OR REPLACE VIEW emails_and_names AS (SELECT userId, email, fullname FROM users WHERE userId IN(SELECT userId FROM listsToUsers WHERE userId != '${req.session.user.id}' AND listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}')));`;
@@ -334,13 +351,15 @@ app.get('/search', function(req, res) {
         const lists = db.any(viewQuery + searchQuery);
         const collaborators = db.any(`SELECT users.email, users.profilePhotoUrl, users.fullname, users.userId, listsToUsers.listId, listsToUsers.owner FROM listsToUsers INNER JOIN users ON listsToUsers.userId = users.userId;`);
         const labels = db.any(`CREATE OR REPLACE VIEW labelsJoinlabelsToLists AS (SELECT labels.labelId, labels.label, labelsToLists.listId FROM labelsToLists INNER JOIN labels ON labelsToLists.labelId = labels.labelId);SELECT * FROM labelsJoinlabelsToLists WHERE labelId IN(SELECT labelId from labelsToUsers where userId = '${req.session.user.id}');`);
-        const allLabels = db.any(`SELECT * FROM labels WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userID = '${req.session.user.id}') ORDER BY label ASC;`);
+        // const allLabels = db.any(`SELECT * FROM labels WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userID = '${req.session.user.id}') ORDER BY label ASC;`);
+        const allLabels = db.any(`SELECT * FROM labels WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userID = '${req.session.user.id}') AND labelID IN(SELECT labels.labelId AS "numberOfLists" FROM labels LEFT JOIN labelsToLists ON labels.labelId = labelsToLists.labelId GROUP BY labels.labelId ORDER BY COUNT(labelsToLists.labelId) DESC);`)
 
         const label = db.any(`SELECT label FROM labels WHERE labelId = '${req.query.labelId}' LIMIT 1;`);
         const archivedLists = db.any(`SELECT listId FROM listsToUsers WHERE archive = TRUE AND userId = '${req.session.user.id}';`);
-
         
-        return t.batch([lists, collaborators, labels, allLabels, label, archivedLists]); 
+        const listViewType = db.any(`SELECT listViewType FROM users WHERE userId = '${req.session.user.id}';`);
+
+        return t.batch([lists, collaborators, labels, allLabels, label, archivedLists, listViewType]); 
     })
         .then((data) => {
             var archivedListIds = [];
@@ -350,7 +369,7 @@ app.get('/search', function(req, res) {
             }
 
             if(req.query.filterByLabel && req.query.filterByLabel == 'true') {
-                return res.render('pages/lists', {lists: data[0], collaborators: data[1], labels: data[2], allLabels: data[3], archivedListIds, user: req.session.user, search: false, message: `filtering by label '` + data[4][0].label + `'`, filterByLabel: true, label: data[4][0].label, labelid: req.query.labelId});
+                return res.render('pages/lists', {lists: data[0], collaborators: data[1], labels: data[2], allLabels: data[3], archivedListIds, listViewType: data[6][0].listviewtype, user: req.session.user, search: false, searchInLabel: false, message: `filtering by label '` + data[4][0].label + `'`, filterByLabel: true, label: data[4][0].label, labelid: req.query.labelId, searchInLabel: false});
             }
             return res.redirect('/lists');
         })
@@ -522,16 +541,17 @@ app.get('/trash', function(req, res) {
         const lists = db.any(`SELECT * FROM lists WHERE trash = TRUE AND listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') ORDER BY editDateTime DESC;`);
         const collaborators = db.any(`SELECT users.email, users.profilePhotoUrl, users.fullname, users.userId, listsToUsers.listId, listsToUsers.owner FROM listsToUsers INNER JOIN users ON listsToUsers.userId = users.userId;`);
         const labels = db.any(`CREATE OR REPLACE VIEW labelsJoinlabelsToLists AS (SELECT labels.labelId, labels.label, labelsToLists.listId FROM labelsToLists INNER JOIN labels ON labelsToLists.labelId = labels.labelId);SELECT * FROM labelsJoinlabelsToLists WHERE labelId IN(SELECT labelId from labelsToUsers where userId = '${req.session.user.id}');`);
-        const allLabels = db.any(`SELECT * FROM labels WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userID = '${req.session.user.id}') ORDER BY label ASC;`);
+        // const allLabels = db.any(`SELECT * FROM labels WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userID = '${req.session.user.id}') ORDER BY label ASC;`);
+        const allLabels = db.any(`SELECT * FROM labels WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userID = '${req.session.user.id}') AND labelID IN(SELECT labels.labelId AS "numberOfLists" FROM labels LEFT JOIN labelsToLists ON labels.labelId = labelsToLists.labelId GROUP BY labels.labelId ORDER BY COUNT(labelsToLists.labelId) DESC);`)
 
         return t.batch([lists, collaborators, labels, allLabels]); 
     })
         .then((data) => {
-            return res.render("pages/trash", {lists: data[0], collaborators: data[1], labels: data[2], allLabels: data[3], user: req.session.user, search: false, error, message});
+            return res.render("pages/trash", {lists: data[0], collaborators: data[1], labels: data[2], allLabels: data[3], user: req.session.user, search: false, searchInLabel: false, error, message});
         })
         .catch((error) => {
             console.log(error);
-            return res.render("pages/trash", {lists: [], collaborators: [], labels: [], user: req.session.user, search: false, error: true, message: 'error loading trash'});
+            return res.render("pages/trash", {lists: [], collaborators: [], labels: [], user: req.session.user, search: false, searchInLabel: false, error: true, message: 'error loading trash'});
         });
 });
 
@@ -631,16 +651,17 @@ app.get('/archive', (req , res) => {
         const lists = db.any(`SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}' AND archive = TRUE) AND trash = FALSE ORDER BY editDateTime DESC;`);
         const collaborators = db.any(`SELECT users.email, users.profilePhotoUrl, users.fullname, users.userId, listsToUsers.listId, listsToUsers.owner FROM listsToUsers INNER JOIN users ON listsToUsers.userId = users.userId;`);
         const labels = db.any(`CREATE OR REPLACE VIEW labelsJoinlabelsToLists AS (SELECT labels.labelId, labels.label, labelsToLists.listId FROM labelsToLists INNER JOIN labels ON labelsToLists.labelId = labels.labelId);SELECT * FROM labelsJoinlabelsToLists WHERE labelId IN(SELECT labelId from labelsToUsers where userId = '${req.session.user.id}');`);
-        const allLabels = db.any(`SELECT * FROM labels WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userID = '${req.session.user.id}') ORDER BY label ASC;`);
+        // const allLabels = db.any(`SELECT * FROM labels WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userID = '${req.session.user.id}') ORDER BY label ASC;`);
+        const allLabels = db.any(`SELECT * FROM labels WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userID = '${req.session.user.id}') AND labelID IN(SELECT labels.labelId AS "numberOfLists" FROM labels LEFT JOIN labelsToLists ON labels.labelId = labelsToLists.labelId GROUP BY labels.labelId ORDER BY COUNT(labelsToLists.labelId) DESC);`)
 
         return t.batch([lists, collaborators, labels, allLabels]); 
     })
         .then((data) => {
-            return res.render('pages/archive', {lists: data[0], collaborators: data[1], labels: data[2], allLabels: data[3], user: req.session.user, search: false, error, message});
+            return res.render('pages/archive', {lists: data[0], collaborators: data[1], labels: data[2], allLabels: data[3], user: req.session.user, search: false, searchInLabel: false, error, message});
         })
         .catch((error) => {
             console.log(error);
-            return res.render('pages/archive', {lists: [], collaborators: [], labels: [], user: req.session.user, search: false, error: true, message: 'error loading archive'});
+            return res.render('pages/archive', {lists: [], collaborators: [], labels: [], user: req.session.user, search: false, searchInLabel: false, error: true, message: 'error loading archive'});
         });
 });
 
@@ -652,6 +673,33 @@ app.post('/archiveList', function(req, res) {
         .catch((error) => {
             console.log(error);
             return res.redirect('/lists?archive=failure');
+        }); 
+});
+
+app.post('/changeListView', function(req, res) {
+    db.any(`SELECT listViewType FROM users WHERE userId = '${req.session.user.id}';`)
+        .then((type) => {
+            var newType = 'column';
+
+            if(type[0].listviewtype == 'column') {
+                newType = 'row';
+            }
+            else if(type[0].listviewtype == 'row') {
+                newType = 'column';
+            }
+
+            db.any(`UPDATE users SET listViewType = '${newType}' WHERE userId = '${req.session.user.id}';`)
+                .then(() => {
+                    return res.redirect('/lists?changeView=success');
+                })
+                .catch((error) => {
+                    console.log(error);
+                    return res.redirect('/lists?changeView=error');
+                }); 
+        })
+        .catch((error) => {
+            console.log(error);
+            return res.redirect('/lists?changeView=error');
         }); 
 });
 
@@ -667,7 +715,9 @@ app.post('/removeCollaborator', function(req, res) {
 });
 
 app.get('/labels', function(req, res) {
-    db.any(`SELECT * FROM labels WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userID = '${req.session.user.id}') ORDER BY label ASC;`)
+    db.any(`SELECT * FROM labels WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userID = '${req.session.user.id}') AND labelID IN(SELECT labels.labelId AS "numberOfLists" FROM labels LEFT JOIN labelsToLists ON labels.labelId = labelsToLists.labelId GROUP BY labels.labelId ORDER BY COUNT(labelsToLists.labelId) DESC);`)
+
+    // db.any(`SELECT * FROM labels WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userID = '${req.session.user.id}') ORDER BY label ASC;`)
         .then((allLabels) => {
             db.any(`SELECT labelId, COUNT(*) FROM labelsToLists GROUP BY labelId;`)
                 .then((labelCounts) => {
@@ -682,6 +732,21 @@ app.get('/labels', function(req, res) {
             console.log(error);
             return res.render('pages/labels', {allLabels: [], user: req.session.user});
         });
+})
+
+
+app.get('/orderlabels', function(req, res) {
+
+
+db.any(`SELECT * FROM labels WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userID = '${req.session.user.id}') AND labelID IN(SELECT labels.labelId AS "numberOfLists" FROM labels LEFT JOIN labelsToLists ON labels.labelId = labelsToLists.labelId GROUP BY labels.labelId ORDER BY COUNT(labelsToLists.labelId) DESC);`)
+.then((rows) => {
+        return res.send(rows);
+    })
+    .catch((error) => {
+        console.log(error);
+        return res.send(error);
+    });
+
 })
 
 app.post('/deleteLabel', function(req, res) {
@@ -735,7 +800,9 @@ app.post('/searchUsers', function(req, res) {
 });
 
 app.get('/labelsModal', function(req, res) {
-    db.any(`SELECT * FROM labels WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userID = '${req.session.user.id}') ORDER BY label ASC;`)
+    db.any(`SELECT * FROM labels WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userID = '${req.session.user.id}') AND labelID IN(SELECT labels.labelId AS "numberOfLists" FROM labels LEFT JOIN labelsToLists ON labels.labelId = labelsToLists.labelId GROUP BY labels.labelId ORDER BY COUNT(labelsToLists.labelId) DESC);`)
+
+    // db.any(`SELECT * FROM labels WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userID = '${req.session.user.id}') ORDER BY label ASC;`)
         .then((labels) => {
             db.any(`SELECT labelId FROM labels WHERE labelID IN(SELECT labelId FROM labelsToLists WHERE listId = '${req.query.listId}');`)
                 .then((labelIdsForThisList) => {
