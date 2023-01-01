@@ -18,7 +18,7 @@ Check it out to explore all the features!
 
 ### **Some of the primary features include:**
 - Log in with your Google account
-- Create and edit lists and notes in a full-feature text editor
+- Create and edit lists and notes in a text editor
 - Delete and archive lists
 - Change list background colors
 - Create and assign labels to lists
