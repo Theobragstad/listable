@@ -1,6 +1,6 @@
 <div class="sticky-top" style="z-index:1">
   <a href="/lists">
-    <div class="logo" style="position:absolute; top:10px; left:10px">
+    <div class="logo" id="logo" style="position:absolute; top:10px; left:10px">
       <img class="zoomSmall" src="/img/brain.svg" style="width:60px;">
       <span style="padding-left:4px; font-weight: bold;color:#f289ca;font-size:28px">
         lists
@@ -8,12 +8,12 @@
     </div>
   </a>
   <a href="/lists">
-    <button title="Go to lists" class="btn rounded-10 zoom" style="position:absolute;right:366px;top:20px;border-color:#f289ca;background-color:#ffe6ee;padding: 0;line-height: 1.35;width:30px">
+    <button title="Go to lists" class="btn rounded-10 zoom" style="position:absolute;right:316px;top:20px;border-color:#f289ca;background-color:#ffe6ee;padding: 0;line-height: 1.35;width:30px">
       <img src="/img/list.png" style="width:20px" onmouseover="hover(this, 'listPink')" onmouseout="unhover(this, 'list')">
     </button>
   </a>
 
-  <div class="" style="float:right;margin-right: 357px;">
+  <div class="" style="float:right;margin-right: 307px;">
     <div style="position:absolute;top:10px;">
       <nav class="navbar">
         <div class="container-fluid">
@@ -25,13 +25,13 @@
               </a>
               <div class="dropdown-menu" style="padding-bottom:0px">
                 <% if(allLabels.length == 0) { %>
-                  <div style="font-weight: bold;font-size:12px;padding-left:5px">No labels yet</div>
+                  <div style="font-weight: bold;font-size:12px;padding-left:5px">Labels will appear here for quick access.</div>
                 <% } %>
                 <% allLabels.forEach(function(label) { %>
                   <form action="/search?filterByLabel=true&labelId=<%= label.labelid %>" method="POST" style="padding-bottom:10px;padding-left:5px;padding-right: 5px;">
                     <input class="form-control" name="labelId" value="<%= label.labelid %>" hidden>
                     <input class="form-control" name="label" value="<%= label.label %>" hidden>
-                    <button title="View lists with label" class="btn rounded-pill" style="border-color: #03a9f4;background-color: #b3e5fc;color:#03a9f4;font-weight: bold;font-size:12px;max-width: 330px;text-overflow:ellipsis;overflow:hidden">
+                    <button title="View lists with label" class="btn rounded-pill" style="border-color: #03a9f4;background-color: #b3e5fc;color:#03a9f4;font-weight: bold;font-size:12px;max-width: 280px;text-overflow:ellipsis;overflow:hidden">
                       <%= label.label %>
                     </button>
                   </form>
@@ -45,13 +45,13 @@
   </div>
 
   <a href="/archive">
-    <button title="Go to archive" class="btn rounded-10 zoom" style="position:absolute;right:250px;top:20px;border-color:#f289ca;background-color:#ffe6ee;padding: 0;line-height: 1.25;width:30px">
+    <button title="Go to archive" class="btn rounded-10 zoom" style="position:absolute;right:200px;top:20px;border-color:#f289ca;background-color:#ffe6ee;padding: 0;line-height: 1.25;width:30px">
       <img src="/img/archive.png" style="width:20px" onmouseover="hover(this, 'archiveGreen')" onmouseout="unhover(this, 'archive')">
     </button>
   </a>
 
   <a href="/trash">
-    <button title="Go to trash" class="btn rounded-10 zoom" style="position:absolute;right:200px;top:20px;border-color:#f289ca;background-color:#ffe6ee;padding: 0;line-height: 1.25;width:30px">
+    <button title="Go to trash" class="btn rounded-10 zoom" style="position:absolute;right:150px;top:20px;border-color:#f289ca;background-color:#ffe6ee;padding: 0;line-height: 1.25;width:30px">
       <img src="/img/trash.png" style="width:20px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')">
     </button>
   </a>
@@ -79,3 +79,17 @@
   max-height: calc(100vh - 150px);
 }
 </style>
+
+
+<script>
+  function hideLogo() {
+    if(window.innerWidth <= 500) {
+      document.getElementById('logo').setAttribute('hidden', 'true');
+    }
+    else {
+      document.getElementById('logo').removeAttribute('hidden');
+    }
+  }
+
+  hideLogo();
+</script>

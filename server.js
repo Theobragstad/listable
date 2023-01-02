@@ -228,16 +228,49 @@ app.get('/logout', function (req, res, next) {
 app.post('/search', function(req, res) {
     var q;
     
-    console.log(req.body.label);
+    // console.log(req.body.label);
     if(req.body.q) {
         q = req.body.q.toLowerCase().replace(/'/g, "''");
+
+        // Handle color search
+        var colorCodeToMatch1 = null;
+        var colorCodeToMatch2 = null;
+        switch(q) {
+            case 'white':
+                colorCodeToMatch1 = 'ffffff';
+                break;
+            case 'gray':
+                colorCodeToMatch1 = 'eeeeee';
+                break;
+            case 'yellow':
+                colorCodeToMatch1 = 'fdf5c1';
+                break;
+            case 'orange':
+                colorCodeToMatch1 = 'f7cdc2';
+                break;
+            case 'blue':
+                colorCodeToMatch1 = 'bae6fc';
+                colorCodeToMatch2 = 'b4c9fa';
+                break;
+            case 'green':
+                colorCodeToMatch1 = 'bdf6d9';
+                colorCodeToMatch2 = 'cafbc8';
+                break;
+            case 'pink':
+                colorCodeToMatch1 = 'f4c3fb';
+                break;
+            case 'purple':
+                colorCodeToMatch1 = 'd0adfa';
+         }
+
     }
     else if(!(req.query.filterByLabel && req.query.filterByLabel == 'true') && !(req.query.searchInLabel && req.query.searchInLabel == 'true')){
         return res.redirect('/lists');
     }
 
+    var searchQuery = `SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') AND trash = FALSE AND (LOWER(color) LIKE '%${colorCodeToMatch1}%' OR LOWER(color) LIKE '%${colorCodeToMatch2}%' OR LOWER(title) LIKE '%${q}%' OR LOWER(list) LIKE '%${q}%' OR listId IN(SELECT listId FROM listsToUsers WHERE userId IN(SELECT userId FROM emails_and_names WHERE LOWER(email) LIKE '%${q}%' OR LOWER(fullname) LIKE '%${q}%')) OR listId IN(SELECT listId FROM labelsToLists WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userId = '${req.session.user.id}' AND labelId IN(SELECT labelID FROM labels WHERE LOWER(label) LIKE '%${q}%')))) ORDER BY editDateTime DESC;`;
 
-    var searchQuery = `SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') AND trash = FALSE AND (LOWER(title) LIKE '%${q}%' OR LOWER(list) LIKE '%${q}%' OR listId IN(SELECT listId FROM listsToUsers WHERE userId IN(SELECT userId FROM emails_and_names WHERE LOWER(email) LIKE '%${q}%' OR LOWER(fullname) LIKE '%${q}%')) OR listId IN(SELECT listId FROM labelsToLists WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userId = '${req.session.user.id}' AND labelId IN(SELECT labelID FROM labels WHERE LOWER(label) LIKE '%${q}%')))) ORDER BY editDateTime DESC;`;
+    // var searchQuery = `SELECT * FROM lists WHERE listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}') AND trash = FALSE AND (LOWER(title) LIKE '%${q}%' OR LOWER(list) LIKE '%${q}%' OR listId IN(SELECT listId FROM listsToUsers WHERE userId IN(SELECT userId FROM emails_and_names WHERE LOWER(email) LIKE '%${q}%' OR LOWER(fullname) LIKE '%${q}%')) OR listId IN(SELECT listId FROM labelsToLists WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userId = '${req.session.user.id}' AND labelId IN(SELECT labelID FROM labels WHERE LOWER(label) LIKE '%${q}%')))) ORDER BY editDateTime DESC;`;
     var renderPage = 'lists';
 
     if(req.query.searchInLabel && req.query.searchInLabel == 'true') {
@@ -860,15 +893,57 @@ app.post('/createNewLabel', function(req, res) {
         });
 });
 
+app.get('/countLabelsPerList', function(req, res) {
+    db.any(`SELECT listId, COUNT(listId) FROM labelsToLists WHERE listId = 2 GROUP BY listId;`)
+        .then((rows) => {
+            return res.send(rows[0].count);
+        })
+        .catch((error) => {
+            console.log(error);
+            return res.send(error);
+        });
+});
+
+app.get('/countCollabsForAList', function(req, res) {
+    var countQuery = `SELECT listId, COUNT(userId) FROM listsToUsers WHERE listId = 1 GROUP BY listId;`;
+
+    db.any(countQuery)
+        .then((rows) => {
+            return res.send(rows[0].count);
+        })
+        .catch((error) => {
+            console.log(error);
+            return res.send(error);
+        });
+});
+
 app.post('/assignLabelToList', function(req, res) {
+    var countQuery = `SELECT listId, COUNT(listId) FROM labelsToLists WHERE listId = '${req.body.listId}' GROUP BY listId;`;
+    if(req.query.listId) {
+        countQuery = `SELECT listId, COUNT(listId) FROM labelsToLists WHERE listId = '${req.query.listId}' GROUP BY listId;`;
+    }
+
     var q = `INSERT INTO labelsToLists (labelId, listId) SELECT '${req.body.labelId}', '${req.body.listId}' WHERE NOT EXISTS (SELECT 1 FROM labelsToLists WHERE labelId = '${req.body.labelId}' AND listId = '${req.body.listId}');`;
     if(req.query.listId) {
         q = `INSERT INTO labelsToLists (labelId, listId) SELECT '${req.body.labelId}', '${req.query.listId}' WHERE NOT EXISTS (SELECT 1 FROM labelsToLists WHERE labelId = '${req.body.labelId}' AND listId = '${req.query.listId}');`;
     }
 
-    db.any(q)
-        .then(() => {
-            return res.redirect('/lists?assignLabel=success');
+
+    db.any(countQuery)
+        .then((rows) => {
+            if(rows.length > 0 && rows[0].count >= 10) {
+                return res.redirect('/lists?assignLabel=failure&maxlabels=true');
+            } 
+            else {
+                db.any(q)
+                    .then(() => {
+                        return res.redirect('/lists?assignLabel=success');
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                        return res.redirect('/lists?assignLabel=failure');
+                    });
+            }
         })
         .catch((error) => {
             console.log(error);
@@ -888,17 +963,31 @@ app.post('/removeLabelFromList', function(req, res) {
 });
 
 app.post('/addCollaborator', function(req, res) {
-    db.any(`INSERT INTO listsToUsers (listId, userId, owner, archive) SELECT '${req.body.listId}', '${req.body.collaboratorUserId}', FALSE, FALSE WHERE NOT EXISTS (SELECT 1 FROM listsToUsers WHERE listId = '${req.body.listId}' AND userId = '${req.body.collaboratorUserId}');UPDATE lists SET editDateTime = '${req.body.now}' WHERE listId = '${req.body.listId}';`)
-        .then(() => {
-            db.any(`SELECT title, list FROM lists WHERE listId = '${req.body.listId}';`)
-                .then((list) => {
-                    sendCollaborationEmail(req.body.email, req.session.user.email, req.session.user.displayName, list[0].title, list[0].list);
-                    return res.redirect('/lists?addCollaborator=success');
-                })
-                .catch((error) => {
-                    console.log(error);
-                    return res.redirect('/lists?addCollaborator=failure');
-                });
+    var countQuery = `SELECT listId, COUNT(userId) FROM listsToUsers WHERE listId = '${req.body.listId}' GROUP BY listId;`;
+
+    db.any(countQuery)
+        .then((rows) => {
+            if(rows.length > 0 && rows[0].count >= 10) {
+                return res.redirect('/lists?addCollaborator=failure&max=true');
+            }
+            else {
+                db.any(`INSERT INTO listsToUsers (listId, userId, owner, archive) SELECT '${req.body.listId}', '${req.body.collaboratorUserId}', FALSE, FALSE WHERE NOT EXISTS (SELECT 1 FROM listsToUsers WHERE listId = '${req.body.listId}' AND userId = '${req.body.collaboratorUserId}');UPDATE lists SET editDateTime = '${req.body.now}' WHERE listId = '${req.body.listId}';`)
+                    .then(() => {
+                        db.any(`SELECT title, list FROM lists WHERE listId = '${req.body.listId}';`)
+                            .then((list) => {
+                                sendCollaborationEmail(req.body.email, req.session.user.email, req.session.user.displayName, list[0].title, list[0].list);
+                                return res.redirect('/lists?addCollaborator=success');
+                            })
+                            .catch((error) => {
+                                console.log(error);
+                                return res.redirect('/lists?addCollaborator=failure');
+                            });
+                        })
+                    .catch((error) => {
+                        console.log(error);
+                        return res.redirect('/lists?addCollaborator=failure');
+                    });
+            }
         })
         .catch((error) => {
             console.log(error);

@@ -24,7 +24,7 @@
   </form>
 
 
-    <div class="text-center" style="padding-top:50px;color:#f289ca">
+    <div class="text-center" style="padding-top:80px;color:#f289ca">
       <% if(search) { %>
         <h4 class="site-title">lists</h4>
         <h6 class="site-title">search results</h6>
@@ -72,10 +72,16 @@
         <p id="listCount" style="font-size:12px;padding-top:16px"><%= lists.length %> lists</p>
       <% } %>
 
-      
-<div style="padding-left:44px;">
-    <button disabled id="numSelectedLists" class="btn" style="font-size:12px;border-radius:10;background-color:#e8fcec;color:#17d475;border-color:#17d475;display: none;padding-left:20px">
-      <button onclick="unselectAll()" title="Unselect all" id="unselectAll" class="btn" style="padding:0;position:absolute;top:199px;left:45px;display: none;z-index: 2;"><img src="/img/x.png" style="width:10px" onmouseover="hover(this, 'pinkX')" onmouseout="unhover(this, 'x')"></button>
+     
+      <div style="position:absolute;top:150px;left:60px">
+<!-- <div style="padding-left:44px;"> -->
+  <div style="">
+
+  <button disabled id="numSelectedLists" class="btn" style="font-size:12px;border-radius:10;background-color:#e8fcec;color:#17d475;border-color:#17d475;display: none;padding-left:20px">
+
+    <!-- <button disabled id="numSelectedLists" class="btn" style="font-size:12px;border-radius:10;background-color:#e8fcec;color:#17d475;border-color:#17d475;display: none;padding-left:20px"> -->
+      <!-- <button onclick="unselectAll()" title="Unselect all" id="unselectAll" class="btn" style="padding:0;position:absolute;top:199px;left:45px;display: none;z-index: 2;"><img src="/img/x.png" style="width:10px" onmouseover="hover(this, 'pinkX')" onmouseout="unhover(this, 'x')"></button> -->
+      <button onclick="unselectAll()" title="Unselect all" id="unselectAll" class="btn" style="position:absolute;bottom:40px;left:2px;padding:0;display: none;z-index: 2;"><img src="/img/x.png" style="width:10px" onmouseover="hover(this, 'pinkX')" onmouseout="unhover(this, 'x')"></button>
 
     </button>  
   </div>
@@ -83,12 +89,20 @@
 
 
   <!-- TEST -->
-  <div style="padding-top:10px;padding-left:44px;">
+
+  <div style="padding-top:10px;">
     <form action="/deleteSelectedLists" method="POST">
     <button id="delSelectedLists" name="listIds" class="btn rounded-10 zoom" style="border-color:#fb6f92;background-color:#ffe5ec;padding: 0;line-height: .25;width:20px;display: none;"><img src="/img/trash.png" style="width:15px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')"></button>
   </form>
   </div>
+
+</div>
     
+
+
+
+
+
     </div>
 
 
@@ -148,10 +162,11 @@
         <div style="padding-right:20px"></div>
 
       </div>
-      <div style="padding-bottom:100px"></div>
+      <!-- <div style="padding-bottom:100px"></div> -->
+      <!-- HELLO -->
       
         <% } else { %>
-          <div class="row">
+          <div class="row" style="padding-top: 0px;">
           <%- include ('../partials/listVertical') %>
         </div>
         <% } %>
@@ -169,16 +184,16 @@
 <!-- <input id="n" value="<%=  %>" hidden> -->
 
 <% if((search || filterByLabel) && lists.length == 0){ %>
-  <div class="text-center" style="padding-top:69px">
+  <div class="text-center">
 
     <% if(filterByLabel) { %>
-      <h6>Filters do not show labeled lists that are in trash.</h6>
+      <h6><b>Note:</b> search does not show labeled lists that may be in trash.</h6>
     <% } %>
     <img style="width:100px" src="/img/noResults.png">
 
   </div>
 <% } else if(lists.length == 0) { %>
-  <div class="text-center" style="padding-top:100px">
+  <div class="text-center" style="padding-top:20px">
 
     <img style="width:100px" src="/img/palmTree.png">
 
