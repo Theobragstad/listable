@@ -92,9 +92,39 @@
 
   <div style="padding-top:10px;">
     <form action="/deleteSelectedLists" method="POST">
-    <button id="delSelectedLists" name="listIds" class="btn rounded-10 zoom" style="border-color:#fb6f92;background-color:#ffe5ec;padding: 0;line-height: .25;width:20px;display: none;"><img src="/img/trash.png" style="width:15px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')"></button>
+    <button title="Delete selected" id="delSelectedLists" name="listIds" class="btn rounded-10 zoom" style="border-color:#fb6f92;background-color:#ffe5ec;padding: 0;line-height: .25;width:20px;display: none;"><img src="/img/trash.png" style="width:15px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')"></button>
   </form>
   </div>
+
+
+  
+
+  <div style="padding-top:10px;">
+    <form action="/copySelected" method="POST">
+      <input class="timeInput" class="form-control" name="now" hidden>
+      <button id="copySelected" name="listIds"  title="Copy selected" class="btn rounded-10 zoom" style="position:absolute;bottom:8px;left:25px;background-color:white;padding: 0px;line-height: .25;width:20px;display: none;">
+        <img src="/img/copy.png" style="width:20px" onmouseover="hover(this, 'copyBlue')" onmouseout="unhover(this, 'copy')">
+      </button>
+  </form>
+  </div>
+
+    <form action="/archiveSelected" method="POST">
+      <button id="archiveSelected" name="listIds"  title="Archive selected" class="btn rounded-10 zoom" style="background-color:white;position:absolute;bottom:9px;left:74px;padding: 0px;line-height: .25;width:20px;display:none">
+        <img src="/img/archive.png" style="width:20px" onmouseover="hover(this, 'archiveGreen')" onmouseout="unhover(this, 'archive')">
+      </button>
+  </form>
+
+
+  <!-- <div style="padding-top:10px;"> -->
+      <button  id="setColorSelected" name="listIds" title="Set color of selected" type="button" class="btn rounded-10 zoom" data-bs-toggle="modal" data-bs-target="#setColorSelectedModal" style="display:none;background-color:white;position:absolute;bottom:9px;left:48px;padding: 0px;line-height: .25;width:20px">
+        <img src="/img/palette.png" style="width:20px" onmouseover="hover(this, 'paletteColors')" onmouseout="unhover(this, 'palette')">
+      </button>
+  <!-- </div> -->
+
+
+  
+    
+
 
 </div>
     
@@ -129,7 +159,7 @@
             <input    tabindex="-1" class="form-control rounded-10 text-center" type="text" maxlength="50" name="title" placeholder="Add a title...">
 
     <div class="text-center" style="padding-bottom:4px">
-        <button class="btn rounded-10 " style="border-color:#17d475;background-color:#e8fcec;padding: .25rem .4rem;line-height: .75;">Save</button>
+        <button class="btn rounded-10 " style="border-color:#17d475;background-color:#e8fcec;padding: .25rem .4rem;line-height: .75;width:100%">Save</button>
       </div>
         <!-- <textarea  name="list"  id="textarea" class="form-control rounded-0" rows="27" ></textarea> -->
         <textarea name="list"  id="textarea" class="form-control rounded-10" >
@@ -241,6 +271,45 @@
 
 
 
+<div class="modal fade" id="setColorSelectedModal" tabindex="-1" aria-labelledby="setColorSelectedModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content mx-auto" style="width:202px">
+
+      
+
+
+
+      <form action="/setColorSelected" method="POST">
+        <input id="setColorSelectedListIds" name="listIds" value="" hidden>
+
+        <button class="btn"  name="color" value="ffffff" style="padding-right:0"><img id="ffffff" src="/img/colors/white.png" style="width:20px"></button>
+        <button class="btn" name="color"  value="fdf5c1" style="padding-right:0"><img id="fdf5c1" src="/img/colors/yellow.png" style="width:20px"></button>
+        <button class="btn" name="color" value="bae6fc" style="padding-right:0"><img id="bae6fc" src="/img/colors/lightBlue.png" style="width:20px"></button>
+
+        <button class="btn" name="color" value="cafbc8" style="padding-right:0"><img id="cafbc8" src="/img/colors/green.png" style="width:20px"></button>
+        <button class="btn"  name="color" value="f4c3fb" style="padding-right:0"><img id="f4c3fb" src="/img/colors/pink.png" style="width:20px"></button>
+      
+      <button class="btn"name="color" value="eeeeee"  style="padding-right:0"><img id="eeeeee" src="/img/colors/grey.png" style="width:20px"></button>
+
+      <button class="btn" name="color" value="f7cdc2" style="padding-right:0"><img id="f7cdc2" src="/img/colors/orange.png" style="width:20px"></button>
+
+      <button class="btn" name="color" value="b4c9fa" style="padding-right:0"><img id="b4c9fa" src="/img/colors/lavender.png" style="width:20px"></button>
+      <button class="btn" name="color" value="bdf6d9" style="padding-right:0"><img id="bdf6d9" src="/img/colors/greenBlue.png" style="width:20px"></button>
+
+      <button class="btn"name="color" value="d0adfa"  ><img id="d0adfa" src="/img/colors/purple.png" style="width:20px"></button>
+     
+    </form>
+
+   
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
 
 
 
@@ -300,6 +369,13 @@ document.getElementById('listColors').addEventListener('show.bs.modal', (e) => {
 
 
 
+});
+
+
+
+
+document.getElementById('setColorSelectedModal').addEventListener('show.bs.modal', (e) => {
+    document.getElementById('setColorSelectedListIds').value = e.relatedTarget.dataset.id;
 });
 
 
@@ -383,6 +459,21 @@ document.getElementById('numSelectedLists').style.display = 'block';
 document.getElementById('delSelectedLists').style.display = 'block';
 document.getElementById('delSelectedLists').value = selectedListIds;
 
+
+document.getElementById('copySelected').style.display = 'block';
+document.getElementById('copySelected').value = selectedListIds;
+
+
+document.getElementById('setColorSelected').style.display = 'block';
+document.getElementById('setColorSelected').setAttribute('data-id' , selectedListIds); 
+
+
+
+document.getElementById('archiveSelected').style.display = 'block';
+document.getElementById('archiveSelected').value = selectedListIds;
+
+
+
 //////
 // document.getElementById('delSelectedLists').setAttribute('data-id' , selectedListIds); 
 
@@ -403,6 +494,17 @@ document.getElementById('unselectAll').style.display = 'block';
     // document.getElementById('numSelectedLists').innerHTML = '';
 
     document.getElementById('delSelectedLists').style.display = 'none';
+
+    document.getElementById('copySelected').style.display = 'none';
+
+    document.getElementById('setColorSelected').style.display = 'none';
+
+    
+    document.getElementById('archiveSelected').style.display = 'none';
+
+
+    
+
 
     document.getElementById('unselectAll').style.display = 'none';
     
@@ -449,7 +551,7 @@ function setInnerHtml(element, text) {
    
 
 
-    var length = element.clientWidth*.25;
+    var length = element.clientWidth*.28;
     var s = '';
     for(var i = 0; i < length/2; i++) {
     s += '&nbsp;';
@@ -578,6 +680,18 @@ document.getElementById('numSelectedLists').style.display = 'block';
 
 document.getElementById('delSelectedLists').style.display = 'block';
 document.getElementById('delSelectedLists').value = selectedListIds;
+
+
+document.getElementById('copySelected').style.display = 'block';
+document.getElementById('copySelected').value = selectedListIds;
+
+
+document.getElementById('setColorSelected').style.display = 'block';
+document.getElementById('setColorSelected').setAttribute('data-id' , selectedListIds); 
+
+document.getElementById('archiveSelected').style.display = 'block';
+document.getElementById('archiveSelected').value = selectedListIds;
+
 
 //////
 // document.getElementById('delSelectedLists').setAttribute('data-id' , selectedListIds); 
