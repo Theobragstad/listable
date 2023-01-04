@@ -56,12 +56,9 @@
     </button>
   </a>
 
-
   <button data-bs-toggle="modal" data-bs-target="#tipsModal" onmouseover="setTextColor(this, '#f289ca')" onmouseout="setTextColor(this, 'black')" title="Tips & Help" class="btn rounded-10 zoom" style="position:absolute;right:138px;top:29px;color:black;background-color:white;padding: 0;line-height: 1.25;font-size: 12px;font-weight: bold;">
     &#9432;
   </button>
-
-
 
   <button class="btn rounded-10 pull-right name " data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-custom-class="small-tooltip" data-bs-title="<%= user.email %>" style="border-color:#f289ca;background-color:#ffe6ee;position:absolute; top:10px; right:50px;font-size:12px">
     <img src="<%= user.profilePhoto %>" style="width:20px;border-radius: 50%;">&nbsp;&nbsp;
@@ -74,7 +71,6 @@
 
   <%- include ('../partials/message') %>
 </div>
-
 
 
 <div class="modal fade" id="tipsModal" tabindex="-1" aria-labelledby="tipsModal" aria-hidden="true">
@@ -94,11 +90,20 @@
           <li>Copying a list also copies labels, but not collaborators, to the new list.</li>
           <li>Collaborators on a list can share it and remove themselves, but they cannot remove other collaborators or delete the list.</li>
           <li>Labeling, pinning and archiving lists are user-specific changes that do not appear for collaborators.</li>
+          <li>You can search for lists by many fields, including:
+          <ul>
+            <li>Title</li>
+            <li>List</li>
+            <li>Collaborator:</li>
+            <ul>
+              <li>Email</li>
+              <li>Name</li>
+            </ul>
+            <li>Label</li>
+            <li>Color</li>
+          </ul>
+          </li>
         </ul>
-
-        
-
-
         <hr>
         <span style="color:#f289ca;">More tips coming soon!</span>
         <br>
@@ -109,22 +114,23 @@
 </div>
 
 
-
-
 <style>
+  
   ul.nav li.dropdown:hover .dropdown-menu {
     display: block;
   }
 
   .dropdown-menu {
-  overflow: hidden;
-  overflow-y: auto;
-  max-height: calc(100vh - 150px);
-}
+    overflow: hidden;
+    overflow-y: auto;
+    max-height: calc(100vh - 150px);
+  }
+
 </style>
 
 
 <script>
+
   function hideLogo() {
     if(window.innerWidth <= 500) {
       document.getElementById('logo').setAttribute('hidden', 'true');
@@ -138,8 +144,6 @@
     element.style.color = color;
   }
 
-
   hideLogo();
-
 
 </script>
