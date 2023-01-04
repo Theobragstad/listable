@@ -31,7 +31,7 @@
                   <form action="/search?filterByLabel=true&labelId=<%= label.labelid %>" method="POST" style="padding-bottom:10px;padding-left:5px;padding-right: 5px;">
                     <input class="form-control" name="labelId" value="<%= label.labelid %>" hidden>
                     <input class="form-control" name="label" value="<%= label.label %>" hidden>
-                    <button title="View lists with label" class="btn rounded-pill" style="border-color: #03a9f4;background-color: #b3e5fc;color:#03a9f4;font-weight: bold;font-size:12px;max-width: 295px;text-overflow:ellipsis;overflow:hidden">
+                    <button title="View lists with label" class="btn rounded-pill" style="border-color: #03a9f4;background-color: #b3e5fc;color:#03a9f4;font-weight: bold;font-size:12px;max-width: 335px;text-overflow:ellipsis;overflow:hidden">
                       <%= label.label %>
                     </button>
                   </form>
@@ -79,7 +79,7 @@
 
 <div class="modal fade" id="tipsModal" tabindex="-1" aria-labelledby="tipsModal" aria-hidden="true">
   <div class="modal-dialog">
-    <div class="modal-content mx-auto" style="width:300px;padding:10px;background-color: #ffe6ee;">
+    <div class="modal-content mx-auto" style="width:600px;padding:10px;background-color: #ffe6ee; border:#f289ca 3px solid;">
       <div class="logo text-center" style="color:#f289ca;font-size:22px;"><img src="/img/brain.svg" style="position:absolute;left:10px;width:40px;">Tips & Help</div>
       <hr>
       <div class="logo" style="font-size:16px">
@@ -91,11 +91,18 @@
           <li>Click the 'x' to unselect all lists.</li>
           </ul>
           </li>
+          <li>Copying a list also copies labels, but not collaborators, to the new list.</li>
+          <li>Collaborators on a list can share it and remove themselves, but they cannot remove other collaborators or delete the list.</li>
+          <li>Labeling, pinning and archiving lists are user-specific changes that do not appear for collaborators.</li>
         </ul>
+
+        
+
+
         <hr>
         <span style="color:#f289ca;">More tips coming soon!</span>
         <br>
-        <a href="mailto:lists.communications@gmail.com">Contact us</a>
+        <a href="mailto:lists.communications@gmail.com" style="text-decoration:none">Contact us here</a>
       </div>
   </div>
   </div>

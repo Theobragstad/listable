@@ -81,7 +81,7 @@
 
     <!-- <button disabled id="numSelectedLists" class="btn" style="font-size:12px;border-radius:10;background-color:#e8fcec;color:#17d475;border-color:#17d475;display: none;padding-left:20px"> -->
       <!-- <button onclick="unselectAll()" title="Unselect all" id="unselectAll" class="btn" style="padding:0;position:absolute;top:199px;left:45px;display: none;z-index: 2;"><img src="/img/x.png" style="width:10px" onmouseover="hover(this, 'pinkX')" onmouseout="unhover(this, 'x')"></button> -->
-      <button onclick="unselectAll()" title="Unselect all" id="unselectAll" class="btn" style="position:absolute;bottom:40px;left:2px;padding:0;display: none;z-index: 2;"><img src="/img/x.png" style="width:10px" onmouseover="hover(this, 'pinkX')" onmouseout="unhover(this, 'x')"></button>
+      <button onclick="unselectAll()" title="Unselect all" id="unselectAll" class="btn" style="position:absolute;bottom:48px;left:2px;padding:0;display: none;z-index: 2;"><img src="/img/x.png" style="width:10px" onmouseover="hover(this, 'pinkX')" onmouseout="unhover(this, 'x')"></button>
 
     </button>  
   </div>
@@ -244,21 +244,22 @@
 
       <form action="/changeListColor" method="POST">
         <input id="modalListId" name="listId" value="" hidden>
-        <button class="btn"  name="color" value="ffffff" style="padding-right:0"><img id="ffffff" src="/img/colors/ffffffSelected.png" style="width:20px"></button>
-        <button class="btn" name="color"  value="fdf5c1" style="padding-right:0"><img id="fdf5c1" src="/img/colors/yellow.png" style="width:20px"></button>
-        <button class="btn" name="color" value="bae6fc" style="padding-right:0"><img id="bae6fc" src="/img/colors/lightBlue.png" style="width:20px"></button>
+        <input class="timeInput" class="form-control" name="now" hidden>
+        <button class="btn zoomSmall"  name="color" value="ffffff" style="padding-right:0"><img id="ffffff" src="/img/colors/ffffffSelected.png" style="width:20px"></button>
+        <button class="btn zoomSmall" name="color"  value="fdf5c1" style="padding-right:0"><img id="fdf5c1" src="/img/colors/yellow.png" style="width:20px"></button>
+        <button class="btn zoomSmall" name="color" value="bae6fc" style="padding-right:0"><img id="bae6fc" src="/img/colors/lightBlue.png" style="width:20px"></button>
 
-        <button class="btn" name="color" value="cafbc8" style="padding-right:0"><img id="cafbc8" src="/img/colors/green.png" style="width:20px"></button>
-        <button class="btn"  name="color" value="f4c3fb" style="padding-right:0"><img id="f4c3fb" src="/img/colors/pink.png" style="width:20px"></button>
+        <button class="btn zoomSmall" name="color" value="cafbc8" style="padding-right:0"><img id="cafbc8" src="/img/colors/green.png" style="width:20px"></button>
+        <button class="btn zoomSmall"  name="color" value="f4c3fb" style="padding-right:0"><img id="f4c3fb" src="/img/colors/pink.png" style="width:20px"></button>
       
-      <button class="btn"name="color" value="eeeeee"  style="padding-right:0"><img id="eeeeee" src="/img/colors/grey.png" style="width:20px"></button>
+      <button class="btn zoomSmall"name="color" value="eeeeee"  style="padding-right:0"><img id="eeeeee" src="/img/colors/grey.png" style="width:20px"></button>
 
-      <button class="btn" name="color" value="f7cdc2" style="padding-right:0"><img id="f7cdc2" src="/img/colors/orange.png" style="width:20px"></button>
+      <button class="btn zoomSmall" name="color" value="f7cdc2" style="padding-right:0"><img id="f7cdc2" src="/img/colors/orange.png" style="width:20px"></button>
 
-      <button class="btn" name="color" value="b4c9fa" style="padding-right:0"><img id="b4c9fa" src="/img/colors/lavender.png" style="width:20px"></button>
-      <button class="btn" name="color" value="bdf6d9" style="padding-right:0"><img id="bdf6d9" src="/img/colors/greenBlue.png" style="width:20px"></button>
+      <button class="btn zoomSmall" name="color" value="b4c9fa" style="padding-right:0"><img id="b4c9fa" src="/img/colors/lavender.png" style="width:20px"></button>
+      <button class="btn zoomSmall" name="color" value="bdf6d9" style="padding-right:0"><img id="bdf6d9" src="/img/colors/greenBlue.png" style="width:20px"></button>
 
-      <button class="btn"name="color" value="d0adfa"  ><img id="d0adfa" src="/img/colors/purple.png" style="width:20px"></button>
+      <button class="btn zoomSmall"name="color" value="d0adfa"  ><img id="d0adfa" src="/img/colors/purple.png" style="width:20px"></button>
      
     </form>
 
@@ -277,26 +278,27 @@
 
       
 
-
+     
 
       <form action="/setColorSelected" method="POST">
         <input id="setColorSelectedListIds" name="listIds" value="" hidden>
+        <input class="timeInput" class="form-control" name="now" hidden>
 
-        <button class="btn"  name="color" value="ffffff" style="padding-right:0"><img id="ffffff" src="/img/colors/white.png" style="width:20px"></button>
-        <button class="btn" name="color"  value="fdf5c1" style="padding-right:0"><img id="fdf5c1" src="/img/colors/yellow.png" style="width:20px"></button>
-        <button class="btn" name="color" value="bae6fc" style="padding-right:0"><img id="bae6fc" src="/img/colors/lightBlue.png" style="width:20px"></button>
+        <button class="btn zoomSmall"  name="color" value="ffffff" style="padding-right:0"><img id="ffffff" src="/img/colors/white.png" style="width:20px"></button>
+        <button class="btn zoomSmall" name="color"  value="fdf5c1" style="padding-right:0"><img id="fdf5c1" src="/img/colors/yellow.png" style="width:20px"></button>
+        <button class="btn zoomSmall" name="color" value="bae6fc" style="padding-right:0"><img id="bae6fc" src="/img/colors/lightBlue.png" style="width:20px"></button>
 
-        <button class="btn" name="color" value="cafbc8" style="padding-right:0"><img id="cafbc8" src="/img/colors/green.png" style="width:20px"></button>
-        <button class="btn"  name="color" value="f4c3fb" style="padding-right:0"><img id="f4c3fb" src="/img/colors/pink.png" style="width:20px"></button>
+        <button class="btn zoomSmall" name="color" value="cafbc8" style="padding-right:0"><img id="cafbc8" src="/img/colors/green.png" style="width:20px"></button>
+        <button class="btn zoomSmall"  name="color" value="f4c3fb" style="padding-right:0"><img id="f4c3fb" src="/img/colors/pink.png" style="width:20px"></button>
       
-      <button class="btn"name="color" value="eeeeee"  style="padding-right:0"><img id="eeeeee" src="/img/colors/grey.png" style="width:20px"></button>
+      <button class="btn zoomSmall"name="color" value="eeeeee"  style="padding-right:0"><img id="eeeeee" src="/img/colors/grey.png" style="width:20px"></button>
 
-      <button class="btn" name="color" value="f7cdc2" style="padding-right:0"><img id="f7cdc2" src="/img/colors/orange.png" style="width:20px"></button>
+      <button class="btn zoomSmall" name="color" value="f7cdc2" style="padding-right:0"><img id="f7cdc2" src="/img/colors/orange.png" style="width:20px"></button>
 
-      <button class="btn" name="color" value="b4c9fa" style="padding-right:0"><img id="b4c9fa" src="/img/colors/lavender.png" style="width:20px"></button>
-      <button class="btn" name="color" value="bdf6d9" style="padding-right:0"><img id="bdf6d9" src="/img/colors/greenBlue.png" style="width:20px"></button>
+      <button class="btn zoomSmall" name="color" value="b4c9fa" style="padding-right:0"><img id="b4c9fa" src="/img/colors/lavender.png" style="width:20px"></button>
+      <button class="btn zoomSmall" name="color" value="bdf6d9" style="padding-right:0"><img id="bdf6d9" src="/img/colors/greenBlue.png" style="width:20px"></button>
 
-      <button class="btn"name="color" value="d0adfa"  ><img id="d0adfa" src="/img/colors/purple.png" style="width:20px"></button>
+      <button class="btn zoomSmall"name="color" value="d0adfa"  ><img id="d0adfa" src="/img/colors/purple.png" style="width:20px"></button>
      
     </form>
 
@@ -598,6 +600,7 @@ function setInnerHtml(element, text) {
       { value: 'First.Name', title: 'First Name' },
       { value: 'Email', title: 'Email' },
     ],
+
 
     setup: function(editor) {
 	  	var max = 20000;

@@ -177,7 +177,7 @@
         </div>
         <div style="padding-top:10px;padding-bottom:5px;padding:10px">
           <form action="/searchUsers" method="POST">
-            <input class="form-control" type="text" name="q" placeholder="Search users..." oninvalid="this.setCustomValidity('Enter a name or email')" oninput="setCustomValidity('')" required>
+            <input class="form-control" type="text" name="q" placeholder="search users..." oninvalid="this.setCustomValidity('Enter a name or email')" oninput="setCustomValidity('')" required>
             <input class="form-control" name="listIdToCollaborate" type="text" value="<%= listid %>" hidden>   <!-- IDK -->
             <div style="padding-top:10px;">
               <button class="btn rounded-pill" style="border-color: #03a9f4;background-color: #b3e5fc;color:#03a9f4;font-size:12px">Search</button>
@@ -194,7 +194,18 @@
 <script>
    
 
+   function hover(element, src) {
+  element.setAttribute('src', '/img/'+src+'.png');
+  console.log(element);
+ if(src !== 'paletteColors' && src !== 'addCollaboratorBlue' && element.id !== 'confirmDeleteShared') {
+  stopModals();
+ }
+}
 
+function unhover(element, src) {
+  element.setAttribute('src', '/img/'+src+'.png');
+  startModals();
+}
 
 
 

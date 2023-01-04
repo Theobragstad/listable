@@ -112,6 +112,24 @@
               </button>
             </form>
           </div>
+
+
+
+          <% if(pinnedListIds.includes(list.listid)) { %>
+            <form action="/unpinList" method="POST">
+              <input class="form-control" name="listId" type="number" value=<%= list.listid %> hidden>
+              <button title="Unpin" type="submit" class="btn rounded-10 zoomSmall" style="background-color:white;position:absolute;left:20px;top:3px;padding: 0px;line-height: .25;width:20px">
+                <img src="/img/starYellow.png" style="width:15px" onmouseover="hover(this, 'star')" onmouseout="unhover(this, 'starYellow')">
+              </button>
+            </form>
+          <% } else { %>
+            <form action="/pinList" method="POST">
+              <input class="form-control" name="listId" type="number" value=<%= list.listid %> hidden>
+              <button title="Pin" type="submit" class="btn rounded-10 zoomSmall" style="background-color:white;position:absolute;left:20px;top:3px;padding: 0px;line-height: .25;width:20px">
+                <img src="/img/star.png" style="width:15px" onmouseover="hover(this, 'starYellow')" onmouseout="unhover(this, 'star')">
+              </button>
+            </form>
+          <% } %>
         </div>
   
         <% if(archivedListIds.includes(list.listid)) { %>

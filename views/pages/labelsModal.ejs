@@ -64,7 +64,7 @@
                     <form action="/assignLabelToList" method="POST">
                     <input class="form-control" name="listId" type="number" value='<%= listid %>' hidden>
                     <input class="form-control" name="labelId" type="text" value="<%= label.labelid %>" hidden>
-                      <button title="Add label" class="btn rounded-pill" style="border-color: #03a9f4;background-color: #b3e5fc;color:#03a9f4;font-weight: bold;font-size:12px">
+                      <button title="Add label" class="btn rounded-pill zoomSmall" style="border-color: #03a9f4;background-color: #b3e5fc;color:#03a9f4;font-weight: bold;font-size:12px">
                         <%= label.label %></button>
                        
                       </form>
@@ -234,7 +234,15 @@
 
     
 <script>
-   
+   function hover(element, src) {
+  element.setAttribute('src', '/img/'+src+'.png');
+  console.log(element);
+ 
+}
+
+function unhover(element, src) {
+  element.setAttribute('src', '/img/'+src+'.png');
+}
 
 
 
