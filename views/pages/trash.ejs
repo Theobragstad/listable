@@ -360,10 +360,10 @@
     var nowMonth = parseInt(now.getMonth() + 1);
     var nowDate = parseInt(now.getDate());
 
-    var thenYear = parseInt(editDateTime.substring(6, 10));
-    var thenMonth = parseInt(editDateTime.substring(0, 2));
-    var thenDate = parseInt(editDateTime.substring(3, 5));
-    var thenHour = parseInt(editDateTime.substring(11, 13));
+    var thenYear = parseInt(editDateTime.substring(6,10));
+    var thenMonth = parseInt(editDateTime.substring(0,2));
+    var thenDate = parseInt(editDateTime.substring(3,5));
+    var thenHour = parseInt(editDateTime.substring(11,13));
     var thenMin = parseInt(editDateTime.substring(14));
 
     var ampm = 'AM';
@@ -386,25 +386,27 @@
     var thenTime = thenHour + ':' + thenMinutesFormatted + ' ' + ampm;
 
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    const thenMonthAbbr = months[thenMonth - 1];
+    const thenMonthAbbr = months[thenMonth-1];
 
     var thenDateFormatted = (thenDate < 10) ? '0' + thenDate : thenDate;
 
 
-    var message = 'Edited: error';
 
-    if (nowYear > thenYear) {
-      message = 'Edited ' + thenMonthAbbr + ' ' + thenDateFormatted + ' ' + thenYear;
-    }
-    else if (nowYear == thenYear && nowMonth == thenMonth && nowDate == thenDate) {
-      message = 'Edited ' + thenTime;
-    }
-    else if (nowYear == thenYear && nowMonth == thenMonth && nowDate == (thenDate + 1)) {
-      message = 'Edited yesterday, ' + thenTime;
-    }
-    else if (nowYear == thenYear && nowMonth >= thenMonth && nowDate > (thenDate + 1)) {
-      message = 'Edited ' + thenMonthAbbr + ' ' + thenDateFormatted;
-    }
+    if(nowYear > thenYear) {
+    var message = 'Edited ' + thenMonthAbbr + ' ' + thenDateFormatted + ' ' + thenYear;
+  }
+  else if(nowYear == thenYear && nowMonth == thenMonth && nowDate == thenDate) {
+      var message = 'Edited ' + thenTime;
+  }
+  else if(nowYear == thenYear && nowMonth == thenMonth && nowDate == (thenDate+1)) {
+      var message = 'Edited yesterday, ' + thenTime;
+  }
+  else if(nowYear == thenYear && nowMonth >= thenMonth && nowDate > (thenDate+1)) {
+      var message = 'Edited ' + thenMonthAbbr + ' ' + thenDateFormatted;
+  }
+  else {
+      var message = 'Edited: error';
+  }
 
     document.getElementById(divId).innerHTML = message;
   }

@@ -1,0 +1,90 @@
+<%- include ('../partials/header') %>
+
+<main>
+  
+    <div  data-bs-backdrop="static" data-bs-keyboard="false" class="modal fade" id="handleDeletionConflict" tabindex="-1" aria-labelledby="handleDeletionConflict" aria-modal="true" role="dialog" style="display: block;">
+        <div class="modal-dialog">
+            <div class="modal-content mx-auto text-center justify-content-center" >
+                <div>
+                    <h5>
+                        You do not own <%= unownedListIds.length %> of the <%= numberOfSelectedLists %> selected lists. 
+                        <br>
+                        Remove yourself from the one(s) you do not own and delete the one(s) that you do?
+                        <h6>Note: additionally, if there are any collaborators on lists you <i>do</i> own in this selection, they will lose access.</h6>
+                    </h5>
+
+                    <a href="/<%= returnPage %>">
+                        <button class="btn rounded-10" style="background-color:#e8fcec;color:#17d475;border-color: #17d475;">
+                            Cancel
+                        </button>
+                    </a>
+
+                    <form action="/deleteSelectedLists?continue=true&notOwner=true" method="POST">
+                        <input name="listIdsToRemove" value="<%= unownedListIds %>" hidden>
+                        <input name="listIdsToDelete" value="<%= ownedListIds %>" hidden>
+                        <input class="timeInput" class="form-control" name="now" hidden>
+                        <button class="btn rounded-10" style="background-color:#ffe5ec;color:#fb6f92;border-color: #fb6f92;">
+                            Continue
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+<script>
+
+    function hover(element, src) {
+        element.setAttribute('src', '/img/'+src+'.png');
+    }
+
+    function unhover(element, src) {
+        element.setAttribute('src', '/img/'+src+'.png');
+    }
+
+    window.onload = function () {
+        let myModal = new bootstrap.Modal(document.getElementById("handleDeletionConflict"), {});
+        myModal.show();
+    };
+
+    function setInputTimes() {
+        const elements = document.getElementsByClassName('timeInput');
+        for(var i = 0; i < elements.length; i++) {
+            elements[i].value = getNowFormatted();
+        }
+    }
+
+    function getNowFormatted() {
+        var now = new Date();
+
+        var nowYear = now.getFullYear();
+        var nowMonth = parseInt(now.getMonth()+1);
+        var nowDate = now.getDate();
+        var nowHours = now.getHours();
+        var nowMinutes = now.getMinutes();
+
+        var nowSeconds = now.getSeconds();
+
+        var monthFormatted = (nowMonth < 10) ? '0' + nowMonth : nowMonth;
+        var dateFormatted = (nowDate < 10) ? '0' + nowDate : nowDate;
+        var hoursFormatted = (nowHours < 10) ? '0' + nowHours : nowHours;
+        var minutesFormatted = (nowMinutes < 10) ? '0' + nowMinutes : nowMinutes;
+
+        var secondsFormatted = (nowSeconds < 10) ? '0' + nowSeconds : nowSeconds;
+
+        var nowFormatted = monthFormatted + '-' + dateFormatted + '-' + nowYear + ',' + hoursFormatted + ':' + minutesFormatted + ':' + secondsFormatted;
+        return nowFormatted;
+    }
+
+
+setInputTimes();
+
+setInterval(setInputTimes, 3000);
+
+</script>
+
+
+</main>
+
+<%- include ('../partials/footer') %>

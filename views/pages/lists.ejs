@@ -1,356 +1,245 @@
 <%- include ('../partials/header') %>
 
-<link rel="stylesheet" href="/css/style.css">
-<!-- <script src="/js/script.js"></script> -->
-
-
-
-
-
 <main>
-
-  <%- include ('../partials/menu1') %>
+  <%- include ('../partials/menu') %>
 
   <form action="/changeListView" method="POST">
-    <% if(listViewType == 'column') { %>
-    <button title="Switch to row view" class="btn zoom" style="padding:2px;padding-top:0px;padding-bottom:0px;position:absolute;top:150px;left:20px;border-color:#000000;background-color:#ececec;">
-      <img src="/img/row.png" style="width:15px">
-    </button>
-    <% } else if(listViewType == 'row') { %>
+    <% if(listViewType == 'column' ) { %>
+      <button title="Switch to row view" class="btn zoom" style="padding:2px;padding-top:0px;padding-bottom:0px;position:absolute;top:150px;left:20px;border-color:#000000;background-color:#ececec;">
+        <img src="/img/row.png" style="width:15px">
+      </button>
+    <% } else if(listViewType == 'row' ) { %>
       <button title="Switch to column view" class="btn zoom" style="padding:2px;padding-top:0px;padding-bottom:0px;position:absolute;top:150px;left:20px;border-color:#000000;background-color:#ececec;">
         <img src="/img/column.png" style="width:15px">
       </button>
     <% } %>
   </form>
 
-
-    <div class="text-center" style="padding-top:80px;color:#f289ca">
-      <% if(search) { %>
-        <h4 class="site-title">lists</h4>
+  <div class="text-center" style="padding-top:80px;color:#f289ca">
+    <% if(search) { %>
+      <h4 class="site-title">lists</h4>
+      <h6 class="site-title">search results</h6>
+    <% } else if(filterByLabel) { %>
+      <h4 class="site-title">
+        <%= label %>
+      </h4>
+      <h6 class="site-title">label</h6>
+      <% if(searchInLabel) { %>
         <h6 class="site-title">search results</h6>
-      <% } else if(filterByLabel) { %>
-        <h4 class="site-title"><%= label %></h4>
-        <h6 class="site-title">label</h6>
-        <% if(searchInLabel) { %>
-          <h6 class="site-title">search results</h6>
-        <% } %>
+      <% } %>
+    <% } else { %>
+      <h4 class="site-title">lists</h4>
+    <% } %>
+
+    <div style="padding-top:5px;padding-bottom:5px">
+      <% if(filterByLabel) { %>
+        <form action="/search?searchInLabel=true&labelId=<%= labelid %>" method="POST" onsubmit="saveQuery()">
+          <input class="form-control" name="label" value="<%= label %>" hidden>
+          <input type="text" id="q" name="q" class="search-hover zoom" placeholder="search this label...">
+          <input type="submit" hidden>
       <% } else { %>
-        <h4 class="site-title">lists</h4>
-        <% } %>
+        <form action="/search" method="POST" onsubmit="saveQuery()">
+        <input type="text" id="q" name="q" class="search-hover zoom" placeholder="search all...">
+      <% } %>
+      </form>
+    </div>
 
+    <div style="padding-top:10px;">
+      <% if(filterByLabel) { %>
+        <button title="New list with this label" data-id="<%= labelid %>" data-bs-toggle="modal" data-bs-target="#exampleModal" type="button" href="#addListModal" data-toggle="modal" class="btn rounded-10 zoom" style="border-color:#f289ca;background-color:#ffe6ee;padding: .25rem .4rem;line-height: .75;">
+          +
+        </button>
+      <% } else { %>
+        <button title="New list" data-bs-toggle="modal" data-bs-target="#exampleModal" type="button" href="#addListModal" data-toggle="modal" class="btn rounded-10 zoom" style="border-color:#f289ca;background-color:#ffe6ee;padding: .25rem .4rem;line-height: .75;">
+          +
+        </button>
+      <% } %>
+    </div>
 
-        
+    <% if(lists.length == 0) { %>
+      <p id="listCount" style="font-size:12px;padding-top:16px">No lists</p>
+    <% } else if(lists.length == 1) { %>
+      <p id="listCount" style="font-size:12px;padding-top:16px">1 list</p>
+    <% } else { %>
+      <p id="listCount" style="font-size:12px;padding-top:16px">
+        <%= lists.length %> lists
+      </p>
+    <% } %>
 
-        <div style="padding-top:5px;padding-bottom:5px">
-          <% if(filterByLabel) { %>
-            <form action="/search?searchInLabel=true&labelId=<%= labelid %>" method="POST" onsubmit="saveQuery()">
-              <input class="form-control" name="label" value="<%= label %>" hidden>
-              <input type="text" id="q" name="q" class="search-hover zoom" placeholder="search this label...">
-              <input type="submit" hidden>
-          <% } else { %>
-            <form action="/search" method="POST" onsubmit="saveQuery()">
-            <input type="text" id="q" name="q" class="search-hover zoom" placeholder="search all...">
-          <% } %>
+    <div style="position:absolute;top:150px;left:60px">
+      <div>
+        <button disabled id="numSelectedLists" class="btn" style="font-size:12px;border-radius:10;background-color:#e8fcec;color:#17d475;border-color:#17d475;display: none;padding-left:20px">
+          <button onclick="unselectAll()" title="Unselect all" id="unselectAll" class="btn" style="position:absolute;bottom:48px;left:2px;padding:0;display: none;z-index: 2;">
+            <img src="/img/x.png" style="width:10px" onmouseover="hover(this, 'pinkX')" onmouseout="unhover(this, 'x')">
+          </button>
+        </button>
+      </div>
+
+      <div style="padding-top:10px;">
+        <form action="/deleteSelectedLists" method="POST">
+          <input class="timeInput" class="form-control" name="now" hidden>
+          <button title="Delete selected" id="delSelectedLists" name="listIds" class="btn rounded-10 zoom" style="border-color:#fb6f92;background-color:#ffe5ec;padding: 0;line-height: .25;width:20px;display: none;">
+            <img src="/img/trash.png" style="width:15px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')">
+          </button>
         </form>
       </div>
-      
+
       <div style="padding-top:10px;">
-      <% if(filterByLabel) { %>
-        <button title="New list with this label"  data-id="<%= labelid %>" data-bs-toggle="modal" data-bs-target="#exampleModal" type="button" href="#addListModal" data-toggle="modal" class="btn rounded-10 zoom" style="border-color:#f289ca;background-color:#ffe6ee;padding: .25rem .4rem;line-height: .75;">+</button>
-      <% } else { %>
-          <button title="New list" data-bs-toggle="modal" data-bs-target="#exampleModal" type="button" href="#addListModal" data-toggle="modal" class="btn rounded-10 zoom" style="border-color:#f289ca;background-color:#ffe6ee;padding: .25rem .4rem;line-height: .75;">+</button>
-      <% } %>
-    </div>
+        <form action="/copySelected" method="POST">
+          <input class="timeInput" class="form-control" name="now" hidden>
+          <button id="copySelected" name="listIds" title="Copy selected" class="btn rounded-10 zoom" style="position:absolute;bottom:8px;left:25px;background-color:white;padding: 0px;line-height: .25;width:20px;display: none;">
+            <img src="/img/copy.png" style="width:20px" onmouseover="hover(this, 'copyBlue')" onmouseout="unhover(this, 'copy')">
+          </button>
+        </form>
+      </div>
 
+      <form action="/archiveSelected" method="POST">
+        <button id="archiveSelected" name="listIds" title="Archive selected" class="btn rounded-10 zoom" style="background-color:white;position:absolute;bottom:9px;left:74px;padding: 0px;line-height: .25;width:20px;display:none">
+          <img src="/img/archive.png" style="width:20px" onmouseover="hover(this, 'archiveGreen')" onmouseout="unhover(this, 'archive')">
+        </button>
+      </form>
 
-
-      <% if(lists.length == 0) { %>
-        <p id="listCount" style="font-size:12px;padding-top:16px">No lists</p>
-      <% } else if(lists.length == 1) { %>
-        <p id="listCount" style="font-size:12px;padding-top:16px">1 list</p>
-      <% } else { %>
-        <p id="listCount" style="font-size:12px;padding-top:16px"><%= lists.length %> lists</p>
-      <% } %>
-
-     
-      <div style="position:absolute;top:150px;left:60px">
-    <div style="">
-    <button disabled id="numSelectedLists" class="btn" style="font-size:12px;border-radius:10;background-color:#e8fcec;color:#17d475;border-color:#17d475;display: none;padding-left:20px">
-    <button onclick="unselectAll()" title="Unselect all" id="unselectAll" class="btn" style="position:absolute;bottom:48px;left:2px;padding:0;display: none;z-index: 2;"><img src="/img/x.png" style="width:10px" onmouseover="hover(this, 'pinkX')" onmouseout="unhover(this, 'x')"></button>
-
-    </button>  
-    </div>
-
-
-
-  <!-- TEST -->
-
-  <div style="padding-top:10px;">
-    <form action="/deleteSelectedLists" method="POST">
-    <button title="Delete selected" id="delSelectedLists" name="listIds" class="btn rounded-10 zoom" style="border-color:#fb6f92;background-color:#ffe5ec;padding: 0;line-height: .25;width:20px;display: none;"><img src="/img/trash.png" style="width:15px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')"></button>
-  </form>
-  </div>
-
-
-  
-
-  <div style="padding-top:10px;">
-    <form action="/copySelected" method="POST">
-      <input class="timeInput" class="form-control" name="now" hidden>
-      <button id="copySelected" name="listIds"  title="Copy selected" class="btn rounded-10 zoom" style="position:absolute;bottom:8px;left:25px;background-color:white;padding: 0px;line-height: .25;width:20px;display: none;">
-        <img src="/img/copy.png" style="width:20px" onmouseover="hover(this, 'copyBlue')" onmouseout="unhover(this, 'copy')">
-      </button>
-  </form>
-  </div>
-
-    <form action="/archiveSelected" method="POST">
-      <button id="archiveSelected" name="listIds"  title="Archive selected" class="btn rounded-10 zoom" style="background-color:white;position:absolute;bottom:9px;left:74px;padding: 0px;line-height: .25;width:20px;display:none">
-        <img src="/img/archive.png" style="width:20px" onmouseover="hover(this, 'archiveGreen')" onmouseout="unhover(this, 'archive')">
-      </button>
-  </form>
-
-
-  <!-- <div style="padding-top:10px;"> -->
-      <button  id="setColorSelected" name="listIds" title="Set color of selected" type="button" class="btn rounded-10 zoom" data-bs-toggle="modal" data-bs-target="#setColorSelectedModal" style="display:none;background-color:white;position:absolute;bottom:9px;left:48px;padding: 0px;line-height: .25;width:20px">
+      <button id="setColorSelected" name="listIds" title="Set color of selected" type="button" class="btn rounded-10 zoom" data-bs-toggle="modal" data-bs-target="#setColorSelectedModal" style="display:none;background-color:white;position:absolute;bottom:9px;left:48px;padding: 0px;line-height: .25;width:20px">
         <img src="/img/palette.png" style="width:20px" onmouseover="hover(this, 'paletteColors')" onmouseout="unhover(this, 'palette')">
       </button>
-  <!-- </div> -->
-
-
-  
-    
-
-
-</div>
-    
-
-
-
-
 
     </div>
+  </div>
 
-
-
-    
-
-
-      
-
-
-  <div class="modal modal-lg"  id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" >
-    <div class="modal-dialog "style="" >
-      <div class="modal-content rounded-10">
-        <% if(filterByLabel) { %>
-        <form action="/addListWithThisLabel" method="POST">
-          <input class="form-control" id="labelId" name="labelId" value="" hidden>
-
+    <div class="modal modal-lg" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content rounded-10">
+          <% if(filterByLabel) { %>
+            <form action="/addListWithThisLabel" method="POST">
+            <input class="form-control" id="labelId" name="labelId" value="" hidden>
           <% } else { %>
             <form action="/addList" method="POST">
-             
-            <% } %>
+          <% } %>
             <input class="timeInput" class="form-control" name="now" hidden>
+            <input tabindex="-1" class="form-control rounded-10 text-center" type="text" maxlength="50" name="title" placeholder="Add a title...">
+            <div class="text-center" style="padding-bottom:4px">
+              <button data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="small-tooltip" data-bs-title="Be sure to save. Autosave is currently unavailable." class="btn rounded-10" style="border-color:#17d475;background-color:#e8fcec;padding: .25rem .4rem;line-height: .75;width:100%">
+                Save
+              </button>
+            </div>
 
-            <input    tabindex="-1" class="form-control rounded-10 text-center" type="text" maxlength="50" name="title" placeholder="Add a title...">
-
-    <div class="text-center" style="padding-bottom:4px">
-        <button class="btn rounded-10 " style="border-color:#17d475;background-color:#e8fcec;padding: .25rem .4rem;line-height: .75;width:100%">Save</button>
-      </div>
-        <!-- <textarea  name="list"  id="textarea" class="form-control rounded-0" rows="27" ></textarea> -->
-        <textarea name="list"  id="textarea" class="form-control rounded-10" >
-        
-       </textarea>
-
-            <!-- <textarea  name="list" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}" onkeyup="handleInput(event)"  id="textarea" class="form-control rounded-0" rows="27" required></textarea> -->
-        </form>
-          </div>
-
-      </div>
-      
-    </div>
-  </div>
-
-
-
-          <div id="overflowArrowRight" class="zoom" style="display:none;position:absolute;right:20px;top:220px"><img src="/img/rightArrow.png" style="width:30px"></div>
-          <div id="overflowArrowLeft" class="zoom" style="display:none;position:absolute;left:20px;top:220px"><img src="/img/leftArrow.png" style="width:30px"></div>
-
-
-
-    <div class="row" id="list" style="overflow:auto;padding-top:0px;padding-left:20px;display:block">
-
-      <!-- <div class="d-flex" > -->
-        <!-- <% let count = 1 %>  -->
-
-        <% if(listViewType == 'column') { %>
-          <div class="d-flex" >
-        <%- include ('../partials/list1') %>
-        <div style="padding-right:20px"></div>
-
-      </div>
-      <!-- <div style="padding-bottom:100px"></div> -->
-      <!-- HELLO -->
-      
-        <% } else { %>
-          <div class="row" style="padding-top: 0px;">
-          <%- include ('../partials/listVertical') %>
+            <textarea name="list" id="textarea" class="form-control rounded-10"></textarea>
+          </form>
         </div>
-        <% } %>
-        
-        
-        
-       
+      </div>
+    </div>
 
-    <!-- <div style="padding-right:20px"></div>
-  </div> -->
-</div>
+  </div>
 
-<!-- TEST -->
+  <div id="overflowArrowRight" class="zoom" style="display:none;position:absolute;right:20px;top:220px">
+    <img src="/img/rightArrow.png" style="width:30px">
+  </div>
 
-<!-- <input id="n" value="<%=  %>" hidden> -->
+  <div id="overflowArrowLeft" class="zoom" style="display:none;position:absolute;left:20px;top:220px">
+    <img src="/img/leftArrow.png" style="width:30px">
+  </div>
 
-<% if((search || filterByLabel) && lists.length == 0){ %>
-  <div class="text-center">
-
-    <% if(filterByLabel) { %>
-      <h6><b>Note:</b> search does not show labeled lists that may be in trash.</h6>
+  <div class="row" id="list" style="overflow:auto;padding-top:0px;padding-left:20px;display:block">
+    <% if(listViewType == 'column') { %>
+      <div class="d-flex">
+        <%- include ('../partials/listColumns') %>
+        <div style="padding-right:20px"></div>
+      </div>
+    <% } else { %>
+      <div class="row" style="padding-top: 0px;">
+        <%- include ('../partials/listRows') %>
+      </div>
     <% } %>
-    <img style="width:100px" src="/img/noResults.png">
-
-  </div>
-<% } else if(lists.length == 0) { %>
-  <div class="text-center" style="padding-top:20px">
-
-    <img style="width:100px" src="/img/palmTree.png">
-
   </div>
 
-  
-
+  <% if((search || filterByLabel) && lists.length == 0) { %>
+    <div class="text-center">
+  <% if(filterByLabel) { %>
+      <h6><b>Note:</b> search does not show labeled lists that may be in trash.</h6>
   <% } %>
-<!-- </div> -->
+      <img style="width:100px" src="/img/noResults.png">
+    </div>
+  <% } else if(lists.length == 0) { %>
+    <div class="text-center" style="padding-top:20px">
+      <img style="width:100px" src="/img/palmTree.png">
+    </div>
+  <% } %>
 
-<div class="modal fade" id="listColors" tabindex="-1" aria-labelledby="listColors" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content mx-auto" style="width:202px">
+  <div class="modal fade" id="listColors" tabindex="-1" aria-labelledby="listColors" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content mx-auto" style="width:202px">
+        <form action="/changeListColor" method="POST">
+          <input id="modalListId" name="listId" value="" hidden>
+          <input class="timeInput" class="form-control" name="now" hidden>
 
-      
-
-
-
-      <form action="/changeListColor" method="POST">
-        <input id="modalListId" name="listId" value="" hidden>
-        <input class="timeInput" class="form-control" name="now" hidden>
-        <button class="btn zoomSmall"  name="color" value="ffffff" style="padding-right:0"><img id="ffffff" src="/img/colors/ffffffSelected.png" style="width:20px"></button>
-        <button class="btn zoomSmall" name="color"  value="fdf5c1" style="padding-right:0"><img id="fdf5c1" src="/img/colors/yellow.png" style="width:20px"></button>
-        <button class="btn zoomSmall" name="color" value="bae6fc" style="padding-right:0"><img id="bae6fc" src="/img/colors/lightBlue.png" style="width:20px"></button>
-
-        <button class="btn zoomSmall" name="color" value="cafbc8" style="padding-right:0"><img id="cafbc8" src="/img/colors/green.png" style="width:20px"></button>
-        <button class="btn zoomSmall"  name="color" value="f4c3fb" style="padding-right:0"><img id="f4c3fb" src="/img/colors/pink.png" style="width:20px"></button>
-      
-      <button class="btn zoomSmall"name="color" value="eeeeee"  style="padding-right:0"><img id="eeeeee" src="/img/colors/grey.png" style="width:20px"></button>
-
-      <button class="btn zoomSmall" name="color" value="f7cdc2" style="padding-right:0"><img id="f7cdc2" src="/img/colors/orange.png" style="width:20px"></button>
-
-      <button class="btn zoomSmall" name="color" value="b4c9fa" style="padding-right:0"><img id="b4c9fa" src="/img/colors/lavender.png" style="width:20px"></button>
-      <button class="btn zoomSmall" name="color" value="bdf6d9" style="padding-right:0"><img id="bdf6d9" src="/img/colors/greenBlue.png" style="width:20px"></button>
-
-      <button class="btn zoomSmall"name="color" value="d0adfa"  ><img id="d0adfa" src="/img/colors/purple.png" style="width:20px"></button>
-     
-    </form>
-
-   
-      
+          <button class="btn zoomSmall" name="color" value="ffffff" style="padding-right:0"><img id="ffffff" src="/img/colors/ffffffSelected.png" style="width:20px"></button>
+          <button class="btn zoomSmall" name="color" value="fdf5c1" style="padding-right:0"><img id="fdf5c1" src="/img/colors/yellow.png" style="width:20px"></button>
+          <button class="btn zoomSmall" name="color" value="bae6fc" style="padding-right:0"><img id="bae6fc" src="/img/colors/lightBlue.png" style="width:20px"></button>
+          <button class="btn zoomSmall" name="color" value="cafbc8" style="padding-right:0"><img id="cafbc8" src="/img/colors/green.png" style="width:20px"></button>
+          <button class="btn zoomSmall" name="color" value="f4c3fb" style="padding-right:0"><img id="f4c3fb" src="/img/colors/pink.png" style="width:20px"></button>
+          <button class="btn zoomSmall" name="color" value="eeeeee" style="padding-right:0"><img id="eeeeee" src="/img/colors/grey.png" style="width:20px"></button>
+          <button class="btn zoomSmall" name="color" value="f7cdc2" style="padding-right:0"><img id="f7cdc2" src="/img/colors/orange.png" style="width:20px"></button>
+          <button class="btn zoomSmall" name="color" value="b4c9fa" style="padding-right:0"><img id="b4c9fa" src="/img/colors/lavender.png" style="width:20px"></button>
+          <button class="btn zoomSmall" name="color" value="bdf6d9" style="padding-right:0"><img id="bdf6d9" src="/img/colors/greenBlue.png" style="width:20px"></button>
+          <button class="btn zoomSmall" name="color" value="d0adfa"><img id="d0adfa" src="/img/colors/purple.png" style="width:20px"></button>
+        </form>
+      </div>
     </div>
   </div>
-</div>
 
+  <div class="modal fade" id="setColorSelectedModal" tabindex="-1" aria-labelledby="setColorSelectedModal" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content mx-auto" style="width:202px">
+        <form action="/setColorSelected" method="POST">
+          <input id="setColorSelectedListIds" name="listIds" value="" hidden>
+          <input class="timeInput" class="form-control" name="now" hidden>
 
-
-
-<div class="modal fade" id="setColorSelectedModal" tabindex="-1" aria-labelledby="setColorSelectedModal" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content mx-auto" style="width:202px">
-
-      
-
-     
-
-      <form action="/setColorSelected" method="POST">
-        <input id="setColorSelectedListIds" name="listIds" value="" hidden>
-        <input class="timeInput" class="form-control" name="now" hidden>
-
-        <button class="btn zoomSmall"  name="color" value="ffffff" style="padding-right:0"><img id="ffffff" src="/img/colors/white.png" style="width:20px"></button>
-        <button class="btn zoomSmall" name="color"  value="fdf5c1" style="padding-right:0"><img id="fdf5c1" src="/img/colors/yellow.png" style="width:20px"></button>
-        <button class="btn zoomSmall" name="color" value="bae6fc" style="padding-right:0"><img id="bae6fc" src="/img/colors/lightBlue.png" style="width:20px"></button>
-
-        <button class="btn zoomSmall" name="color" value="cafbc8" style="padding-right:0"><img id="cafbc8" src="/img/colors/green.png" style="width:20px"></button>
-        <button class="btn zoomSmall"  name="color" value="f4c3fb" style="padding-right:0"><img id="f4c3fb" src="/img/colors/pink.png" style="width:20px"></button>
-      
-      <button class="btn zoomSmall"name="color" value="eeeeee"  style="padding-right:0"><img id="eeeeee" src="/img/colors/grey.png" style="width:20px"></button>
-
-      <button class="btn zoomSmall" name="color" value="f7cdc2" style="padding-right:0"><img id="f7cdc2" src="/img/colors/orange.png" style="width:20px"></button>
-
-      <button class="btn zoomSmall" name="color" value="b4c9fa" style="padding-right:0"><img id="b4c9fa" src="/img/colors/lavender.png" style="width:20px"></button>
-      <button class="btn zoomSmall" name="color" value="bdf6d9" style="padding-right:0"><img id="bdf6d9" src="/img/colors/greenBlue.png" style="width:20px"></button>
-
-      <button class="btn zoomSmall"name="color" value="d0adfa"  ><img id="d0adfa" src="/img/colors/purple.png" style="width:20px"></button>
-     
-    </form>
-
-   
-      
+          <button class="btn zoomSmall" name="color" value="ffffff" style="padding-right:0"><img id="ffffff" src="/img/colors/white.png" style="width:20px"></button>
+          <button class="btn zoomSmall" name="color" value="fdf5c1" style="padding-right:0"><img id="fdf5c1" src="/img/colors/yellow.png" style="width:20px"></button>
+          <button class="btn zoomSmall" name="color" value="bae6fc" style="padding-right:0"><img id="bae6fc" src="/img/colors/lightBlue.png" style="width:20px"></button>
+          <button class="btn zoomSmall" name="color" value="cafbc8" style="padding-right:0"><img id="cafbc8" src="/img/colors/green.png" style="width:20px"></button>
+          <button class="btn zoomSmall" name="color" value="f4c3fb" style="padding-right:0"><img id="f4c3fb" src="/img/colors/pink.png" style="width:20px"></button>
+          <button class="btn zoomSmall" name="color" value="eeeeee" style="padding-right:0"><img id="eeeeee" src="/img/colors/grey.png" style="width:20px"></button>
+          <button class="btn zoomSmall" name="color" value="f7cdc2" style="padding-right:0"><img id="f7cdc2" src="/img/colors/orange.png" style="width:20px"></button>
+          <button class="btn zoomSmall" name="color" value="b4c9fa" style="padding-right:0"><img id="b4c9fa" src="/img/colors/lavender.png" style="width:20px"></button>
+          <button class="btn zoomSmall" name="color" value="bdf6d9" style="padding-right:0"><img id="bdf6d9" src="/img/colors/greenBlue.png" style="width:20px"></button>
+          <button class="btn zoomSmall" name="color" value="d0adfa"><img id="d0adfa" src="/img/colors/purple.png" style="width:20px"></button>
+        </form>
+      </div>
     </div>
   </div>
-</div>
-
-
-
-
-
-
-
-
-<!-- <button onclick="showOrHideModal('show')" style="z-index:10">show</button> -->
-
-
-
-
-<!-- Button trigger modal -->
-
-
-<!-- Modal -->
-<!-- <div class="modal fade" id="searchResultsModal" tabindex="-1" aria-labelledby="searchResultsModal" aria-hidden="true"> -->
- 
-
-
-
-
-
-
-<!-- <button onclick="setEditTimes()"> call</button> -->
-
-
-
-<!-- <div class="result">I am everready for every ready state to keep the work ready</div> -->
-
-
-
-
-
-
-
-
-
-
-
 </main>
 
-<script src="https://cdn.tiny.cloud/1/is0q015mgv0512rfhujg2w9j8h17y7kkgn7ntlxua0p4pzbx/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
-
-  
 <script>
 
+  tinymce.init({
+    selector: 'textarea',
+    height: 600,
+    plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount  ',
+    toolbar: 'blocks fontfamily fontsize | bold italic underline strikethrough forecolor backcolor | link image media table | spellcheckdialog | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat',
+    image_list: [
+      { title: 'My image 1', value: 'http://t2.gstatic.com/licensed-image?q=tbn:ANd9GcQOO0X7mMnoYz-e9Zdc6Pe6Wz7Ow1DcvhEiaex5aSv6QJDoCtcooqA7UUbjrphvjlIc' },
+      { title: 'My image 2', value: 'http://www.moxiecode.com/my2.gif' }
+    ],
+    tinycomments_mode: 'embedded',
+    tinycomments_author: 'Author name',
+    mergetags_list: [
+      { value: 'First.Name', title: 'First Name' },
+      { value: 'Email', title: 'Email' },
+    ],
+
+    setup: function(editor) {
+      var max = 20000;
+      editor.on('submit', function (event) {
+        var numChars = tinymce.activeEditor.plugins.wordcount.body.getCharacterCount();
+        if(numChars > max) {
+          alert("Maximum " + max + " characters allowed.");
+          event.preventDefault();
+          return false;
+        }
+      });
+    }
+  });
 
 
 document.getElementById('listColors').addEventListener('show.bs.modal', (e) => {
@@ -581,35 +470,7 @@ function setInnerHtml(element, text) {
 
 // console.log(nSelected);
 
-  tinymce.init({
-    selector: 'textarea',
-    height: 600,
-    plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount  ',
-    toolbar: 'blocks fontfamily fontsize | bold italic underline strikethrough forecolor backcolor | link image media table | spellcheckdialog | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat',
-    image_list: [
-    {title: 'My image 1', value: 'http://t2.gstatic.com/licensed-image?q=tbn:ANd9GcQOO0X7mMnoYz-e9Zdc6Pe6Wz7Ow1DcvhEiaex5aSv6QJDoCtcooqA7UUbjrphvjlIc'},
-    {title: 'My image 2', value: 'http://www.moxiecode.com/my2.gif'}
-  ],
-    tinycomments_mode: 'embedded',
-    tinycomments_author: 'Author name',
-    mergetags_list: [
-      { value: 'First.Name', title: 'First Name' },
-      { value: 'Email', title: 'Email' },
-    ],
 
-
-    setup: function(editor) {
-	  	var max = 20000;
-	    editor.on('submit', function(event) {
-		  var numChars = tinymce.activeEditor.plugins.wordcount.body.getCharacterCount();
-		  if (numChars > max) {
-			alert("Maximum " + max + " characters allowed.");
-			event.preventDefault();
-			return false;
-		  }
-		});
-  }
-  });
 
   
   function changeListColor(val, id, listId){
@@ -1107,22 +968,6 @@ function saveQuery() {
 
 
 
-
-
-       
 </script>
-<!-- <script>tinymce.init({
-  selector: 'textarea',  // change this value according to your HTML
-  plugins: 'image',
-  menubar: 'insert',
-  toolbar: 'image',
-  image_list: [
-    {title: 'My image 1', value: 'https://www.example.com/my1.gif'},
-    {title: 'My image 2', value: 'http://www.moxiecode.com/my2.gif'}
-  ]
-});</script> -->
-
 
 <%- include ('../partials/footer') %>
-
-

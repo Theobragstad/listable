@@ -86,7 +86,12 @@ app.get('/auth/callback/success' , (req , res) => {
         res.redirect('/auth/callback/failure');
     }
     else {
-        db.any(`INSERT INTO users (userId, email, fullname, profilePhotoUrl, listViewType) SELECT '${req.user.id}', '${req.user.email}', '${req.user.displayName}', '${req.user.photos[0].value}', 'column' WHERE NOT EXISTS (SELECT 1 FROM users WHERE userId = '${req.user.id}' AND email = '${req.user.email}' AND fullname = '${req.user.displayName}' AND profilePhotoUrl = '${req.user.photos[0].value}');`)
+        db.any(`INSERT INTO users (userId, email, fullname, profilePhotoUrl, listViewType)
+                VALUES ('${req.user.id}', '${req.user.email}', '${req.user.displayName}', '${req.user.photos[0].value}', 'column')
+                ON CONFLICT (userId) DO UPDATE 
+                SET email = excluded.email, 
+                    fullname = excluded.fullname,
+                    profilePhotoUrl = excluded.profilePhotoUrl;`)
             .then(() => {
                 req.session.user = {id: req.user.id, givenName: req.user.name.givenName, email: req.user.email, profilePhoto: req.user.photos[0].value, displayName: req.user.displayName};
                 req.session.save();
@@ -331,7 +336,7 @@ app.post('/search', function(req, res) {
 });
 
 app.post('/permanentlyDeleteList', function(req, res) {
-    db.any(`DELETE FROM listsToUsers WHERE listId = ${req.body.listId}; DELETE FROM lists WHERE listId = ${req.body.listId};`)
+    db.any(`DELETE FROM listsToUsers WHERE listId = ${req.body.listId};  DELETE FROM labelsToLists WHERE listId IN(${req.body.listId}); DELETE FROM lists WHERE listId = ${req.body.listId};`)
         .then(() => {
             return res.redirect('/trash?permanentlyDeleted=success');
 
@@ -509,7 +514,8 @@ app.get('/pinorder', function(req, res) {
 });
 
 app.post('/deleteList', function(req, res) {
-    db.any(`UPDATE lists SET trash = TRUE WHERE listId = ${req.body.listId};DELETE FROM listsToUsers WHERE userId != '${req.session.user.id}' AND listId = ${req.body.listId};`)
+    console.log(req.body.now)
+    db.any(`UPDATE lists SET trash = TRUE WHERE listId = ${req.body.listId}; DELETE FROM listsToUsers WHERE userId != '${req.session.user.id}' AND listId = ${req.body.listId}; UPDATE lists SET editDateTime = '${req.body.now}' WHERE listId = ${req.body.listId};`)
         .then(() => {
             if(req.query.archived && req.query.archived == 'true') {
                 return res.redirect('/archive?delete=success');
@@ -535,20 +541,134 @@ app.post('/unarchiveList', function(req, res) {
 });
 
 app.post('/deleteSelectedLists', function(req, res) {
-    var array = req.body.listIds.split(',');
-    var result = array.map(function (x) { 
-        return parseInt(x, 10); 
-    });
+    var returnPage = 'lists';
+    if(false) {
+        returnPage = 'archive';
+    }
 
-    db.any(`UPDATE lists SET trash = TRUE WHERE listId IN(${result});`)
-        .then(() => {
-            var count = encodeURIComponent(result.length);
-            return res.redirect('/lists?deleteSelected=success&count=' + count);
-        })
-        .catch((error) => {
-            console.log(error);
-            return res.redirect('/lists?deleteSelected=error');
-        }); 
+    if(req.query.continue && req.query.continue == 'true' && req.query.notOwner && req.query.notOwner == 'true') {
+        var listIdsToRemoveRaw = req.body.listIdsToRemove.split(',');
+        var listIdsToRemove = listIdsToRemoveRaw.map(function (x) { 
+            return parseInt(x, 10); 
+        });
+
+        
+        var listIdsToDelete = [];
+
+        if(req.body.listIdsToDelete) {
+            var listIdsToDeleteRaw = req.body.listIdsToDelete.split(',');
+            listIdsToDelete = listIdsToDeleteRaw.map(function (x) { 
+                return parseInt(x, 10); 
+            });
+        }
+        
+        console.log(listIdsToRemove.length);
+        console.log(listIdsToRemove);
+
+        console.log(listIdsToDelete.length);
+        console.log(listIdsToDelete);
+
+        var deletionQuery = `DELETE FROM listsToUsers WHERE listId IN(${listIdsToRemove}) AND userId = '${req.session.user.id}'; UPDATE lists SET editDateTime = '${req.body.now}' WHERE listId IN(${listIdsToRemove});`;
+        if(listIdsToDelete.length > 0) {
+            deletionQuery += `UPDATE lists SET trash = TRUE WHERE listId IN(${listIdsToDelete}); DELETE FROM listsToUsers WHERE userId != '${req.session.user.id}' AND listId IN (${listIdsToDelete}); UPDATE lists SET editDateTime = '${req.body.now}' WHERE listId IN(${listIdsToDelete});`;
+        }
+
+
+        db.any(deletionQuery)
+            .then(() => {
+                return res.redirect('/lists?deleteSelected=success&count=' + (listIdsToRemove.length + listIdsToDelete.length));
+            })
+            .catch((error) => {
+                console.log(error);
+                return res.redirect('/lists?deleteSelected=error');
+            }); 
+    }
+    else if(req.query.continue && req.query.continue == 'true' && req.query.ownShared && req.query.ownShared == 'true') {
+        console.log("____________");
+        console.log(req.body.now);
+        console.log("____________");
+        let listIds = [];
+
+        if(req.body.listIds) {
+            let listIdsRaw = req.body.listIds.split(',');
+            listIds = listIdsRaw.map(function (x) { 
+                return parseInt(x, 10); 
+            });
+        }
+
+        db.any(`UPDATE lists SET trash = TRUE WHERE listId IN(${listIds}); DELETE FROM listsToUsers WHERE userId != '${req.session.user.id}' AND listId IN (${listIds}); UPDATE lists SET editDateTime = '${req.body.now}' WHERE listId IN(${listIds});`)
+            .then(() => {
+                return res.redirect('/lists?deleteSelected=success&count=' + (listIds.length));
+            })
+            .catch((error) => {
+                console.log(error);
+                return res.redirect('/lists?deleteSelected=error');
+            }); 
+    }
+    else {
+        var listIdsRaw = req.body.listIds.split(',');
+        var listIds = listIdsRaw.map(function (x) { 
+            return parseInt(x, 10); 
+        });
+
+        db.any(`SELECT listId FROM listsToUsers WHERE listId IN(${listIds}) AND userId = '${req.session.user.id}' AND owner = FALSE;`)
+            .then((unownedListIdsRaw) => {
+                
+
+                var unownedListIds = [];
+                for(var i = 0; i < unownedListIdsRaw.length; i++) {
+                    unownedListIds.push(unownedListIdsRaw[i].listid);
+                }
+
+                var ownedListIds = [];
+                for(var i = 0; i < listIds.length; i++) {
+                    if(!(unownedListIds.includes(listIds[i]))) {
+                        ownedListIds.push(listIds[i]);
+                    }
+                }
+
+                // console.log(unownedListIds);
+                // console.log(ownedListIds);
+                
+                if(unownedListIds.length > 0) {
+                    return res.render('pages/deleteSelectedNotOwner', {unownedListIds, numberOfSelectedLists: listIds.length, returnPage, ownedListIds});
+                }
+                else {
+                    db.any(`SELECT listId FROM listsToUsers WHERE listId IN(${listIds}) GROUP BY listId HAVING COUNT(*) > 1;`)
+                        .then((sharedListIdsRaw) => {
+                            if(sharedListIdsRaw.length > 0) {
+                                return res.render('pages/deleteSelectedOwnShared', {sharedListIdsRaw, returnPage, listIds});
+                            }
+                            else {
+                                db.any(`UPDATE lists SET trash = TRUE WHERE listId IN(${listIds}); DELETE FROM listsToUsers WHERE userId != '${req.session.user.id}' AND listId IN (${listIds}); UPDATE lists SET editDateTime = '${req.body.now}' WHERE listId IN(${listIds});`)
+                                    .then(() => {
+                                        return res.redirect('/lists?deleteSelected=success&count=' + (listIds.length));
+                                    })
+                                    .catch((error) => {
+                                        console.log(error);
+                                        return res.redirect('/lists?deleteSelected=error');
+                                    }); 
+                            }
+                        })
+                        .catch((error) => {
+                            console.log(error);
+                            return res.redirect('/lists?deleteSelected=error');
+                        }); 
+                    // db.any(`UPDATE lists SET trash = TRUE WHERE listId IN(${listIds}); DELETE FROM listsToUsers WHERE userId != '${req.session.user.id}' AND listId IN (${listIdsToDelete});`)
+                    //     .then(() => {
+                    //         return res.redirect('/lists?deleteSelected=success&count=' + (listIds.length));
+                    //     })
+                    //     .catch((error) => {
+                    //         console.log(error);
+                    //         return res.redirect('/lists?deleteSelected=error');
+                    //     }); 
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+                return res.redirect('/lists?deleteSelected=error');
+            }); 
+    }
 });
 
 app.post('/copySelected', function(req, res) {
@@ -609,7 +729,7 @@ app.post('/permanentlyDeleteSelected', function(req, res) {
         return parseInt(x, 10); 
     });
 
-    db.any(`DELETE FROM listsToUsers WHERE listId IN(${result}); DELETE FROM lists WHERE listId IN(${result});`)
+    db.any(`DELETE FROM listsToUsers WHERE listId IN(${result}); DELETE FROM labelsToLists WHERE listId IN(${result}); DELETE FROM lists WHERE listId IN(${result});`)
         .then(() => {
             var count = encodeURIComponent(result.length);
             return res.redirect('/trash?permanentlyDeleteSelected=success&count=' + count);
@@ -1101,7 +1221,7 @@ app.post('/addCollaborator', function(req, res) {
                 return res.redirect('/lists?addCollaborator=error&max=true');
             }
             else {
-                db.any(`INSERT INTO listsToUsers (listId, userId, owner, archive, pinned) SELECT '${req.body.listId}', '${req.body.collaboratorUserId}', FALSE, FALSE, FALSE WHERE NOT EXISTS (SELECT 1 FROM listsToUsers WHERE listId = '${req.body.listId}' AND userId = '${req.body.collaboratorUserId}');UPDATE lists SET editDateTime = '${req.body.now}' WHERE listId = '${req.body.listId}';`)
+                db.any(`INSERT INTO listsToUsers (listId, userId, owner, archive, pinned) SELECT '${req.body.listId}', '${req.body.collaboratorUserId}', FALSE, FALSE, FALSE WHERE NOT EXISTS (SELECT 1 FROM listsToUsers WHERE listId = '${req.body.listId}' AND userId = '${req.body.collaboratorUserId}'); UPDATE lists SET editDateTime = '${req.body.now}' WHERE listId = '${req.body.listId}';`)
                     .then(() => {
                         db.any(`SELECT title, list FROM lists WHERE listId = '${req.body.listId}';`)
                             .then((list) => {

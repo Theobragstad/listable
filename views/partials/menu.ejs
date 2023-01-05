@@ -1,155 +1,192 @@
-<div class="sticky-top" style="z-index:2">
-  <a href="/lists">
-    <div class="logo" id="logo" style="position:absolute; top:10px; left:10px">
-      <img class="zoomSmall" src="/img/brain.svg" style="width:60px;">
-      <span style="padding-left:4px; font-weight: bold;color:#f289ca;font-size:28px">
-        lists
-      </span>
-    </div>
-  </a>
-  <a href="/lists">
-    <button title="Go to lists" class="btn rounded-10 zoom" style="position:absolute;right:413px;top:22px;border-color:#f289ca;background-color:#ffe6ee;padding: 0;line-height: 1.35;width:30px">
-      <img src="/img/list.png" style="width:20px" onmouseover="hover(this, 'listPink')" onmouseout="unhover(this, 'list')">
-    </button>
-  </a>
 
-  <div class="" style="float:right;margin-right: 405px;">
-    <div style="position:absolute;top:12px;">
-      <nav class="navbar">
-        <div class="container-fluid">
-          <ul class="nav navbar-nav">
-            <li class="dropdown">
-              <a title="Go to labels" class="dropdown-toggle btn rounded-10 zoom" href="/labels" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="border-color:#f289ca;background-color:#ffe6ee;padding: 0px;line-height: 1.35;width:45px">
-                <img src="/img/label.png" style="width:20px" onmouseover="hover(this, 'labelPink')" onmouseout="unhover(this, 'label')">
-                <span class="caret"></span>
-              </a>
-              <div class="dropdown-menu" style="padding-bottom:0px">
-                <% if(allLabels.length == 0) { %>
-                  <div style="font-weight: bold;font-size:12px;padding-left:5px">Labels will appear here for quick access &nbsp;&nbsp;</div>
-                <% } %>
-                <% allLabels.forEach(function(label) { %>
-                  <form action="/search?filterByLabel=true&labelId=<%= label.labelid %>" method="POST" style="padding-bottom:10px;padding-left:5px;padding-right: 5px;">
-                    <input class="form-control" name="labelId" value="<%= label.labelid %>" hidden>
-                    <input class="form-control" name="label" value="<%= label.label %>" hidden>
-                    <button title="View lists with label" class="btn rounded-pill" style="border-color: #03a9f4;background-color: #b3e5fc;color:#03a9f4;font-weight: bold;font-size:12px;max-width: 377px;text-overflow:ellipsis;overflow:hidden">
-                      <%= label.label %>
-                    </button>
-                  </form>
-                <% }); %>
-              </div>
+
+<div class="sticky-top" style="z-index:2">
+    <a href="/lists">
+      <div class="logo" id="logo" style="position:absolute; top:10px; left:10px">
+        <img id="brain" class="zoomSmall" src="/img/brain.svg" style="width:60px;">
+        <span id="logoName" style="padding-left:4px; font-weight: bold;color:#f289ca;font-size:28px">
+          lists
+        </span>
+      </div>
+    </a>
+
+    <!-- <div style="position:absolute;right:10px"> -->
+        <!-- <div style="position:absolute;">
+        </div> -->
+
+        <div class="row g-3" style="position:absolute;right:10px;top:10px">
+
+            <div class="col" style="padding-top:9px">
+            <a href="/lists" style="text-decoration:none">
+                <button title="Go to lists" class="btn rounded-10 zoom" style="border-color:#f289ca;background-color:#ffe6ee;padding: 0;line-height: 1.35;width:30px">
+                  <img src="/img/list.png" style="width:20px" onmouseover="hover(this, 'listPink')" onmouseout="unhover(this, 'list')">
+                </button>
+            </a>
+        </div>
+
+        <div class="col" style="padding-top:9px">
+            <a href="/archive" style="text-decoration:none">
+                <button title="Go to archive" class="btn rounded-10 zoom" style="border-color:#f289ca;background-color:#ffe6ee;padding: 0;line-height: 1.25;width:30px">
+                  <img src="/img/archive.png" style="width:20px" onmouseover="hover(this, 'archiveGreen')" onmouseout="unhover(this, 'archive')">
+                </button>
+            </a>
+        </div>
+
+
+            <div class="col" style="padding-top:9px">
+            <a href="/trash"  style="text-decoration:none">
+                <button title="Go to trash" class="btn rounded-10 zoom" style="border-color:#f289ca;background-color:#ffe6ee;padding: 0;line-height: 1.25;width:30px">
+                  <img src="/img/trash.png" style="width:20px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')">
+                </button>
+            </a>
+        </div>
+
+
+            
+            <div class="col" style="padding-top:9px;padding-right: 0px;">
+                  <ul class="nav navbar-nav" style="width:80px;display: block;">
+                    <li class="dropdown">
+                      <a title="Go to labels" class="dropdown-toggle btn rounded-10 zoom" href="/labels" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="border-color:#f289ca;background-color:#ffe6ee;padding: 0px;line-height: 1.35;width:45px">
+                        <img src="/img/label.png" style="width:20px" onmouseover="hover(this, 'labelPink')" onmouseout="unhover(this, 'label')">
+                        <span class="caret"></span>
+                      </a>
+                      <div class="dropdown-menu" style="width:228px;padding-bottom:0px">
+                        <% if(allLabels.length == 0) { %>
+                          <div style="font-weight: bold;font-size:12px;padding-left:5px">Labels appear here for quick access </div>
+                        <% } %>
+                        <% allLabels.forEach(function(label) { %>
+                          <form action="/search?filterByLabel=true&labelId=<%= label.labelid %>" method="POST" style="padding-bottom:10px;padding-left:5px;padding-right: 5px;">
+                            <input class="form-control" name="labelId" value="<%= label.labelid %>" hidden>
+                            <input class="form-control" name="label" value="<%= label.label %>" hidden>
+                            <button title="View lists with label" class="btn rounded-pill" style="border-color: #03a9f4;background-color: #b3e5fc;color:#03a9f4;font-weight: bold;max-width:100%;font-size:12px;text-overflow:ellipsis;overflow:hidden">
+                              <%= label.label %>
+                            </button>
+                          </form>
+                        <% }); %>
+                      </div>
+                    </li>
+                  </ul>
+                  </div>
+               
+           
+            
+        
+ 
+                  <div class="col" style="padding-right: 5px;padding-top: 5px;padding-left:0px;">
+            <button data-bs-toggle="modal" data-bs-target="#tipsModal" onmouseover="setTextColor(this, '#f289ca')" onmouseout="setTextColor(this, 'black')" title="Tips & Help" class="btn rounded-10 zoomSmall" style="border-radius:50%;color:black;background-color:#ffe6ee;padding: 7px;line-height: 1.25;font-size: 30px;font-weight: bold;"></button>
+</div>
+
+<div class="col" style="padding-right: 0px;padding-left: 0px;">
+            <button class="btn rounded-10 name " data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-custom-class="small-tooltip" data-bs-title="<%= user.email %>" style="border-color:#f289ca;background-color:#ffe6ee;font-size:12px">
+                <span style="text-overflow:ellipsis;overflow:hidden;max-width:135px;white-space: nowrap;display: block;">
+                <img src="<%= user.profilePhoto %>" style="width:20px;border-radius: 50%;">&nbsp;&nbsp;
+                <%= user.givenName %></span>
+            </button>
+        </div>
+
+        <div class="col" style="padding-left: 5px;padding-top:1px">
+
+            <a title="Log out" href="/logout" class="btn rounded-10 logout" style="height:33.25px;border-color:#000000;background-color:#ececec;font-size:12px">
+                ←
+            </a>
+        </div>
+        </div>
+
+       
+    <!-- </div> -->
+
+
+  
+    <%- include ('../partials/message') %>
+</div>
+
+
+  
+  
+  <div class="modal fade" id="tipsModal" tabindex="-1" aria-labelledby="tipsModal" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content mx-auto" style="width:600px;padding:10px;background-color: #ffe6ee; border:#f289ca 3px solid;">
+        <div class="logo text-center" style="color:#f289ca;font-size:22px;"><img src="/img/brain.svg" style="position:absolute;left:10px;width:40px;">Tips & Help</div>
+        <hr>
+        <div class="logo" style="font-size:16px">
+          <ul>
+            <li>Do actions on multiple lists at once:
+            <ul>
+            <li>Click the white circle beside each list to select the ones you want, or press CMD-A to select all.</li>
+            <li>Click one of the buttons that appear to complete your desired action.</li>
+            <li>Click the 'x' to unselect all lists.</li>
+            </ul>
+            </li>
+            <li>Copying a list also copies labels, but not collaborators, to the new list.</li>
+            <li>Collaborators on a list can share it and remove themselves, but they cannot remove other collaborators or delete the list.</li>
+            <li>Labeling, pinning and archiving lists are user-specific changes that do not appear for collaborators.</li>
+            <li>You can search for lists by many fields, including:
+            <ul>
+              <li>Title</li>
+              <li>List</li>
+              <li>Collaborator:</li>
+              <ul>
+                <li>Email</li>
+                <li>Name</li>
+              </ul>
+              <li>Label</li>
+              <li>Color</li>
+            </ul>
+            </li>
+            <li>Autosave is currently unavailable, so make sure to click the save button when you're done editing a list.</li>
+            <li>Lists are sorted by most recently edited.
+            <ul>
+            <li>Pinned lists are also sorted by most recently edited.</li>
+            </ul>
             </li>
           </ul>
+          <hr>
+          <span style="color:#f289ca;">More tips coming soon!</span>
+          <br>
+          <a href="mailto:lists.communications@gmail.com" style="text-decoration:none">Contact us here</a>
         </div>
-      </nav>
+    </div>
     </div>
   </div>
-
-  <a href="/archive">
-    <button title="Go to archive" class="btn rounded-10 zoom" style="position:absolute;right:300px;top:22px;border-color:#f289ca;background-color:#ffe6ee;padding: 0;line-height: 1.25;width:30px">
-      <img src="/img/archive.png" style="width:20px" onmouseover="hover(this, 'archiveGreen')" onmouseout="unhover(this, 'archive')">
-    </button>
-  </a>
-
-  <a href="/trash">
-    <button title="Go to trash" class="btn rounded-10 zoom" style="position:absolute;right:250px;top:22px;border-color:#f289ca;background-color:#ffe6ee;padding: 0;line-height: 1.25;width:30px">
-      <img src="/img/trash.png" style="width:20px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')">
-    </button>
-  </a>
-
-  <div style="position:absolute;right:50px">
-    <div style="padding-right: 10px;">
-    <button data-bs-toggle="modal" data-bs-target="#tipsModal" onmouseover="setTextColor(this, '#f289ca')" onmouseout="setTextColor(this, 'black')" title="Tips & Help" class="btn rounded-10 zoomSmall" style="border-radius:50%;position:relative;right:25px;top:17px;color:black;background-color:#ffe6ee;padding: 7px;line-height: 1.25;font-size: 30px;font-weight: bold;">
-      
-    </button>
-  </div>
-
-    <button class="btn rounded-10 pull-right name " data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-custom-class="small-tooltip" data-bs-title="<%= user.email %>" style="position:relative;bottom:13px;border-color:#f289ca;background-color:#ffe6ee;font-size:12px">
-      <span style="text-overflow:ellipsis;overflow:hidden;max-width:135px;white-space: nowrap;display: block;">
-        <img src="<%= user.profilePhoto %>" style="width:20px;border-radius: 50%;">&nbsp;&nbsp;
-      <%= user.givenName %></span>
-    </button>
-</div>
-
-  <a title="Log out" href="/logout" class="btn rounded-10 pull-right logout" style="height:33.25px;position:absolute;top:10.5px; right:5px;border-color:#000000;background-color:#ececec;font-size:12px">
-    ←
-  </a>
-
-  <%- include ('../partials/message') %>
-</div>
-
-
-<div class="modal fade" id="tipsModal" tabindex="-1" aria-labelledby="tipsModal" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content mx-auto" style="width:600px;padding:10px;background-color: #ffe6ee; border:#f289ca 3px solid;">
-      <div class="logo text-center" style="color:#f289ca;font-size:22px;"><img src="/img/brain.svg" style="position:absolute;left:10px;width:40px;">Tips & Help</div>
-      <hr>
-      <div class="logo" style="font-size:16px">
-        <ul>
-          <li>Do actions on multiple lists at once:
-          <ul>
-          <li>Click the white circle beside each list to select the ones you want, or press CMD-A to select all.</li>
-          <li>Click one of the buttons that appear to complete your desired action.</li>
-          <li>Click the 'x' to unselect all lists.</li>
-          </ul>
-          </li>
-          <li>Copying a list also copies labels, but not collaborators, to the new list.</li>
-          <li>Collaborators on a list can share it and remove themselves, but they cannot remove other collaborators or delete the list.</li>
-          <li>Labeling, pinning and archiving lists are user-specific changes that do not appear for collaborators.</li>
-          <li>You can search for lists by many fields, including:
-          <ul>
-            <li>Title</li>
-            <li>List</li>
-            <li>Collaborator:</li>
-            <ul>
-              <li>Email</li>
-              <li>Name</li>
-            </ul>
-            <li>Label</li>
-            <li>Color</li>
-          </ul>
-          </li>
-          <li>Autosave is not yet available, so make sure to click the save button when you're done editing a list.</li>
-        </ul>
-        <hr>
-        <span style="color:#f289ca;">More tips coming soon!</span>
-        <br>
-        <a href="mailto:lists.communications@gmail.com" style="text-decoration:none">Contact us here</a>
-      </div>
-  </div>
-  </div>
-</div>
-
-
-<style>
   
-  ul.nav li.dropdown:hover .dropdown-menu {
-    display: block;
-  }
-
-  .dropdown-menu {
-    overflow: hidden;
-    overflow-y: auto;
-    max-height: calc(100vh - 150px);
-  }
-
-</style>
-
-
-<script>
-
-  function hideLogo() {
-    if(window.innerWidth <= 500) {
-      document.getElementById('logo').setAttribute('hidden', 'true');
+  
+  <style>
+    
+    ul.nav li.dropdown:hover .dropdown-menu {
+      display: block;
     }
-    else {
-      document.getElementById('logo').removeAttribute('hidden');
+  
+    .dropdown-menu {
+      overflow: hidden;
+      overflow-y: auto;
+      max-height: calc(100vh - 150px);
     }
-  }
+  
+  </style>
+  
+  
+  <script>
+  
+    function hideLogo() {
+      if(window.innerWidth <= 500) {
+        document.getElementById('logoName').setAttribute('hidden', 'true');
+        document.getElementById('brain').style.setProperty('width', '25px');
+        document.getElementById('logo').style.setProperty('top', '2px');
+        document.getElementById('logo').style.setProperty('left', '2px');
 
-  function setTextColor(element, color) {
-    element.style.color = color;
-  }
-
-  hideLogo();
-
-</script>
+      }
+      else {
+        document.getElementById('logoName').removeAttribute('hidden');
+        document.getElementById('brain').style.setProperty('width', '60px');
+        document.getElementById('logo').style.setProperty('top', '10px');
+        document.getElementById('logo').style.setProperty('left', '10px');
+      }
+    }
+  
+    function setTextColor(element, color) {
+      element.style.color = color;
+    }
+  
+    hideLogo();
+  
+  </script>
