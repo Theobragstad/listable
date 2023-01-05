@@ -108,7 +108,7 @@ const auth = (req, res, next) => {
     next();
 };
   
-// Authentication required
+// Require authentication
 app.use(auth);
 
 
@@ -338,7 +338,7 @@ app.post('/permanentlyDeleteList', function(req, res) {
         })
         .catch((error) => {
             console.log(error);
-            return res.redirect('/trash?permanentlyDeleted=failure');
+            return res.redirect('/trash?permanentlyDeleted=error');
         });
 });
 
@@ -354,12 +354,12 @@ app.post('/addListWithThisLabel', function(req, res) {
                 })
                 .catch((error) => {
                     console.log(error);
-                    return res.redirect('/search?filterByLabel=true&labelId='+ labelId +'&add=failure');
+                    return res.redirect('/search?filterByLabel=true&labelId='+ labelId +'&add=error');
                 });
         })
         .catch((error) => {
             console.log(error);
-            return res.redirect('/search?filterByLabel=true&labelId='+ labelId +'&add=failure');
+            return res.redirect('/search?filterByLabel=true&labelId='+ labelId +'&add=error');
         });
 });
 
@@ -415,12 +415,12 @@ app.post('/emptyTrash', function(req, res) {
                 })
                 .catch((error) => {
                     console.log(error);
-                    return res.redirect('/trash?empty=failure');
+                    return res.redirect('/trash?empty=error');
                 });
         })
         .catch((error) => {
             console.log(error);
-            return res.redirect('/trash?empty=failure');
+            return res.redirect('/trash?empty=error');
         });
 });
 
@@ -435,12 +435,12 @@ app.post('/addList', function(req, res) {
                 })
                 .catch((error) => {
                     console.log(error);
-                    return res.redirect('/lists?add=failure');
+                    return res.redirect('/lists?add=error');
                 });
         })
         .catch((error) => {
             console.log(error);
-            return res.redirect('/lists?add=failure');
+            return res.redirect('/lists?add=error');
         });
 });
 
@@ -455,7 +455,7 @@ app.post('/changeListColor', function(req, res) {
         })
         .catch((error) => {
             console.log(error);
-            return res.redirect('/lists?changeColor=failure');
+            return res.redirect('/lists?changeColor=error');
         });
 });
 
@@ -519,7 +519,7 @@ app.post('/deleteList', function(req, res) {
         })
         .catch((error) => {
             console.log(error);
-            return res.redirect('/lists?delete=failure');
+            return res.redirect('/lists?delete=error');
         });  
 });
 
@@ -530,7 +530,7 @@ app.post('/unarchiveList', function(req, res) {
         })
         .catch((error) => {
             console.log(error);
-            return res.redirect('/lists?unarchive=failure');
+            return res.redirect('/lists?unarchive=error');
         });  
 });
 
@@ -547,7 +547,7 @@ app.post('/deleteSelectedLists', function(req, res) {
         })
         .catch((error) => {
             console.log(error);
-            return res.redirect('/lists?deleteSelected=failure');
+            return res.redirect('/lists?deleteSelected=error');
         }); 
 });
 
@@ -616,7 +616,7 @@ app.post('/permanentlyDeleteSelected', function(req, res) {
         })
         .catch((error) => {
             console.log(error);
-            return res.redirect('/trash?permanentlyDeleteSelected=failure');
+            return res.redirect('/trash?permanentlyDeleteSelected=error');
         });
 });
 
@@ -631,7 +631,7 @@ app.post('/updateList', function(req, res) {
         })
         .catch((error) => {
             console.log(error);
-            return res.redirect('/lists?update=failure');
+            return res.redirect('/lists?update=error');
         });  
 });
 
@@ -695,7 +695,7 @@ app.post('/restoreList', function(req, res) {
         })
         .catch((error) => {
             console.log(error);
-            return res.redirect('/lists?restore=failure');
+            return res.redirect('/lists?restore=error');
         });
 });
 
@@ -706,7 +706,7 @@ app.post('/restoreAll', function(req, res) {
         })
         .catch((error) => {
             console.log(error);
-            return res.redirect('/lists?restoreAll=failure');
+            return res.redirect('/lists?restoreAll=error');
         });
 });
 
@@ -735,17 +735,17 @@ app.post('/copy', function(req, res) {
                         })
                         .catch((error) => {
                             console.log(error);
-                            return res.redirect('/lists?copy=failure');
+                            return res.redirect('/lists?copy=error');
                         });
                 })
                 .catch((error) => {
                     console.log(error);
-                    return res.redirect('/lists?copy=failure');
+                    return res.redirect('/lists?copy=error');
                 });  
         })
         .catch((error) => {
             console.log(error);
-            return res.redirect('/lists?copy=failure');
+            return res.redirect('/lists?copy=error');
         });
 });
 
@@ -762,7 +762,7 @@ app.post('/restoreSelectedLists', function(req, res) {
         })
         .catch((error) => {
             console.log(error);
-            return res.redirect('/lists?restoreSelected=failure');
+            return res.redirect('/lists?restoreSelected=error');
         });
 });
 
@@ -826,7 +826,7 @@ app.post('/archiveList', function(req, res) {
         })
         .catch((error) => {
             console.log(error);
-            return res.redirect('/lists?archive=failure');
+            return res.redirect('/lists?archive=error');
         }); 
 });
 
@@ -880,7 +880,7 @@ app.post('/removeCollaborator', function(req, res) {
         })
         .catch((error) => {
             console.log(error);
-            return res.redirect('/lists?removeCollaborator=failure');
+            return res.redirect('/lists?removeCollaborator=error');
         });
 });
 
@@ -920,7 +920,7 @@ app.post('/deleteLabel', function(req, res) {
         })
         .catch((error) => {
             console.log(error);
-            return res.redirect('/labels?deleteLabel=failure');
+            return res.redirect('/labels?deleteLabel=error');
         });
 })
 
@@ -933,7 +933,7 @@ app.post('/deleteAllLabels', function(req, res) {
         })
         .catch((error) => {
             console.log(error);
-            return res.redirect('/labels?deleteAll=failure');
+            return res.redirect('/labels?deleteAll=error');
         });
 })
 
@@ -944,7 +944,7 @@ app.post('/updateLabel', function(req, res) {
         })
         .catch((error) => {
             console.log(error);
-            return res.redirect('/labels?updateLabel=failure');
+            return res.redirect('/labels?updateLabel=error');
         });
 })
 
@@ -991,17 +991,17 @@ app.post('/createNewLabel', function(req, res) {
     const listId = req.body.listId;
 
     if(label.match(/^ *$/) !== null) {
-        return res.redirect('/labelsModal?createNewLabel=failure&listId=' + listId);
+        return res.redirect('/labelsModal?createNewLabel=error&listId=' + listId);
     }
 
     db.any(`SELECT * FROM labelsToUsers WHERE userId = '${req.session.user.id}' AND labelId IN(SELECT labelId FROM labels WHERE label = '${label}');`)
         .then((rows) => {
             if(rows.length > 0) {
                 if(req.query.redirect && req.query.redirect == 'labels') {
-                    return res.redirect('/labels?createNewLabel=failure'); 
+                    return res.redirect('/labels?createNewLabel=error'); 
                 }
 
-                return res.redirect('/labelsModal?createNewLabel=failure&listId=' + listId); 
+                return res.redirect('/labelsModal?createNewLabel=error&listId=' + listId); 
             }
             else {
                 db.any(`INSERT INTO labels (label) VALUES ('${label}');INSERT INTO labelsToUsers (labelId, userId) VALUES ((SELECT MAX(labelId) FROM labels), '${req.session.user.id}');`)
@@ -1014,13 +1014,13 @@ app.post('/createNewLabel', function(req, res) {
                     })
                     .catch((error) => {
                         console.log(error);
-                        return res.redirect('/labelsModal?createNewLabel=failure&listId=' + listId);
+                        return res.redirect('/labelsModal?createNewLabel=error&listId=' + listId);
                     });
             }
         })
         .catch((error) => {
             console.log(error);
-            return res.redirect('/labelsModal?createNewLabel=failure&listId=' + listId); 
+            return res.redirect('/labelsModal?createNewLabel=error&listId=' + listId); 
         });
 });
 
@@ -1062,7 +1062,7 @@ app.post('/assignLabelToList', function(req, res) {
     db.any(countQuery)
         .then((rows) => {
             if(rows.length > 0 && rows[0].count >= 10) {
-                return res.redirect('/lists?assignLabel=failure&maxlabels=true');
+                return res.redirect('/lists?assignLabel=error&maxlabels=true');
             } 
             else {
                 db.any(q)
@@ -1071,13 +1071,13 @@ app.post('/assignLabelToList', function(req, res) {
                     })
                     .catch((error) => {
                         console.log(error);
-                        return res.redirect('/lists?assignLabel=failure');
+                        return res.redirect('/lists?assignLabel=error');
                     });
             }
         })
         .catch((error) => {
             console.log(error);
-            return res.redirect('/lists?assignLabel=failure');
+            return res.redirect('/lists?assignLabel=error');
         });
 });
 
@@ -1088,7 +1088,7 @@ app.post('/removeLabelFromList', function(req, res) {
         })
         .catch((error) => {
             console.log(error);
-            return res.redirect('/lists?removeLabelFromList=failure');
+            return res.redirect('/lists?removeLabelFromList=error');
         });
 });
 
@@ -1098,7 +1098,7 @@ app.post('/addCollaborator', function(req, res) {
     db.any(countQuery)
         .then((rows) => {
             if(rows.length > 0 && rows[0].count >= 10) {
-                return res.redirect('/lists?addCollaborator=failure&max=true');
+                return res.redirect('/lists?addCollaborator=error&max=true');
             }
             else {
                 db.any(`INSERT INTO listsToUsers (listId, userId, owner, archive, pinned) SELECT '${req.body.listId}', '${req.body.collaboratorUserId}', FALSE, FALSE, FALSE WHERE NOT EXISTS (SELECT 1 FROM listsToUsers WHERE listId = '${req.body.listId}' AND userId = '${req.body.collaboratorUserId}');UPDATE lists SET editDateTime = '${req.body.now}' WHERE listId = '${req.body.listId}';`)
@@ -1110,18 +1110,18 @@ app.post('/addCollaborator', function(req, res) {
                             })
                             .catch((error) => {
                                 console.log(error);
-                                return res.redirect('/lists?addCollaborator=failure');
+                                return res.redirect('/lists?addCollaborator=error');
                             });
                         })
                     .catch((error) => {
                         console.log(error);
-                        return res.redirect('/lists?addCollaborator=failure');
+                        return res.redirect('/lists?addCollaborator=error');
                     });
             }
         })
         .catch((error) => {
             console.log(error);
-            return res.redirect('/lists?addCollaborator=failure');
+            return res.redirect('/lists?addCollaborator=error');
         });
 });
 

@@ -6,7 +6,7 @@
       </button>
     </div>
   
-    <div title="Edit list" data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid %>" data-toggle="modal" id="<%= list.listid %>" class="list col card card-body m-2" style="width:400px;overflow-x:scroll;background-color:#<%= list.color %>;" color="<%= list.color %>">
+    <div title="Edit list" data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid %>" data-toggle="modal" id="<%= list.listid %>" class="list col card card-body m-2" style="max-width:600px;min-width:240px;overflow-x:scroll;background-color:#<%= list.color %>;" color="<%= list.color %>">
       <div class="buttonSet row" style="font-weight:bold;padding-left:10px;">
             
           
@@ -115,14 +115,14 @@
         <% if(pinnedListIds.includes(list.listid)) { %>
           <form action="/unpinList" method="POST">
             <input class="form-control" name="listId" type="number" value=<%= list.listid %> hidden>
-            <button title="Unpin" type="submit" class="btn rounded-10 zoomSmall" style="background-color:white;position:absolute;right:355px;top:3px;padding: 0px;line-height: .25;width:20px">
+            <button title="Unpin" type="submit" class="btn rounded-10 zoomSmall" style="background-color:white;position:absolute;left:20px;top:3px;padding: 0px;line-height: .25;width:20px">
               <img src="/img/starYellow.png" style="width:15px" onmouseover="hover(this, 'star')" onmouseout="unhover(this, 'starYellow')">
             </button>
           </form>
         <% } else { %>
           <form action="/pinList" method="POST">
             <input class="form-control" name="listId" type="number" value=<%= list.listid %> hidden>
-            <button title="Pin" type="submit" class="btn rounded-10 zoomSmall" style="background-color:white;position:absolute;right:355px;top:3px;padding: 0px;line-height: .25;width:20px">
+            <button title="Pin" type="submit" class="btn rounded-10 zoomSmall" style="background-color:white;position:absolute;left:20px;top:3px;padding: 0px;line-height: .25;width:20px">
               <img src="/img/star.png" style="width:15px" onmouseover="hover(this, 'starYellow')" onmouseout="unhover(this, 'star')">
             </button>
           </form>
@@ -176,11 +176,11 @@
         <% }); %>
       </div>
   
-      <div class="result" style="padding-top:20px;font-weight:bold;width:60%;text-overflow:ellipsis;white-space: nowrap;overflow: hidden;">
+      <div class="result" style="padding-top:20px;padding-bottom:10px;font-weight:bold;">
         <%= list.title %>
       </div>
   
-      <div class="result">
+      <div class="result" style="overflow: hidden;">
         <% if(list.list) { %>
           <%- list.list %>
         <% } else if(!list.title) {%>

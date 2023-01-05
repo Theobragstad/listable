@@ -36,7 +36,8 @@
         </button>
       </form>
     <% } %>
-    <div style="padding-left:44px;">
+    
+    <!-- <div style="padding-left:44px;">
       <button disabled id="numSelectedLists" class="btn" style="font-size:12px;border-radius:10;background-color:#e8fcec;color:#17d475;border-color:#17d475;display: none;padding-left:20px">
         <button onclick="unselectAll()" title="Unselect all" id="unselectAll" class="btn" style="padding:0;position:absolute;top:115px;left:47px;display: none;z-index: 2;">
           <img src="/img/x.png" style="width:10px" onmouseover="hover(this, 'pinkX')" onmouseout="unhover(this, 'x')">
@@ -48,11 +49,42 @@
         <img src="/img/trash.png" style="width:15px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')">
       </button>
       <form style="display:inline" action="/restoreSelectedLists" method="POST">
-        <button id="restoreSelectedLists" title="Recover selected" class="btn rounded-10 zoom" name="listIds" style="position:absolute;top:163px;left:73px;border-color:#17d475;background-color:#e8fcec;padding: 0;line-height: .25;width:20px;display:none">
+        <button id="restoreSelectedLists" title="Recover selected" class="btn rounded-10 zoom" name="listIds" style="position:absolute;top:212.5px;left:73px;border-color:#17d475;background-color:#e8fcec;padding: 0;line-height: .25;width:20px;display:none">
           <img src="/img/restore.png" style="width:15px" onmouseover="hover(this, 'restorePink')" onmouseout="unhover(this, 'restore')">
         </button>
       </form>
-    </div>  
+    </div>   -->
+
+
+       
+  </div>
+
+
+  <div style="position:absolute;top:150px;left:45px">
+    <div style="">
+    <button disabled id="numSelectedLists" class="btn" style="font-size:12px;border-radius:10;background-color:#e8fcec;color:#17d475;border-color:#17d475;display: none;padding-left:20px">
+    <button onclick="unselectAll()" title="Unselect all" id="unselectAll" class="btn" style="position:absolute;bottom:38px;left:2px;padding:0;display: none;z-index: 2;"><img src="/img/x.png" style="width:10px" onmouseover="hover(this, 'pinkX')" onmouseout="unhover(this, 'x')"></button>
+
+    </button>  
+    </div>
+
+    <div style="padding-top:10px;">
+      <button data-id="" data-bs-toggle="modal" data-bs-target="#confirmPermanentlyDeleteSelected" href="#confirmPermanentlyDeleteSelected" data-toggle="modal" title="Permanently delete selected" id="delSelectedLists" name="listIds" class="btn rounded-10 zoom" style="border-color:#fb6f92;background-color:#ffe5ec;padding: 0;line-height: .25;width:20px;display: none;">
+        <img src="/img/trash.png" style="width:15px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')">
+      </button>
+    </div>
+
+
+    <form action="/restoreSelectedLists" method="POST">
+      <button id="restoreSelectedLists" title="Recover selected" class="btn rounded-10 zoom" name="listIds" style="position:absolute;bottom:0px;left:30px;border-color:#17d475;background-color:#e8fcec;padding: 0;line-height: .25;width:20px;display:none">
+        <img src="/img/restore.png" style="width:15px" onmouseover="hover(this, 'restorePink')" onmouseout="unhover(this, 'restore')">
+      </button>
+    </form>
+</div>
+
+
+
+  
   </div>
 
   <div class="row" style="overflow:auto;padding-top:50px;padding-left:20px;display:block">
@@ -122,11 +154,11 @@
       <div class="modal-content  mx-auto text-center" style="max-width:200px;padding:10px">
         Empty trash?
         <div class="mx-auto" style="padding-top:10px">
-          <button class="btn rounded-10" data-bs-dismiss="modal" style="width:90px;background:#e8fcec;color:#17d475;border-color: #17d475;">
+          <button class="btn rounded-10" data-bs-dismiss="modal" style="width:90px;background-color:#e8fcec;color:#17d475;border-color: #17d475;">
             Cancel
           </button>
           <form action="/emptyTrash" method="POST" style="padding-top:10px">
-            <button class="btn rounded-10" style="background:#ffe5ec;color:#fb6f92;border-color: #fb6f92;">
+            <button class="btn rounded-10" style="background-color:#ffe5ec;color:#fb6f92;border-color: #fb6f92;">
               Continue
             </button>
           </form>
@@ -140,12 +172,12 @@
       <div class="modal-content  mx-auto text-center" style="max-width:300px;padding:10px">
         <div id="permanentlyDeleteSelectedMessage"></div>
         <div class="mx-auto" style="padding-top:10px">
-          <button class="btn rounded-10" data-bs-dismiss="modal" style="width:90px;background:#e8fcec;color:#17d475;border-color: #17d475;">
+          <button class="btn rounded-10" data-bs-dismiss="modal" style="width:90px;background-color:#e8fcec;color:#17d475;border-color: #17d475;">
             Cancel
           </button>
           <form action="/permanentlyDeleteSelected" method="POST" style="padding-top:10px">
             <input id="modalListIds" name="listIds" value="" hidden>
-            <button class="btn rounded-10" style="background:#ffe5ec;color:#fb6f92;border-color: #fb6f92;">
+            <button class="btn rounded-10" style="background-color:#ffe5ec;color:#fb6f92;border-color: #fb6f92;">
               Continue
             </button>
           </form>
@@ -159,12 +191,12 @@
       <div class="modal-content  mx-auto text-center" style="max-width:200px;padding:10px">
         Permanently delete list?
         <div class="mx-auto" style="padding-top:10px">
-          <button class="btn rounded-10" data-bs-dismiss="modal" style="width:90px;background:#e8fcec;color:#17d475;border-color: #17d475;">
+          <button class="btn rounded-10" data-bs-dismiss="modal" style="width:90px;background-color:#e8fcec;color:#17d475;border-color: #17d475;">
             Cancel
           </button>
           <form action="/permanentlyDeleteList" method="POST" style="padding-top:10px">
             <input id="modalListId" name="listId" value="" hidden>
-            <button class="btn rounded-10"cstyle="background:#ffe5ec;color:#fb6f92;border-color: #fb6f92;">
+            <button class="btn rounded-10" style="background-color:#ffe5ec;color:#fb6f92;border-color: #fb6f92;">
               Continue
             </button>
           </form>

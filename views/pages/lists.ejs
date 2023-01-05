@@ -9,7 +9,7 @@
 
 <main>
 
-  <%- include ('../partials/menu') %>
+  <%- include ('../partials/menu1') %>
 
   <form action="/changeListView" method="POST">
     <% if(listViewType == 'column') { %>
@@ -74,17 +74,12 @@
 
      
       <div style="position:absolute;top:150px;left:60px">
-<!-- <div style="padding-left:44px;"> -->
-  <div style="">
-
-  <button disabled id="numSelectedLists" class="btn" style="font-size:12px;border-radius:10;background-color:#e8fcec;color:#17d475;border-color:#17d475;display: none;padding-left:20px">
-
-    <!-- <button disabled id="numSelectedLists" class="btn" style="font-size:12px;border-radius:10;background-color:#e8fcec;color:#17d475;border-color:#17d475;display: none;padding-left:20px"> -->
-      <!-- <button onclick="unselectAll()" title="Unselect all" id="unselectAll" class="btn" style="padding:0;position:absolute;top:199px;left:45px;display: none;z-index: 2;"><img src="/img/x.png" style="width:10px" onmouseover="hover(this, 'pinkX')" onmouseout="unhover(this, 'x')"></button> -->
-      <button onclick="unselectAll()" title="Unselect all" id="unselectAll" class="btn" style="position:absolute;bottom:48px;left:2px;padding:0;display: none;z-index: 2;"><img src="/img/x.png" style="width:10px" onmouseover="hover(this, 'pinkX')" onmouseout="unhover(this, 'x')"></button>
+    <div style="">
+    <button disabled id="numSelectedLists" class="btn" style="font-size:12px;border-radius:10;background-color:#e8fcec;color:#17d475;border-color:#17d475;display: none;padding-left:20px">
+    <button onclick="unselectAll()" title="Unselect all" id="unselectAll" class="btn" style="position:absolute;bottom:48px;left:2px;padding:0;display: none;z-index: 2;"><img src="/img/x.png" style="width:10px" onmouseover="hover(this, 'pinkX')" onmouseout="unhover(this, 'x')"></button>
 
     </button>  
-  </div>
+    </div>
 
 
 
@@ -177,7 +172,8 @@
 
 
 
-          <div id="overflowArrow" class="zoom" style="display:none;position:absolute;right:20px;top:200px"><img src="/img/rightArrow.png" style="width:30px"></div>
+          <div id="overflowArrowRight" class="zoom" style="display:none;position:absolute;right:20px;top:220px"><img src="/img/rightArrow.png" style="width:30px"></div>
+          <div id="overflowArrowLeft" class="zoom" style="display:none;position:absolute;left:20px;top:220px"><img src="/img/leftArrow.png" style="width:30px"></div>
 
 
 
@@ -1040,14 +1036,21 @@ function addButtonsIfOverflown() {
   var element = document.getElementById('list');
 
   if(isOverflown(element)) {
-    document.getElementById('overflowArrow').style.display = 'block';
+    document.getElementById('overflowArrowRight').style.display = 'block';
+    document.getElementById('overflowArrowLeft').style.display = 'block';
 
   }
 }
 
-const rightArrow = document.getElementById('overflowArrow');
+const rightArrow = document.getElementById('overflowArrowRight');
 rightArrow.onclick = function () {
       document.getElementById('list').scrollLeft += 30;
+};
+
+
+const leftArrow = document.getElementById('overflowArrowLeft');
+leftArrow.onclick = function () {
+      document.getElementById('list').scrollLeft -= 30;
 };
 
 addButtonsIfOverflown();

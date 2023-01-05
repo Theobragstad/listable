@@ -8,13 +8,13 @@
     </div>
   </a>
   <a href="/lists">
-    <button title="Go to lists" class="btn rounded-10 zoom" style="position:absolute;right:371px;top:20px;border-color:#f289ca;background-color:#ffe6ee;padding: 0;line-height: 1.35;width:30px">
+    <button title="Go to lists" class="btn rounded-10 zoom" style="position:absolute;right:413px;top:22px;border-color:#f289ca;background-color:#ffe6ee;padding: 0;line-height: 1.35;width:30px">
       <img src="/img/list.png" style="width:20px" onmouseover="hover(this, 'listPink')" onmouseout="unhover(this, 'list')">
     </button>
   </a>
 
-  <div class="" style="float:right;margin-right: 362px;">
-    <div style="position:absolute;top:10px;">
+  <div class="" style="float:right;margin-right: 405px;">
+    <div style="position:absolute;top:12px;">
       <nav class="navbar">
         <div class="container-fluid">
           <ul class="nav navbar-nav">
@@ -25,13 +25,13 @@
               </a>
               <div class="dropdown-menu" style="padding-bottom:0px">
                 <% if(allLabels.length == 0) { %>
-                  <div style="font-weight: bold;font-size:12px;padding-left:5px">Labels will appear here for quick access.</div>
+                  <div style="font-weight: bold;font-size:12px;padding-left:5px">Labels will appear here for quick access &nbsp;&nbsp;</div>
                 <% } %>
                 <% allLabels.forEach(function(label) { %>
                   <form action="/search?filterByLabel=true&labelId=<%= label.labelid %>" method="POST" style="padding-bottom:10px;padding-left:5px;padding-right: 5px;">
                     <input class="form-control" name="labelId" value="<%= label.labelid %>" hidden>
                     <input class="form-control" name="label" value="<%= label.label %>" hidden>
-                    <button title="View lists with label" class="btn rounded-pill" style="border-color: #03a9f4;background-color: #b3e5fc;color:#03a9f4;font-weight: bold;font-size:12px;max-width: 335px;text-overflow:ellipsis;overflow:hidden">
+                    <button title="View lists with label" class="btn rounded-pill" style="border-color: #03a9f4;background-color: #b3e5fc;color:#03a9f4;font-weight: bold;font-size:12px;max-width: 377px;text-overflow:ellipsis;overflow:hidden">
                       <%= label.label %>
                     </button>
                   </form>
@@ -45,25 +45,30 @@
   </div>
 
   <a href="/archive">
-    <button title="Go to archive" class="btn rounded-10 zoom" style="position:absolute;right:255px;top:20px;border-color:#f289ca;background-color:#ffe6ee;padding: 0;line-height: 1.25;width:30px">
+    <button title="Go to archive" class="btn rounded-10 zoom" style="position:absolute;right:300px;top:22px;border-color:#f289ca;background-color:#ffe6ee;padding: 0;line-height: 1.25;width:30px">
       <img src="/img/archive.png" style="width:20px" onmouseover="hover(this, 'archiveGreen')" onmouseout="unhover(this, 'archive')">
     </button>
   </a>
 
   <a href="/trash">
-    <button title="Go to trash" class="btn rounded-10 zoom" style="position:absolute;right:205px;top:20px;border-color:#f289ca;background-color:#ffe6ee;padding: 0;line-height: 1.25;width:30px">
+    <button title="Go to trash" class="btn rounded-10 zoom" style="position:absolute;right:250px;top:22px;border-color:#f289ca;background-color:#ffe6ee;padding: 0;line-height: 1.25;width:30px">
       <img src="/img/trash.png" style="width:20px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')">
     </button>
   </a>
 
-  <button data-bs-toggle="modal" data-bs-target="#tipsModal" onmouseover="setTextColor(this, '#f289ca')" onmouseout="setTextColor(this, 'black')" title="Tips & Help" class="btn rounded-10 zoom" style="position:absolute;right:138px;top:29px;color:black;background-color:white;padding: 0;line-height: 1.25;font-size: 12px;font-weight: bold;">
-    &#9432;
-  </button>
+  <div style="position:absolute;right:50px">
+    <div style="padding-right: 10px;">
+    <button data-bs-toggle="modal" data-bs-target="#tipsModal" onmouseover="setTextColor(this, '#f289ca')" onmouseout="setTextColor(this, 'black')" title="Tips & Help" class="btn rounded-10 zoomSmall" style="border-radius:50%;position:relative;right:25px;top:17px;color:black;background-color:#ffe6ee;padding: 7px;line-height: 1.25;font-size: 30px;font-weight: bold;">
+      
+    </button>
+  </div>
 
-  <button class="btn rounded-10 pull-right name " data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-custom-class="small-tooltip" data-bs-title="<%= user.email %>" style="border-color:#f289ca;background-color:#ffe6ee;position:absolute; top:10px; right:50px;font-size:12px">
-    <img src="<%= user.profilePhoto %>" style="width:20px;border-radius: 50%;">&nbsp;&nbsp;
-    <%= user.givenName %>
-  </button>
+    <button class="btn rounded-10 pull-right name " data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-custom-class="small-tooltip" data-bs-title="<%= user.email %>" style="position:relative;bottom:13px;border-color:#f289ca;background-color:#ffe6ee;font-size:12px">
+      <span style="text-overflow:ellipsis;overflow:hidden;max-width:135px;white-space: nowrap;display: block;">
+        <img src="<%= user.profilePhoto %>" style="width:20px;border-radius: 50%;">&nbsp;&nbsp;
+      <%= user.givenName %></span>
+    </button>
+</div>
 
   <a title="Log out" href="/logout" class="btn rounded-10 pull-right logout" style="height:33.25px;position:absolute;top:10.5px; right:5px;border-color:#000000;background-color:#ececec;font-size:12px">
     ←
@@ -103,6 +108,7 @@
             <li>Color</li>
           </ul>
           </li>
+          <li>Autosave is not yet available, so make sure to click the save button when you're done editing a list.</li>
         </ul>
         <hr>
         <span style="color:#f289ca;">More tips coming soon!</span>
