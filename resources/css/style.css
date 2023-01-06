@@ -244,8 +244,27 @@ mark.a0 {
 
 .buttonSet {
   display: none;
+  z-index:2;
 }
   
 .list:hover .buttonSet {
   display: block;
+  
 }
+
+
+.list:hover .buttonSet ~ .hideButton{
+  opacity: 0;
+  
+}
+
+
+
+
+
+
+
+/* .hideButton:hover{
+  opacity: 0;
+} */
+

@@ -4,21 +4,28 @@
   
     <div  data-bs-backdrop="static" data-bs-keyboard="false" class="modal fade" id="handleDeletionConflict" tabindex="-1" aria-labelledby="handleDeletionConflict" aria-modal="true" role="dialog" style="display: block;">
         <div class="modal-dialog">
-            <div class="modal-content mx-auto text-center justify-content-center" >
+            <div class="modal-content mx-auto text-center justify-content-center" style="padding:10px">
                 <div>
+                    <h4 class="logo" style="color:#fb6f92">
+                        Deletion warning
+                    </h4>
+                    <hr>
+
                     <h5>
-                        <%= sharedListIdsRaw.length %> of the <%= listIds.length %> selected lists is shared, and you are the owner.
-                        <br>
+                        <%= sharedListIdsRaw.length %> of the <%= listIds.length %> remaining list(s) selected for deletion is/are shared, and you are the owner.
+                        <br><br>
                         Any collaborators on shared list(s) you own will lose access if you delete this selection.
                     </h5>
 
-                    <a href="/<%= returnPage %>">
-                        <button class="btn rounded-10" style="background-color:#e8fcec;color:#17d475;border-color: #17d475;">
-                            Cancel
-                        </button>
-                    </a>
+                    <div style="padding-top:20px">
+                        <a href="/<%= returnPage %>">
+                            <button class="btn rounded-10" style="background-color:#e8fcec;color:#17d475;border-color: #17d475;">
+                                Cancel
+                            </button>
+                        </a>
+                    </div>
 
-                    <form action="/deleteSelectedLists?continue=true&ownShared=true" method="POST">
+                    <form action="/deleteSelectedLists?continue=true&ownShared=true" method="POST" style="padding-top:20px">
                         <input name="listIds" value="<%= listIds %>" hidden>
                         <input class="timeInput" class="form-control" name="now" hidden>
                         <button class="btn rounded-10" style="background-color:#ffe5ec;color:#fb6f92;border-color: #fb6f92;">

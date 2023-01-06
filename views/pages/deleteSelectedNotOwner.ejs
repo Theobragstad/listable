@@ -4,22 +4,32 @@
   
     <div  data-bs-backdrop="static" data-bs-keyboard="false" class="modal fade" id="handleDeletionConflict" tabindex="-1" aria-labelledby="handleDeletionConflict" aria-modal="true" role="dialog" style="display: block;">
         <div class="modal-dialog">
-            <div class="modal-content mx-auto text-center justify-content-center" >
+            <div class="modal-content mx-auto text-center justify-content-center" style="padding:10px">
                 <div>
+                    <h4 class="logo" style="color:#fb6f92">
+                        Deletion warning
+                    </h4>
+                    <hr>
+
                     <h5>
                         You do not own <%= unownedListIds.length %> of the <%= numberOfSelectedLists %> selected lists. 
-                        <br>
-                        Remove yourself from the one(s) you do not own and delete the one(s) that you do?
-                        <h6>Note: additionally, if there are any collaborators on lists you <i>do</i> own in this selection, they will lose access.</h6>
+                        <br><br>
+                        <% if(ownedListIds.length > 0) { %>
+                            Remove yourself from the <%= unownedListIds.length %> list(s) you do not own and delete the <%= ownedListIds.length %> list(s) that you do?
+                        <% } else { %>
+                            Remove yourself from the <%= unownedListIds.length %> list(s) you do not own?
+                        <% } %>
                     </h5>
 
-                    <a href="/<%= returnPage %>">
-                        <button class="btn rounded-10" style="background-color:#e8fcec;color:#17d475;border-color: #17d475;">
-                            Cancel
-                        </button>
-                    </a>
+                    <div style="padding-top:20px">
+                        <a href="/<%= returnPage %>">
+                            <button class="btn rounded-10" style="background-color:#e8fcec;color:#17d475;border-color: #17d475;">
+                                Cancel
+                            </button>
+                        </a>
+                    </div>
 
-                    <form action="/deleteSelectedLists?continue=true&notOwner=true" method="POST">
+                    <form action="/deleteSelectedLists?continue=true&notOwner=true" method="POST" style="padding-top:20px">
                         <input name="listIdsToRemove" value="<%= unownedListIds %>" hidden>
                         <input name="listIdsToDelete" value="<%= ownedListIds %>" hidden>
                         <input class="timeInput" class="form-control" name="now" hidden>

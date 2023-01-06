@@ -259,6 +259,9 @@
             <textarea name="list" id="textarea" class="form-control rounded-10"><%- list.list %></textarea>
           </form>
           <div data-bs-toggle="tooltip" data-bs-custom-class="timeTooltip" class="createTime" id="createTime<%= list.listid %>" data-value="<%= list.createdatetime %>" style="text-align:center;padding-top:5px;font-size:12px;font-weight: bold;">
+            <% if(archivedListIds.includes(list.listid)) { %>
+              <span style="padding: 1px;vertical-align: middle;">Archived List</span>
+              <% }  %>
             <button class="editTime btn" id="editTime<%= list.listid %>" data-value="<%= list.editdatetime %>" style="text-align:center;padding-top:5px;font-size:12px;font-weight: bold;"></button>
           </div>
         </div>

@@ -275,7 +275,7 @@ app.post('/search', function(req, res) {
         return res.redirect('/lists');
     }
 
-    var searchQuery = `SELECT lists.* FROM lists JOIN listsToUsers ON listsToUsers.listId = lists.listId WHERE listsToUsers.userId = '${req.session.user.id}' AND listsToUsers.archive = FALSE AND lists.trash = FALSE AND (LOWER(lists.color) LIKE '%${colorCodeToMatch1}%' OR LOWER(lists.color) LIKE '%${colorCodeToMatch2}%' OR LOWER(lists.title) LIKE '%${q}%' OR LOWER(lists.list) LIKE '%${q}%' OR lists.listId IN(SELECT listId FROM labelsToLists WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userId = '${req.session.user.id}' AND labelId IN(SELECT labelId FROM labels WHERE LOWER(label) LIKE '%${q}%'))) OR lists.listId IN(SELECT listId FROM listsToUsers WHERE userId IN(SELECT userId FROM emails_and_names WHERE LOWER(email) LIKE '%${q}%' OR LOWER(fullname) LIKE '%${q}%'))) ORDER BY listsToUsers.pinned DESC, lists.editDateTime DESC;`;
+    var searchQuery = `SELECT lists.* FROM lists JOIN listsToUsers ON listsToUsers.listId = lists.listId WHERE listsToUsers.userId = '${req.session.user.id}' AND lists.trash = FALSE AND (LOWER(lists.color) LIKE '%${colorCodeToMatch1}%' OR LOWER(lists.color) LIKE '%${colorCodeToMatch2}%' OR LOWER(lists.title) LIKE '%${q}%' OR LOWER(lists.list) LIKE '%${q}%' OR lists.listId IN(SELECT listId FROM labelsToLists WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userId = '${req.session.user.id}' AND labelId IN(SELECT labelId FROM labels WHERE LOWER(label) LIKE '%${q}%'))) OR lists.listId IN(SELECT listId FROM listsToUsers WHERE userId IN(SELECT userId FROM emails_and_names WHERE LOWER(email) LIKE '%${q}%' OR LOWER(fullname) LIKE '%${q}%'))) ORDER BY listsToUsers.pinned DESC, lists.editDateTime DESC;`;
 
     var renderPage = 'lists';
 
@@ -568,25 +568,54 @@ app.post('/deleteSelectedLists', function(req, res) {
         console.log(listIdsToDelete.length);
         console.log(listIdsToDelete);
 
-        var deletionQuery = `DELETE FROM listsToUsers WHERE listId IN(${listIdsToRemove}) AND userId = '${req.session.user.id}'; UPDATE lists SET editDateTime = '${req.body.now}' WHERE listId IN(${listIdsToRemove});`;
-        if(listIdsToDelete.length > 0) {
-            deletionQuery += `UPDATE lists SET trash = TRUE WHERE listId IN(${listIdsToDelete}); DELETE FROM listsToUsers WHERE userId != '${req.session.user.id}' AND listId IN (${listIdsToDelete}); UPDATE lists SET editDateTime = '${req.body.now}' WHERE listId IN(${listIdsToDelete});`;
-        }
+        ///
 
-
-        db.any(deletionQuery)
+        db.any(`DELETE FROM listsToUsers WHERE listId IN(${listIdsToRemove}) AND userId = '${req.session.user.id}'; UPDATE lists SET editDateTime = '${req.body.now}' WHERE listId IN(${listIdsToRemove});`)
             .then(() => {
-                return res.redirect('/lists?deleteSelected=success&count=' + (listIdsToRemove.length + listIdsToDelete.length));
+                db.any(`SELECT listId FROM listsToUsers WHERE listId IN(${listIdsToDelete}) GROUP BY listId HAVING COUNT(*) > 1;`)
+                    .then((sharedListIdsRaw) => {
+                        if(sharedListIdsRaw.length > 0) {
+                            return res.render('pages/deleteSelectedOwnShared', {sharedListIdsRaw, returnPage, listIds: listIdsToDelete});
+                        }
+                        else {
+                            db.any(`UPDATE lists SET trash = TRUE WHERE listId IN(${listIdsToDelete}); DELETE FROM listsToUsers WHERE userId != '${req.session.user.id}' AND listId IN (${listIdsToDelete}); UPDATE lists SET editDateTime = '${req.body.now}' WHERE listId IN(${listIdsToDelete});`)
+                                .then(() => {
+                                    return res.redirect('/lists?deleteSelected=success&count=' + (listIdsToRemove.length + listIdsToDelete.length));
+
+                                })
+                                .catch((error) => {
+                                    console.log(error);
+                                    return res.redirect('/lists?deleteSelected=error');
+                                }); 
+                        }
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                        return res.redirect('/lists?deleteSelected=error');
+                    }); 
             })
             .catch((error) => {
                 console.log(error);
                 return res.redirect('/lists?deleteSelected=error');
             }); 
+        
+
+        // var deletionQuery = `DELETE FROM listsToUsers WHERE listId IN(${listIdsToRemove}) AND userId = '${req.session.user.id}'; UPDATE lists SET editDateTime = '${req.body.now}' WHERE listId IN(${listIdsToRemove});`;
+        // if(listIdsToDelete.length > 0) {
+        //     deletionQuery += `UPDATE lists SET trash = TRUE WHERE listId IN(${listIdsToDelete}); DELETE FROM listsToUsers WHERE userId != '${req.session.user.id}' AND listId IN (${listIdsToDelete}); UPDATE lists SET editDateTime = '${req.body.now}' WHERE listId IN(${listIdsToDelete});`;
+        // }
+
+
+        // db.any(deletionQuery)
+        //     .then(() => {
+        //         return res.redirect('/lists?deleteSelected=success&count=' + (listIdsToRemove.length + listIdsToDelete.length));
+        //     })
+        //     .catch((error) => {
+        //         console.log(error);
+        //         return res.redirect('/lists?deleteSelected=error');
+        //     }); 
     }
     else if(req.query.continue && req.query.continue == 'true' && req.query.ownShared && req.query.ownShared == 'true') {
-        console.log("____________");
-        console.log(req.body.now);
-        console.log("____________");
         let listIds = [];
 
         if(req.body.listIds) {
