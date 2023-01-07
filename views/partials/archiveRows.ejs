@@ -1,14 +1,16 @@
 <% lists.forEach(function(list) { %>
-    <div class="col-1.5">
+    <!-- <div class="col-1.5"> -->
+        <div class="" style="padding-left:20px;">
+
     <div>
       <button title="Select list" id="" value=<%=list.listid %> class="btn rounded-10 zoom" style="position:relative;left:11px;top:29px;z-index: 1;line-height: .25;width:15px;padding: 0px;">
         <img class="listSelector" src="/img/colors/white.png" style="width:15px" onclick="changeImage(this, 'colors/white', 'colors/ffffffSelected')">
       </button>
     </div>
     <% if(pinnedListIds.includes(list.listid)) { %>
-      <div title="Edit list" data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid %>" data-toggle="modal" id="<%= list.listid %>" class="list col card card-body m-2" style="border:#FDFD96 3px solid;max-width:600px;min-width:240px;background-color:#<%= list.color %>;" color="<%= list.color %>">
+      <div title="Edit list" data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid %>" data-toggle="modal" id="<%= list.listid %>" class="list col card card-body m-2" style="border:#FDFD96 3px solid;max-width: 100%;background-color:#<%= list.color %>;" color="<%= list.color %>">
     <% } else { %>
-    <div title="Edit list" data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid %>" data-toggle="modal" id="<%= list.listid %>" class="list col card card-body m-2" style="max-width:600px;min-width:240px;background-color:#<%= list.color %>;" color="<%= list.color %>">
+    <div title="Edit list" data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid %>" data-toggle="modal" id="<%= list.listid %>" class="list col card card-body m-2" style="max-width: 100%;background-color:#<%= list.color %>;" color="<%= list.color %>">
       <% } %>
       <div class="buttonSet row" style="font-weight:bold;padding-left:10px;">
             
@@ -146,9 +148,11 @@
         <% }); %>
       </div>
   
+
       <div class="row g-0" style="padding-top:10px;">
         <% labels.forEach(function(label) { %>
           <% if(label.listid == list.listid) { %>
+
             <div class="col auto" style="padding-right:0; padding-left:10px;padding-bottom:5px;">
               <form action="/removeLabelFromList" method="POST">
                 <input class="form-control" name="listId" type="number" value="<%= list.listid %>" hidden>
@@ -289,3 +293,4 @@
       </div>
     </div>
   <% }); %>
+  <div style="padding-bottom:20px"></div>

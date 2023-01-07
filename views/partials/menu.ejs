@@ -10,11 +10,27 @@
       </div>
     </a>
 
+
+    <!-- <div class="col" style="padding-top:9px;padding-right:50px"> -->
+      <!-- <div style="padding-bottom:0px"> -->
+
+      <button onclick="goToTop()" id="upArrow" title="Go to top" class="btn zoom rounded-10" style="position:absolute;top:55px;left:4px;padding:0px;background-color: white;line-height: .25;width:20px">
+        <img src="/img/upArrow.png" style="width:100%">
+      </button>
+      <!-- </div> -->
+      <!-- <div style="padding-top:0px"> -->
+      <button onclick="goToBottom()" id="downArrow" title="Go to bottom" class="btn zoom rounded-10" style="position:absolute;top:75px;left:4px;padding:0px;background-color: white;line-height: .25;width:20px">
+        <img src="/img/downArrow.png" style="width:100%">
+      </button>
+    <!-- </div> -->
+    <!-- </div> -->
+
     <!-- <div style="position:absolute;right:10px"> -->
         <!-- <div style="position:absolute;">
         </div> -->
 
         <div class="row g-3" style="position:absolute;right:10px;top:10px">
+
 
             <div class="col" style="padding-top:9px">
             <a href="/lists" style="text-decoration:none">
@@ -73,7 +89,7 @@
         
  
                   <div class="col" style="padding-right: 5px;padding-top: 5px;padding-left:0px;">
-            <button data-bs-toggle="modal" data-bs-target="#tipsModal" onmouseover="setTextColor(this, '#f289ca')" onmouseout="setTextColor(this, 'black')" title="Tips & Help" class="btn rounded-10 zoomSmall" style="border-radius:50%;color:black;background-color:#ffe6ee;padding: 7px;line-height: 1.25;font-size: 30px;font-weight: bold;"></button>
+            <button data-bs-toggle="modal" data-bs-target="#tipsModal" onmouseover="setTextColor(this, '#f289ca')" onmouseout="setTextColor(this, 'black')" title="Tips & Help" class="btn rounded-10 zoomSmall" style="border-radius:50%;color:black;background-color:#ffe6ee;border-color:#f289ca;padding: 5px;line-height: .5;font-size: 12px;font-weight: bold;">?</button>
 </div>
 
 <div class="col" style="padding-right: 0px;padding-left: 0px;">
@@ -84,10 +100,10 @@
             </button>
         </div>
 
-        <div class="col" style="padding-left: 5px;padding-top:1px">
+        <div class="col" style="padding-left: 5px;">
 
-            <a title="Log out" href="/logout" class="btn rounded-10 logout" style="height:33.25px;border-color:#000000;background-color:#ececec;font-size:12px">
-                ←
+            <a onmouseover="hover(document.getElementById('logoutArrow'), 'leftArrowPink')" onmouseout="hover(document.getElementById('logoutArrow'), 'leftArrowBlack')" title="Log out" href="/logout" class="btn rounded-10 logout" style="height:33.25px;border-color:#000000;background-color:#ececec;font-size:12px">
+                <img id="logoutArrow" src="/img/leftArrowBlack.png" style="width:15px">
             </a>
         </div>
         </div>
@@ -98,15 +114,17 @@
 
   
     <%- include ('../partials/message') %>
+
+    
 </div>
 
 
   
   
-  <div class="modal fade" id="tipsModal" tabindex="-1" aria-labelledby="tipsModal" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content mx-auto" style="width:600px;padding:10px;background-color: #ffe6ee; border:#f289ca 3px solid;">
-        <div class="logo text-center" style="color:#f289ca;font-size:22px;"><img src="/img/brain.svg" style="position:absolute;left:10px;width:40px;">Tips & Help</div>
+  <div class="modal modal-lg fade" id="tipsModal" tabindex="-1" aria-labelledby="tipsModal" aria-hidden="true">
+    <div class="modal-dialog" >
+      <div class="modal-content mx-auto" style="padding:10px;background-color: #ffe6ee; border:#f289ca 3px solid;">
+        <div class="logo text-center" style="color:#f289ca;font-size:22px;">Tips & Help</div>
         <hr>
         <div class="logo" style="font-size:16px">
           <ul>
@@ -131,6 +149,7 @@
               </ul>
               <li>Label</li>
               <li>Color</li>
+              <li>Lists are stored as HTML, so you can even search to filter by specific content types using their HTML tag, such as 'li' for lists, 'strong' for bold text, and more!</li>
             </ul>
             </li>
             <li>Autosave is currently unavailable, so make sure to click the save button when you're done editing a list.</li>
@@ -138,9 +157,9 @@
             <li>Labels are sorted first by the number of lists they are associated with (descending), then alphabetically (ascending).</li>
           </ul>
           <hr>
-          <span style="color:#f289ca;">More tips coming soon!</span>
-          <br>
-          <a href="mailto:lists.communications@gmail.com" style="text-decoration:none">Contact us here</a>
+          <div class="text-center">
+          <a href="mailto:lists.communications@gmail.com" style="text-decoration:none">Contact</a>
+        </div>
         </div>
     </div>
     </div>
@@ -185,5 +204,61 @@
     }
   
     hideLogo();
+    setInterval(hideLogo, 1000);
+
+
+
+
+
+    let upArrow = document.getElementById("upArrow");
+    let downArrow = document.getElementById("downArrow");
+
+// When the user scrolls down 20px from the top of the document, show the button
+window.onscroll = function() {showUpDownArrows()};
+
+function showUpDownArrows() {
+  
+
+  if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+    upArrow.style.display = "block";
+    downArrow.style.display = "block";
+  } else {
+    upArrow.style.display = "none";
+    downArrow.style.display = "none";
+  }
+
+  // if((document.body.scrollHeight > document.body.clientHeight)) {
+  //   downArrow.style.display = "block";
+  // }
+
+  // else 
+  // if((document.documentElement.scrollHeight > document.documentElement.clientHeight)) {
+    
+  // }
+  // else {
+   
+  // }
+
+  
+}
+
+
+
+// When the user clicks on the button, scroll to the top of the document
+function goToTop() {
+  document.body.scrollTop = 0; // For Safari
+  document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+}
+
+
+function goToBottom() {
+  window.scrollTo(0, document.body.scrollHeight);
+  window.scrollTo(0, document.documentElement.scrollHeight);
+}
+
+
+showUpDownArrows();
+setInterval(showUpDownArrows, 1000);
+
   
   </script>

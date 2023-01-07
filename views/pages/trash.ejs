@@ -93,7 +93,7 @@
         <button title="Select list" id="" value=<%=list.listid %> class="btn rounded-10 zoom" style="padding:0;position:relative;left:26px;top:10px;z-index: 2;line-height:.25;width:15px;height:15px">
           <img class="listSelector" src="/img/colors/white.png" style="width:15px" onclick="changeImage(this, 'colors/white', 'colors/ffffffSelected')">
         </button>
-        <div title="Lists in trash cannot be edited" data-bs-toggle="" data-bs-target="#editList<%= list.listid%>" type="" href="#editList<%= list.listid%>" data-toggle="modal" id="<%= list.listid %>" class="col card card-body m-2" style="min-width: 250px;overflow-x:scroll;background-color:#<%= list.color %>;">
+        <div title="Lists in trash cannot be edited" data-bs-toggle="" data-bs-target="#editList<%= list.listid%>" type="" href="#editList<%= list.listid%>" data-toggle="modal" id="<%= list.listid %>" class="list col card card-body m-2" style="min-width: 250px;overflow-x:scroll;background-color:#<%= list.color %>;">
           <div class="row" style="font-weight:bold;padding-left:10px">
             <div style="width:70%;text-overflow:ellipsis;white-space: nowrap;overflow: hidden; ">
               <%= list.title %>
@@ -130,7 +130,7 @@
               <% } %>
             <% }); %>
           </div>
-          <div data-bs-toggle="tooltip" data-bs-custom-class="timeTooltip" class="createTime" id="createTime<%= list.listid%>" data-value="<%= list.createdatetime %>" style="text-align:center;padding-top:5px;font-size:12px;font-weight: bold;">
+          <div data-bs-toggle="tooltip" data-bs-custom-class="timeTooltip" class="createTime hide" id="createTime<%= list.listid%>" data-value="<%= list.createdatetime %>" style="text-align:center;padding-top:5px;font-size:12px;font-weight: bold;">
             <button class="editTime btn" id="editTime<%= list.listid%>" data-value="<%= list.editdatetime %>" style="text-align:center;padding-top:5px;font-size:12px;font-weight: bold;"></button>
           </div>
         </div>

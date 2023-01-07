@@ -5,11 +5,11 @@
 
   <form action="/changeListView" method="POST">
     <% if(listViewType == 'column' ) { %>
-      <button title="Switch to row view" class="btn zoom" style="padding:2px;padding-top:0px;padding-bottom:0px;position:absolute;top:150px;left:20px;border-color:#000000;background-color:#ececec;">
+      <button title="Switch to row view" class="btn zoom" style="padding:2px;padding-top:0px;padding-bottom:0px;position:absolute;top:150px;left:25px;border-color:#000000;background-color:#ececec;">
         <img src="/img/row.png" style="width:15px">
       </button>
     <% } else if(listViewType == 'row' ) { %>
-      <button title="Switch to column view" class="btn zoom" style="padding:2px;padding-top:0px;padding-bottom:0px;position:absolute;top:150px;left:20px;border-color:#000000;background-color:#ececec;">
+      <button title="Switch to column view" class="btn zoom" style="padding:2px;padding-top:0px;padding-bottom:0px;position:absolute;top:150px;left:25px;border-color:#000000;background-color:#ececec;">
         <img src="/img/column.png" style="width:15px">
       </button>
     <% } %>
@@ -118,7 +118,7 @@
             <input class="timeInput" class="form-control" name="now" hidden>
             <input tabindex="-1" class="form-control rounded-10 text-center" type="text" maxlength="50" name="title" placeholder="Add a title...">
             <div class="text-center" style="padding-bottom:4px">
-              <button data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="small-tooltip" data-bs-title="Be sure to save. Autosave is currently unavailable." class="btn rounded-10" style="border-color:#17d475;background-color:#e8fcec;padding: .25rem .4rem;line-height: .75;width:100%">
+              <button data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="small-tooltip" data-bs-title="Be sure to save. Autosave is currently unavailable." class="btn rounded-10" style="border-color:#17d475;background-color:#e8fcec;padding: .25rem .4rem;line-height: .75;width:50px">
                 Save
               </button>
             </div>
@@ -139,16 +139,22 @@
     <img src="/img/leftArrow.png" style="width:30px">
   </div>
 
-  <div class="row" id="list" style="overflow:auto;padding-top:0px;padding-left:20px;display:block">
+  <!-- <div class="row" id="list" style="overflow:auto;padding-top:0px;padding-left:20px;display:block"> -->
+    <div class="row" id="list" style="overflow-x:scroll;padding-top:0px;padding-left:20px;display:block">
+
     <% if(listViewType == 'column') { %>
-      <div class="d-flex">
+      <div class="d-flex" >
         <%- include ('../partials/listColumns') %>
         <div style="padding-right:20px"></div>
       </div>
+      <div style="padding-top:20px"></div>
+
     <% } else { %>
       <div class="row" style="padding-top: 0px;">
         <%- include ('../partials/listRows') %>
+        
       </div>
+      
     <% } %>
   </div>
 
@@ -683,23 +689,25 @@ function setTimeEdited(editDateTime, divId) {
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const thenMonthAbbr = months[thenMonth-1];
 
-  var thenDateFormatted = (thenDate < 10) ? '0' + thenDate : thenDate;
-  
+  // var thenDateFormatted = (thenDate < 10) ? '0' + thenDate : thenDate;
+  var thenDateFormatted = thenDate;
 
   if(nowYear > thenYear) {
-    var message = 'Edited ' + thenMonthAbbr + ' ' + thenDateFormatted + ' ' + thenYear;
+    var message = 'Edited ' + thenMonthAbbr + ' ' + thenDateFormatted  + ', ' + thenYear + ' at ' + thenTime;
+    // var message = 'Edited ' + thenMonthAbbr + ' ' + thenDateFormatted + ' ' + thenYear;
     document.getElementById(divId).innerHTML = message;
   }
   else if(nowYear == thenYear && nowMonth == thenMonth && nowDate == thenDate) {
-      var message = 'Edited ' + thenTime;
+      var message = 'Edited today at ' + thenTime;
       document.getElementById(divId).innerHTML = message;
   }
   else if(nowYear == thenYear && nowMonth == thenMonth && nowDate == (thenDate+1)) {
-      var message = 'Edited yesterday, ' + thenTime;
+      var message = 'Edited yesterday at ' + thenTime;
       document.getElementById(divId).innerHTML = message;
   }
   else if(nowYear == thenYear && nowMonth >= thenMonth && nowDate > (thenDate+1)) {
-      var message = 'Edited ' + thenMonthAbbr + ' ' + thenDateFormatted;
+      // var message = 'Edited ' + thenMonthAbbr + ' ' + thenDateFormatted;
+      var message = 'Edited ' + thenMonthAbbr + ' ' + thenDateFormatted  + ', ' + thenYear + ' at ' + thenTime;
       document.getElementById(divId).innerHTML = message;
   }
   else {
@@ -747,22 +755,23 @@ function setTimeCreated(createDateTime, divId) {
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const thenMonthAbbr = months[thenMonth-1];
 
-  var thenDateFormatted = (thenDate < 10) ? '0' + thenDate : thenDate;
+  // var thenDateFormatted = (thenDate < 10) ? '0' + thenDate : thenDate;
+  var thenDateFormatted = thenDate;
 
   if(nowYear > thenYear) {
-    var message = 'Created ' + thenMonthAbbr + ' ' + thenDateFormatted + ' ' + thenYear;
+    var message = 'Created ' + thenMonthAbbr + ' ' + thenDateFormatted  + ', ' + thenYear + ' at ' + thenTime;
     // document.getElementById(divId).setAttribute('data-bs-title', message);
   }
   else if(nowYear == thenYear && nowMonth == thenMonth && nowDate == thenDate) {
-      var message = 'Created ' + thenTime;
+      var message = 'Created today at ' + thenTime;
       // document.getElementById(divId).innerHTML = message;
   }
   else if(nowYear == thenYear && nowMonth == thenMonth && nowDate == (thenDate+1)) {
-      var message = 'Created yesterday, ' + thenTime;
+      var message = 'Created yesterday at ' + thenTime;
       // document.getElementById(divId).innerHTML = message;
   }
   else if(nowYear == thenYear && nowMonth >= thenMonth && nowDate > (thenDate+1)) {
-      var message = 'Created ' + thenMonthAbbr + ' ' + thenDateFormatted;
+      var message = 'Created ' + thenMonthAbbr + ' ' + thenDateFormatted  + ', ' + thenYear + ' at ' + thenTime;
       // document.getElementById(divId).innerHTML = message;
   }
   else {
@@ -911,20 +920,28 @@ function addButtonsIfOverflown() {
     document.getElementById('overflowArrowLeft').style.display = 'block';
 
   }
+
+  if(element.scrollLeft == (element.scrollWidth - element.clientWidth)) {
+    document.getElementById('overflowArrowRight').style.display = 'none';
+  }
+  if(element.scrollLeft == 0) {
+    document.getElementById('overflowArrowLeft').style.display = 'none';
+  }
 }
 
 const rightArrow = document.getElementById('overflowArrowRight');
 rightArrow.onclick = function () {
-      document.getElementById('list').scrollLeft += 30;
+      document.getElementById('list').scrollLeft += 200;
 };
 
 
 const leftArrow = document.getElementById('overflowArrowLeft');
 leftArrow.onclick = function () {
-      document.getElementById('list').scrollLeft -= 30;
+      document.getElementById('list').scrollLeft -= 200;
 };
 
 addButtonsIfOverflown();
+setInterval(addButtonsIfOverflown, 1000);
 
 
 

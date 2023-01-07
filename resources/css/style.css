@@ -128,7 +128,7 @@ input#q:focus {
   .timeTooltip {
     /* --bs-tooltip-bg: #f289ca; */
     /* --bs-tooltip-color: white; */
-    font-size:12px;
+    font-size:10px;
     font-weight:bold;
 
   }
@@ -259,6 +259,13 @@ mark.a0 {
 }
 
 
+.list .hide{
+  display:none;
+}
+
+.list:hover .hide {
+  display:block;
+}
 
 
 
