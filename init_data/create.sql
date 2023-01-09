@@ -13,7 +13,8 @@ CREATE TABLE lists (
     color VARCHAR(6) NOT NULL,
     trash BOOLEAN NOT NULL,
     editDateTime VARCHAR(19) NOT NULL,
-    createDateTime VARCHAR(19) NOT NULL
+    createDateTime VARCHAR(19) NOT NULL,
+    lastModifiedByUserId TEXT
 );
 
 CREATE TABLE listsToUsers (
@@ -22,7 +23,7 @@ CREATE TABLE listsToUsers (
     owner BOOLEAN NOT NULL,
     archive BOOLEAN NOT NULL,
     pinned BOOLEAN NOT NULL,
-    editable BOOLEAN
+    editable BOOLEAN NOT NULL
 );
 
 CREATE TABLE labels (

@@ -1,13 +1,26 @@
 <% lists.forEach(function(list) { %>
+  <% var editable = false; %>
+  <% for(let i = 0; i < collaborators.length; i++) { %>
+    <% if(collaborators[i].listid == list.listid && collaborators[i].userid == user.id && collaborators[i].editable) { %>
+      <% editable = true; %>
+      <% break; %>
+    <% } %>
+  <% } %>
+
+
     <div class="col-1.5">
     <div>
       <button title="Select list" id="" value=<%=list.listid %> class="btn rounded-10 zoom" style="position:relative;left:11px;top:29px;z-index: 1;line-height: .25;width:15px;padding: 0px;">
         <img class="listSelector" src="/img/colors/white.png" style="width:15px" onclick="changeImage(this, 'colors/white', 'colors/ffffffSelected')">
       </button>
     </div>
-    <% if(pinnedListIds.includes(list.listid)) { %>
+    <% if(editable && pinnedListIds.includes(list.listid)) { %>
       <div title="Edit list" data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid %>" data-toggle="modal" id="<%= list.listid %>" class="list col card card-body m-2" style="border:#FDFD96 3px solid;max-width:600px;min-width:240px;background-color:#<%= list.color %>;" color="<%= list.color %>">
-    <% } else { %>
+    <% } else if(!editable && pinnedListIds.includes(list.listid)) { %>
+      <div title="You can only view this list" data-bs-toggle="" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid %>" data-toggle="" id="<%= list.listid %>" class="list col card card-body m-2" style="border:#FDFD96 3px solid;max-width:600px;min-width:240px;background-color:#<%= list.color %>;" color="<%= list.color %>">
+      <% } else if(!editable) { %>
+        <div title="You can only view this list" data-bs-toggle="" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid %>" data-toggle="" id="<%= list.listid %>" class="list col card card-body m-2" style="max-width:600px;min-width:240px;background-color:#<%= list.color %>;" color="<%= list.color %>">
+          <% } else { %>
     <div title="Edit list" data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid %>" data-toggle="modal" id="<%= list.listid %>" class="list col card card-body m-2" style="max-width:600px;min-width:240px;background-color:#<%= list.color %>;" color="<%= list.color %>">
       <% } %>
       <div class="buttonSet row" style="font-weight:bold;padding-left:10px;">
@@ -58,7 +71,11 @@
         <% } %>
   
         <div class="col">
-          <button title="Change color" onclick="setSelectedColor('<%= list.color %>')" type="button" class="btn rounded-10 zoom" data-id="<%= list.listid %>" data-bs-toggle="modal" data-bs-target="#listColors" style="background-color:white;position:absolute;right:50px;padding: 0px;line-height: .25;width:20px">
+          <% if(editable) { %>
+            <button title="Change color" onclick="setSelectedColor('<%= list.color %>')" type="button" class="btn rounded-10 zoom" data-id="<%= list.listid %>" data-bs-toggle="modal" data-bs-target="#listColors" style="border-color:white;background-color:white;position:absolute;right:50px;padding: 0px;line-height: .25;width:20px">
+              <% } else { %>
+                <button disabled title="Change color" onclick="setSelectedColor('<%= list.color %>')" type="button" class="btn rounded-10 zoom" data-id="<%= list.listid %>" data-bs-toggle="modal" data-bs-target="#listColors" style="border-color:white;background-color:white;position:absolute;right:50px;padding: 0px;line-height: .25;width:20px">
+                  <% } %>
             <img src="/img/palette.png" style="width:20px" onmouseover="hover(this, 'paletteColors')" onmouseout="unhover(this, 'palette')">
           </button>
         </div>
@@ -101,7 +118,11 @@
         <% } %>
   
         <div class="col">
-          <button title="Add collaborator" type="button" class="btn rounded-10 zoom" data-id="<%= list.listid %>" data-bs-toggle="modal" data-bs-target="#addCollaborator<%= list.listid %>" href="#addCollaborator<%= list.listid %>" data-toggle="modal" style="background-color:white;position:absolute;right:140px;padding: 2px;line-height: .25;width:20px">
+          <% if(editable) { %>
+            <button title="Add collaborator" type="button" class="btn rounded-10 zoom" data-id="<%= list.listid %>" data-bs-toggle="modal" data-bs-target="#addCollaborator<%= list.listid %>" href="#addCollaborator<%= list.listid %>" data-toggle="modal" style="border-color:white;background-color:white;position:absolute;right:140px;padding: 2px;line-height: .25;width:20px">
+          <% } else { %>
+            <button disabled title="Add collaborator" type="button" class="btn rounded-10 zoom" data-id="<%= list.listid %>" data-bs-toggle="modal" data-bs-target="#addCollaborator<%= list.listid %>" href="#addCollaborator<%= list.listid %>" data-toggle="modal" style="border-color:white;background-color:white;position:absolute;right:140px;padding: 2px;line-height: .25;width:20px">
+          <% } %>
             <img src="/img/addCollaborator.png" style="width:15px" onmouseover="hover(this, 'addCollaboratorBlue')" onmouseout="unhover(this, 'addCollaborator')">
           </button>
         </div>
@@ -198,13 +219,13 @@
   
     <div class="modal fade" id="addCollaborator<%= list.listid %>" tabindex="-1" aria-labelledby="addCollaborator" aria-hidden="true">
       <div class="modal-dialog">
-        <div class="modal-content mx-auto text-center justify-content-center" style="width:500px">
-          <div style="padding-top:10px">
+        <div class="modal-content mx-auto text-center justify-content-center" style="width:550px">
+          <div class="logo" style="padding-top:10px">
             <h6>Add collaborator</h6>
           </div>
           <div style="padding-top:10px;padding-bottom:5px;padding:10px">
             <form action="/searchUsers" method="POST">
-              <input class="form-control" type="text" name="q" placeholder="Search users..." oninvalid="this.setCustomValidity('Enter a name or email')" oninput="setCustomValidity('')" required>
+              <input class="form-control" type="text" name="q" placeholder="search users..." oninvalid="this.setCustomValidity('Enter a name or email')" oninput="setCustomValidity('')" required>
               <input class="form-control" name="listIdToCollaborate" type="text" value="<%= list.listid %>" hidden>
               <div style="padding-top:10px;">
                 <button class="btn rounded-pill" style="border-color: #03a9f4;background-color: #b3e5fc;color:#03a9f4;font-size:12px">
@@ -214,7 +235,7 @@
             </form>
           </div>
           <div style="padding-top:10px;padding-bottom:5px;padding:10px">
-            <h6>Current collaborators</h6>
+            <h6 class="logo">Current collaborators</h6>
             <% if(canDelete && n > 1) { %>
               <div style="padding-bottom:10px">
                 <button data-bs-toggle="modal" data-bs-target="#confirmRemoveAllCollaborators<%= list.listid %>" href="#confirmRemoveAllCollaborators<%= list.listid %>" data-toggle="modal" title="Remove all collaborators" class="btn rounded-10 zoomSmall" style="padding-left:4px;padding-right:4px;padding-top:2px;padding-bottom:2px;color:#fb6f92;background-color:#ffe5ec;font-size: 12px;">
@@ -235,6 +256,9 @@
                       <% if(collaborator.owner) { %>
                         <% deletePrivileges = (collaborator.userid == user.id) ? true : false; %>
                         (owner)
+                        <% if(collaborator.userid == user.id) { %>
+                          (you)
+                        <% } %>
                     </button>
                   </div>
                       <% } else if(collaborator.userid == user.id) { %>
@@ -246,7 +270,7 @@
                   </div>
                 <% } %>
                 <% if(deletePrivileges && collaborator.userid != user.id) { %>
-                  <div class="col-2">
+                  <div class="col-1">
                     <form action="/removeCollaborator" method="POST">
                       <input class="timeInput" class="form-control" name="now" hidden>
                       <input type="number" name="listId" value=<%=list.listid %> hidden>
@@ -254,6 +278,21 @@
                       <button title="Remove collaborator" class="btn zoom rounded-10" style="padding:0px">
                         <img src="/img/redX.png" style="width:15px;">
                       </button>
+                    </form>
+                  </div>
+                  <div class="col-1">
+                    <form action="/changePermissions" method="POST">
+                      <input type="number" name="listId" value=<%= list.listid %> hidden>
+                      <input type="number" name="userId" value=<%= collaborator.userid %> hidden>
+                      <% if(collaborator.editable) { %>
+                      <button title="Change to view only" class="btn zoom rounded-10" style="padding:0px">
+                        <img src="/img/edit.png" style="width:15px;">
+                      </button>
+                      <% } else { %>
+                        <button title="Change to edit" class="btn zoom rounded-10" style="padding:0px">
+                          <img src="/img/view.png" style="width:20px;">
+                        </button>
+                      <% } %>
                     </form>
                   </div>
                 <% } %>
@@ -277,7 +316,7 @@
             <textarea name="list" id="textarea" class="form-control rounded-10"><%- list.list %></textarea>
             
             <div class="text-center" style="padding-bottom:4px">
-              <button data-bs-toggle="tooltip" data-bs-html="true" data-bs-custom-class="small-tooltip" data-bs-title="Be sure to save. Autosave is currently unavailable." class="btn rounded-10" style="border-color:#17d475;background-color:#e8fcec;padding: .25rem .4rem;line-height: .75;width:50px">
+              <button data-bs-toggle="tooltip" data-bs-html="true" data-bs-custom-class="small-tooltip" data-bs-title="Be sure to save. Autosave is currently unavailable." class="btn rounded-10 logo" style="border-color:#17d475;background-color:#e8fcec;padding: .25rem .4rem;line-height: .75;width:50px">
                 Save
               </button>
             </div>

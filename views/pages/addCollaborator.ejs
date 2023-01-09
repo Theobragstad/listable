@@ -29,15 +29,15 @@
 
             </div>
             <div class="modal-header" style="padding-top:40px">
-              <h5 class="modal-title" id="myModalLabel">Collaborator Search Results</h5>
+              <h5 class="modal-title logo" id="myModalLabel">Collaborator Search Results</h5>
             </div>
             <div class="modal-body">
 
 
                 <% if(users.length == 0) { %>
-                    No users found (or you've already shared this list with that person)
+                    <div style="font-size:18px;">No users found (or this list is already shared with them)</div>
                 <% } else { %>
-                    <div style="color:#fb6f92;font-weight: bold;font-size:12px;padding-bottom:10px" >Select a person to collaborate on this list with:</div>
+                    <div style="color:#fb6f92;font-weight: bold;font-size:12px;padding-bottom:10px">Select a person to collaborate on this list with:</div>
                 <% } %>
 
                 <% users.forEach(function(user) { %>
@@ -47,7 +47,7 @@
                             <input class="form-control" name="collaboratorUserId" type="text" value="<%= user.userid %>" hidden>
                             <input class="form-control" name="listId" type="text" value="<%= listid %>" hidden>
                             <input class="form-control" name="email" type="text" value="<%= user.email %>" hidden>
-                    <button class="btn rounded-pill" style=font-weight:bold;font-size:12px;background-color:#e6d4ff;">
+                    <button class="btn rounded-pill zoomExtraSmall" style=font-weight:bold;font-size:12px;background-color:#e6d4ff;">
                       <img src="<%= user.profilephotourl %>" style="width:20px;border-radius: 50%;">&nbsp;&nbsp;&nbsp;&nbsp;<%= user.fullname %> < <%= user.email %> >
                 </button>
             </form>
