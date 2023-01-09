@@ -132,15 +132,15 @@
   </div>
 
   <div id="overflowArrowRight" class="zoom" style="display:none;position:absolute;right:20px;top:220px">
-    <img src="/img/rightArrow.png" style="width:30px">
+    <img src="/img/rightArrow.png" style="width:30px" onmouseover="hover(this, 'rightArrowPink')" onmouseout="unhover(this, 'rightArrow')">
   </div>
 
   <div id="overflowArrowLeft" class="zoom" style="display:none;position:absolute;left:20px;top:220px">
-    <img src="/img/leftArrow.png" style="width:30px">
+    <img src="/img/leftArrow.png" style="width:30px" onmouseover="hover(this, 'leftArrowPink')" onmouseout="unhover(this, 'leftArrow')">
   </div>
 
-  <!-- <div class="row" id="list" style="overflow:auto;padding-top:0px;padding-left:20px;display:block"> -->
-    <div class="row" id="list" style="overflow-x:scroll;padding-top:0px;padding-left:20px;display:block">
+  <div class="row" id="list" style="overflow:auto;padding-top:0px;padding-left:20px;display:block">
+    <!-- <div class="row" id="list" style="overflow-x:scroll;padding-top:0px;padding-left:20px;display:block"> -->
 
     <% if(listViewType == 'column') { %>
       <div class="d-flex" >

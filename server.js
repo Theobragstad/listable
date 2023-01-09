@@ -700,55 +700,294 @@ app.post('/deleteSelectedLists', function(req, res) {
     }
 });
 
-app.post('/copySelected', function(req, res) {
-    var array = req.body.listIds.split(',');
-    var result = array.map(function (x) { 
-        return parseInt(x, 10); 
-    });
-
-    db.any(`SELECT * FROM lists WHERE listId IN(${result});`)
-        .then((listsToCopy) => {
-            var insertListsQuery = '';
-            for(var i = 0; i < listsToCopy.length; i++) {
-                insertListsQuery += `INSERT INTO lists (title, list, color, trash, editDateTime, createDateTime) VALUES ('${listsToCopy[i].title.replace(/'/g, "''")}', '${listsToCopy[i].list.replace(/'/g, "''")}', '${listsToCopy[i].color}', FALSE, '${req.body.now}', '${req.body.now}');`;
+app.post('/copy', function(req, res) {
+    db.any(`SELECT labelId FROM labelsToLists WHERE listId = '${req.body.listId}';`)
+        .then((labelIdsRaw) => {
+            var labelIdsPure = [];
+            for(var i = 0; i < labelIdsRaw.length; i++) {
+                labelIdsPure.push(labelIdsRaw[i].labelid);
             }
 
-            db.any(insertListsQuery)
-                .then(() => {
-                    db.any(`SELECT listId FROM lists ORDER BY listId DESC LIMIT ${result.length};`)
-                        .then((listIdsRaw) => {
-                            var listIdsPure = [];
-                            for(var i = 0; i < listIdsRaw.length; i++) {
-                                listIdsPure.push(listIdsRaw[i].listid);
+            db.any(`INSERT INTO lists (title, list, color, trash, editDateTime, createDateTime) VALUES ('${req.body.title.replace(/'/g, "''")}', '${req.body.list.replace(/'/g, "''")}', '${req.body.color}', FALSE, '${req.body.now}', '${req.body.now}') RETURNING listId;`)
+                .then((listId) => {
+                    var assignLabelsToListQuery = '';
+                    for(var i = 0; i < labelIdsPure.length; i++) {
+                        assignLabelsToListQuery += `INSERT INTO labelsToLists (labelId, listId) VALUES ('${labelIdsPure[i]}', '${listId[0].listid}');`;
+                    }
+
+                    db.any(assignLabelsToListQuery + `INSERT INTO listsToUsers (listId, userId, owner, archive, pinned) VALUES (${listId[0].listid}, '${req.session.user.id}', TRUE, FALSE, FALSE);`)
+                        .then(() => {
+                            if(req.query.archived && req.query.archived == 'true') {
+                                return res.redirect('/lists?copyArchived=success');
                             }
 
-                            var insertListsToUsersQuery = '';
-                            for(var i = 0; i < listIdsPure.length; i++) {
-                                insertListsToUsersQuery += `INSERT INTO listsToUsers (listId, userId, owner, archive, pinned) VALUES (${listIdsPure[i]}, '${req.session.user.id}', TRUE, FALSE, FALSE);`;
-                            }
-
-                            db.any(insertListsToUsersQuery)
-                                .then(() => {
-                                    return res.redirect('/lists?copySelected=success');
-                                })
-                                .catch((error) => {
-                                    console.log(error);
-                                    return res.redirect('/lists?copySelected=error');
-                                }); 
+                            return res.redirect('/lists?copy=success');
                         })
                         .catch((error) => {
                             console.log(error);
-                            return res.redirect('/lists?copySelected=error');
+                            return res.redirect('/lists?copy=error');
                         });
                 })
                 .catch((error) => {
                     console.log(error);
-                    return res.redirect('/lists?copySelected=error');
+                    return res.redirect('/lists?copy=error');
+                });  
+        })
+        .catch((error) => {
+            console.log(error);
+            return res.redirect('/lists?copy=error');
+        });
+});
+
+
+
+
+
+
+
+app.get('/idk', function(req, res) {
+    // const collaborators = db.any(`SELECT users.email, users.profilePhotoUrl, users.fullname, users.userId, listsToUsers.listId, listsToUsers.owner FROM listsToUsers INNER JOIN users ON listsToUsers.userId = users.userId ORDER BY owner DESC;`);
+
+db.any(`SELECT * FROM labelsToLists JOIN labelsToUsers ON labelsToLists.labelId = labelsToUsers.labelId;`)
+    .then((result) => {
+    
+        return res.send(result);
+    })
+    .catch((error) => {
+        console.log(error);
+        return res.send(error)
+    });
+
+
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+app.post('/copySelected', function(req, res) {
+    var listIdsRaw = req.body.listIds.split(',');
+    var listIdsPure = listIdsRaw.map(function (x) { 
+        return parseInt(x, 10); 
+    });
+
+    var now = req.body.now;
+    var userId = req.session.user.id;
+   
+    db.tx(t => {
+        let lists = db.any(`SELECT * FROM lists WHERE listId IN(${listIdsPure});`);
+        let listsToUsers = db.any(`SELECT * FROM listsToUsers WHERE listId IN(${listIdsPure});`);
+        let latestListId = db.any(`SELECT MAX(listId) FROM lists;`);        
+        let labelIds = db.any(`SELECT * FROM labelsToLists JOIN labelsToUsers ON labelsToLists.labelId = labelsToUsers.labelId WHERE labelsToLists.listId IN(${listIdsPure});`)
+        let userIdsAndEmails = db.any(`SELECT userId, email FROM users;`);
+
+        return t.batch([lists, listsToUsers, latestListId, labelIds, userIdsAndEmails]); 
+    })
+        .then((data) => {
+            var lists = data[0];
+            var listsToUsers = data[1];
+            var latestListId = data[2][0].max;
+            var labelIds = data[3];
+            var userIdsAndEmails = data[4];
+
+            var nextListId = latestListId + 1;
+
+            var copyAll = '';
+
+
+            for(let i = 0; i < lists.length; i++) {
+                let listIdToMatch = lists[i].listid;
+
+                var copyList = `INSERT INTO 
+                                lists (title, list, color, trash, editDateTime, createDateTime) 
+                                VALUES 
+                                ('${lists[i].title.replace(/'/g, "''")}', '${lists[i].list.replace(/'/g, "''")}', '${lists[i].color}', FALSE, '${now}', '${now}');`;
+
+
+                var owner = 'false'
+               
+                for(let j = 0; j < listsToUsers.length; j++) {
+                    if(listsToUsers[j].listid == listIdToMatch && listsToUsers[j].userid == userId && listsToUsers[j].owner) {
+                        owner = 'true';
+                        break;
+                    }
+                }
+
+                let collabsToAdd = '';
+
+                if(owner == 'true') {
+                    for(let j = 0; j < listsToUsers.length; j++) {
+                        if(listsToUsers[j].listid == listIdToMatch) {
+                            collabsToAdd += `INSERT INTO 
+                                            listsToUsers (listId, userId, owner, archive, pinned) 
+                                            VALUES ('${nextListId}', '${listsToUsers[j].userid}', '${listsToUsers[j].owner}', '${listsToUsers[j].archive}', '${listsToUsers[j].pinned}');`;
+                        
+                            if(listsToUsers[j].userid != userId) {
+                                let recipientEmail = '';
+                                for(let k = 0; k < userIdsAndEmails.length; k++) {
+                                    if(userIdsAndEmails[k].userid == listsToUsers[j].userid) {
+                                        recipientEmail = userIdsAndEmails[k].email;
+                                        break;
+                                    }
+                                }
+                                sendCollaborationEmail(recipientEmail, req.session.user.email, req.session.user.displayName, lists[i].title, lists[i].list, 'true');
+                            }
+                        }
+                    }
+                }
+                else {
+                    console.log('not owner');
+                    console.log(userId);
+                    console.log(listIdToMatch);
+                    for(let j = 0; j < listsToUsers.length; j++) {
+                        console.log(listsToUsers[j]);
+            
+                        if(listsToUsers[j].listid == listIdToMatch && listsToUsers[j].userid == userId) {
+                            collabsToAdd += `INSERT INTO 
+                                            listsToUsers (listId, userId, owner, archive, pinned) 
+                                            VALUES ('${nextListId}', '${listsToUsers[j].userid}', TRUE, '${listsToUsers[j].archive}', '${listsToUsers[j].pinned}');`;
+                            break;
+                        }
+                    }
+                }
+
+
+                let labelsToAdd = '';
+
+                if(owner == 'true') {
+                    for(let j = 0; j < labelIds.length; j++) {
+                        if(labelIds[j].listid == listIdToMatch) {
+                            labelsToAdd += `INSERT INTO labelsToLists (labelId, listId) VALUES ('${labelIds[j].labelid}', '${nextListId}');`;
+                        }
+                    }
+                }
+                else {
+                    for(let j = 0; j < labelIds.length; j++) {
+                        if(labelIds[j].listid == listIdToMatch && labelIds[j].userid == userId) {
+                            labelsToAdd += `INSERT INTO labelsToLists (labelId, listId) VALUES ('${labelIds[j].labelid}', '${nextListId}');`;
+                        }
+                    }
+                }
+
+
+                copyAll += copyList;
+                copyAll += collabsToAdd;
+                copyAll += labelsToAdd;
+                nextListId++;
+            }
+
+            db.any(copyAll)
+                .then(() => {
+                    return res.redirect('/lists?copyselected=success');
+                })
+                .catch((error) => {
+                    console.log(error);
+                    return res.redirect('/lists?copyselected=error');
                 });
         })
         .catch((error) => {
             console.log(error);
-            return res.redirect('/lists?copySelected=error');
+            return res.redirect('/lists?copyselected=error');
         });
 });
 
@@ -859,44 +1098,24 @@ app.post('/restoreAll', function(req, res) {
         });
 });
 
-app.post('/copy', function(req, res) {
-    db.any(`SELECT labelId FROM labelsToLists WHERE listId = '${req.body.listId}';`)
-        .then((labelIdsRaw) => {
-            var labelIdsPure = [];
-            for(var i = 0; i < labelIdsRaw.length; i++) {
-                labelIdsPure.push(labelIdsRaw[i].labelid);
-            }
 
-            db.any(`INSERT INTO lists (title, list, color, trash, editDateTime, createDateTime) VALUES ('${req.body.title.replace(/'/g, "''")}', '${req.body.list.replace(/'/g, "''")}', '${req.body.color}', FALSE, '${req.body.now}', '${req.body.now}') RETURNING listId;`)
-                .then((listId) => {
-                    var assignLabelsToListQuery = '';
-                    for(var i = 0; i < labelIdsPure.length; i++) {
-                        assignLabelsToListQuery += `INSERT INTO labelsToLists (labelId, listId) VALUES ('${labelIdsPure[i]}', '${listId[0].listid}');`;
-                    }
 
-                    db.any(assignLabelsToListQuery + `INSERT INTO listsToUsers (listId, userId, owner, archive, pinned) VALUES (${listId[0].listid}, '${req.session.user.id}', TRUE, FALSE, FALSE);`)
-                        .then(() => {
-                            if(req.query.archived && req.query.archived == 'true') {
-                                return res.redirect('/lists?copyArchived=success');
-                            }
 
-                            return res.redirect('/lists?copy=success');
-                        })
-                        .catch((error) => {
-                            console.log(error);
-                            return res.redirect('/lists?copy=error');
-                        });
-                })
-                .catch((error) => {
-                    console.log(error);
-                    return res.redirect('/lists?copy=error');
-                });  
+app.post('/removeAllCollaborators', function(req, res) {
+    db.any(`DELETE FROM listsToUsers WHERE listId = '${req.body.listId}' AND userId IN(SELECT userId FROM users WHERE userId != '${req.session.user.id}'); DELETE FROM labelsToLists WHERE listId = '${req.body.listId}' AND labelId IN(SELECT labelId FROM labelsToUsers WHERE userId != '${req.session.user.id}');`)
+        .then(() => {
+            // console.log(req.body.listId);
+            // console.log(req.body.now);
+            return res.redirect('/lists?removeallcollaborators=success');
         })
         .catch((error) => {
             console.log(error);
-            return res.redirect('/lists?copy=error');
+            // return res.send(error);
+            return res.redirect('/lists?removeallcollaborators=error');
         });
 });
+
+
 
 app.post('/restoreSelectedLists', function(req, res) {
     var array = req.body.listIds.split(',');
@@ -1254,7 +1473,7 @@ app.post('/addCollaborator', function(req, res) {
                     .then(() => {
                         db.any(`SELECT title, list FROM lists WHERE listId = '${req.body.listId}';`)
                             .then((list) => {
-                                sendCollaborationEmail(req.body.email, req.session.user.email, req.session.user.displayName, list[0].title, list[0].list);
+                                sendCollaborationEmail(req.body.email, req.session.user.email, req.session.user.displayName, list[0].title, list[0].list, 'false');
                                 return res.redirect('/lists?addCollaborator=success');
                             })
                             .catch((error) => {
@@ -1279,7 +1498,7 @@ app.post('/addCollaborator', function(req, res) {
 
 // Functions
 
-function sendCollaborationEmail(emailTo, emailFrom, nameFrom, title, list) {
+function sendCollaborationEmail(emailTo, emailFrom, nameFrom, title, list, copy) {
     var listInfo = '';
     if(title) {
         listInfo = title.substring(0,10);
@@ -1292,6 +1511,14 @@ function sendCollaborationEmail(emailTo, emailFrom, nameFrom, title, list) {
         if(list.length > 10) {
             listInfo += '...';
         }
+    }
+
+    var subject =  nameFrom + ' shared their list "' + listInfo + '" with you';
+    var html = 'Hello!<br><br><b>' + nameFrom + '</b> (' + emailFrom + ')' + ' has shared their list "<b>' + listInfo + '</b>" with you.<br><br>Log in to your lists account to collaborate on it with them!';
+
+    if(copy == 'true') {
+        subject = nameFrom + ' copied a list you have access to: "' + listInfo + '"';
+        html = 'Hello!<br><br><b>' + nameFrom + '</b> (' + emailFrom + ')' + ' has copied a list you have access to: "<b>' + listInfo + '</b>".<br><br>You now have access to the new copy as well, with your original labels preserved.<br><br>Log in to your lists account to collaborate on it with them!';
     }
 
     let transporter = nodemailer.createTransport({
@@ -1311,8 +1538,8 @@ function sendCollaborationEmail(emailTo, emailFrom, nameFrom, title, list) {
       let mailOptions = {
         from: 'lists.communications@gmail.com',
         to: emailTo,
-        subject: nameFrom + ' shared their list "' + listInfo + '" with you',
-        html: 'Hello!<br><br><b>' + nameFrom + '</b> (' + emailFrom + ')' + ' has shared their list "<b>' + listInfo + '</b>" with you.<br><br>Log in to your lists account to collaborate on it with them!'
+        subject: subject,
+        html: html
       };
 
       transporter.sendMail(mailOptions, (error, info) => {

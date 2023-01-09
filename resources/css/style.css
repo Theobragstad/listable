@@ -104,6 +104,24 @@ input#q:focus {
 
 
 
+  .zoomExtraSmall {
+    /* padding: 50px;
+    background-color: green; */
+    transition: transform .2s; /* Animation */
+    /* width: 200px;
+    height: 200px;
+    margin: 0 auto; */
+  }
+  
+  .zoomExtraSmall:hover {
+    transform: scale(1.05); /* (150% zoom - Note: if the zoom is too large, it will go outside of the viewport) */
+    /* border-radius: 10px; */
+    
+  }
+
+
+
+
   
   .signin:hover {
    
@@ -274,4 +292,5 @@ mark.a0 {
 /* .hideButton:hover{
   opacity: 0;
 } */
+
 

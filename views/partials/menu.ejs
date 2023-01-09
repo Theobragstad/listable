@@ -1,6 +1,4 @@
-
-
-<div class="sticky-top" style="z-index:2">
+<div class="sticky-top menu" style="z-index:2;">
     <a href="/lists">
       <div class="logo" id="logo" style="position:absolute; top:10px; left:10px">
         <img id="brain" class="zoomSmall" src="/img/brain.svg" style="width:60px;">
@@ -15,12 +13,12 @@
       <!-- <div style="padding-bottom:0px"> -->
 
       <button onclick="goToTop()" id="upArrow" title="Go to top" class="btn zoom rounded-10" style="position:absolute;top:55px;left:4px;padding:0px;background-color: white;line-height: .25;width:20px">
-        <img src="/img/upArrow.png" style="width:100%">
+        <img src="/img/upArrow.png" style="width:100%" onmouseover="hover(this, 'upArrowPink')" onmouseout="unhover(this, 'upArrow')">
       </button>
       <!-- </div> -->
       <!-- <div style="padding-top:0px"> -->
       <button onclick="goToBottom()" id="downArrow" title="Go to bottom" class="btn zoom rounded-10" style="position:absolute;top:75px;left:4px;padding:0px;background-color: white;line-height: .25;width:20px">
-        <img src="/img/downArrow.png" style="width:100%">
+        <img src="/img/downArrow.png" style="width:100%" onmouseover="hover(this, 'downArrowPink')" onmouseout="unhover(this, 'downArrow')">
       </button>
     <!-- </div> -->
     <!-- </div> -->
@@ -100,7 +98,7 @@
             </button>
         </div>
 
-        <div class="col" style="padding-left: 5px;">
+        <div class="col" style="padding-left: 5px;padding-top:1px">
 
             <a onmouseover="hover(document.getElementById('logoutArrow'), 'leftArrowPink')" onmouseout="hover(document.getElementById('logoutArrow'), 'leftArrowBlack')" title="Log out" href="/logout" class="btn rounded-10 logout" style="height:33.25px;border-color:#000000;background-color:#ececec;font-size:12px">
                 <img id="logoutArrow" src="/img/leftArrowBlack.png" style="width:15px">
@@ -116,8 +114,8 @@
     <%- include ('../partials/message') %>
 
     
+    
 </div>
-
 
   
   
@@ -155,6 +153,7 @@
             <li>Autosave is currently unavailable, so make sure to click the save button when you're done editing a list.</li>
             <li>Lists are sorted first by pins, then most recently edited.</li>
             <li>Labels are sorted first by the number of lists they are associated with (descending), then alphabetically (ascending).</li>
+            <li>Copying a list also copies any labels and/or collaborators (if you are the owner) to the new list.</li>
           </ul>
           <hr>
           <div class="text-center">

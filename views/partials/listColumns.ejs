@@ -215,12 +215,19 @@
           </div>
           <div style="padding-top:10px;padding-bottom:5px;padding:10px">
             <h6>Current collaborators</h6>
+            <% if(canDelete && n > 1) { %>
+              <div style="padding-bottom:10px">
+                <button data-bs-toggle="modal" data-bs-target="#confirmRemoveAllCollaborators<%= list.listid %>" href="#confirmRemoveAllCollaborators<%= list.listid %>" data-toggle="modal" title="Remove all collaborators" class="btn rounded-10 zoomSmall" style="padding-left:4px;padding-right:4px;padding-top:2px;padding-bottom:2px;color:#fb6f92;background-color:#ffe5ec;font-size: 12px;">
+                  Remove all
+                </button>
+              </div>
+            <% } %>
             <% var deletePrivileges = false; %>
             <% collaborators.forEach(function(collaborator) { %>
               <% if(collaborator.listid == list.listid) { %>
                 <div class="row g-0" style="padding-bottom:5px;">
                   <div class="col-10" style="margin-left:0px">
-                    <button class="btn rounded-pill" style="right:100px;font-weight:bold;font-size:12px;background-color:#e6d4ff;">
+                    <button class="btn rounded-pill zoomExtraSmall" style="right:100px;font-weight:bold;font-size:12px;background-color:#e6d4ff;">
                       <img src="<%= collaborator.profilephotourl %>" style="width:20px;border-radius: 50%;">
                       &nbsp;&nbsp;&nbsp;&nbsp;
                       <%= collaborator.fullname %>
@@ -299,6 +306,29 @@
               Cancel
             </button>
             <form action="/deleteList" method="POST" style="padding-top:10px">
+              <input class="timeInput" class="form-control" name="now" hidden>
+              <input type="number" name="listId" value=<%=list.listid %> hidden>
+              <button class="btn rounded-10" style="background:#ffe5ec;color:#fb6f92;border-color: #fb6f92;">
+                Continue
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="modal" id="confirmRemoveAllCollaborators<%= list.listid %>" tabindex="-1" aria-labelledby="confirmRemoveAllCollaborators<%= list.listid %>" aria-hidden="true">
+      <div class="modal-dialog ">
+        <div class="modal-content  mx-auto text-center" style="max-width:200px;padding:10px">
+          Remove all collaborators?
+          <br>
+          Only you will have access.
+          <div class="mx-auto" style="padding-top:10px">
+            <button class="btn rounded-10" data-bs-dismiss="modal" style="width:90px;background:#e8fcec;color:#17d475;border-color: #17d475;">
+              Cancel
+            </button>
+            <form action="/removeAllCollaborators" method="POST" style="padding-top:10px">
               <input class="timeInput" class="form-control" name="now" hidden>
               <input type="number" name="listId" value=<%=list.listid %> hidden>
               <button class="btn rounded-10" style="background:#ffe5ec;color:#fb6f92;border-color: #fb6f92;">

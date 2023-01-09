@@ -21,7 +21,8 @@ CREATE TABLE listsToUsers (
     userId TEXT NOT NULL REFERENCES users(userId),
     owner BOOLEAN NOT NULL,
     archive BOOLEAN NOT NULL,
-    pinned BOOLEAN NOT NULL
+    pinned BOOLEAN NOT NULL,
+    editable BOOLEAN
 );
 
 CREATE TABLE labels (
