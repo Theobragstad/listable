@@ -86,8 +86,8 @@ app.get('/auth/callback/success' , (req , res) => {
         res.redirect('/auth/callback/failure');
     }
     else {
-        db.any(`INSERT INTO users (userId, email, fullname, profilePhotoUrl, listViewType)
-                VALUES ('${req.user.id}', '${req.user.email}', '${req.user.displayName}', '${req.user.photos[0].value}', 'column')
+        db.any(`INSERT INTO users (userId, email, fullname, profilePhotoUrl, listViewType, listPassword)
+                VALUES ('${req.user.id}', '${req.user.email}', '${req.user.displayName}', '${req.user.photos[0].value}', 'column', NULL)
                 ON CONFLICT (userId) DO UPDATE 
                 SET email = excluded.email, 
                     fullname = excluded.fullname,
@@ -194,7 +194,7 @@ app.get('/lists', function(req, res) {
     db.tx(t => {
         const lists = db.any(`SELECT lists.* FROM lists JOIN listsToUsers ON listsToUsers.listId = lists.listId WHERE listsToUsers.userId = '${req.session.user.id}' AND listsToUsers.archive = FALSE AND lists.trash = FALSE ORDER BY listsToUsers.pinned DESC, lists.editDateTime DESC;`);
         // const collaborators = db.any(`SELECT users.email, users.profilePhotoUrl, users.fullname, users.userId, listsToUsers.listId, listsToUsers.owner FROM listsToUsers INNER JOIN users ON listsToUsers.userId = users.userId ORDER BY owner DESC;`);
-        const collaborators = db.any(`SELECT users.email, users.profilePhotoUrl, users.fullname, users.userId, listsToUsers.listId, listsToUsers.owner, listsToUsers.editable FROM listsToUsers INNER JOIN users ON listsToUsers.userId = users.userId ORDER BY owner DESC;`);
+        const collaborators = db.any(`SELECT users.email, users.profilePhotoUrl, users.fullname, users.userId, listsToUsers.listId, listsToUsers.owner, listsToUsers.editable, listsToUsers.locked FROM listsToUsers INNER JOIN users ON listsToUsers.userId = users.userId ORDER BY owner DESC;`);
 
         const labels = db.any(`CREATE OR REPLACE VIEW labelsJoinlabelsToLists AS (SELECT labels.labelId, labels.label, labelsToLists.listId FROM labelsToLists INNER JOIN labels ON labelsToLists.labelId = labels.labelId);SELECT * FROM labelsJoinlabelsToLists WHERE labelId IN(SELECT labelId from labelsToUsers where userId = '${req.session.user.id}');`);
         const allLabels = db.any(`SELECT * FROM labels WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userID = '${req.session.user.id}') AND labelID IN(SELECT labels.labelId AS "numberOfLists" FROM labels LEFT JOIN labelsToLists ON labels.labelId = labelsToLists.labelId GROUP BY labels.labelId ORDER BY COUNT(labelsToLists.labelId) DESC, label ASC);`);
@@ -204,7 +204,7 @@ app.get('/lists', function(req, res) {
 
         return t.batch([lists, collaborators, labels, allLabels, archivedLists, listViewType, pinnedLists]); 
     })
-        .then((data) => {
+        .then((data) => {            
             var archivedListIds = [];
             var archivedListIdsRaw = data[4];
             for(var i = 0; i < archivedListIdsRaw.length; i++) {
@@ -353,9 +353,9 @@ app.post('/addListWithThisLabel', function(req, res) {
     var title = (!req.body.title) ? '' : req.body.title;
     var labelId = req.body.labelId;
 
-    db.any(`INSERT INTO lists (title, list, color, trash, editDateTime, createDateTime) VALUES ('${title.replace(/'/g, "''")}', '${req.body.list.replace(/'/g, "''")}', 'ffffff', FALSE, '${req.body.now}', '${req.body.now}') RETURNING listId;`)
+    db.any(`INSERT INTO lists (title, list, color, trash, editDateTime, createDateTime, lastModifiedByEmail) VALUES ('${title.replace(/'/g, "''")}', '${req.body.list.replace(/'/g, "''")}', 'ffffff', FALSE, '${req.body.now}', '${req.body.now}', '${req.session.user.email}') RETURNING listId;`)
         .then((listId) => {
-            db.any(`INSERT INTO listsToUsers (listId, userId, owner, archive, pinned, editable) VALUES (${listId[0].listid}, '${req.session.user.id}', TRUE, FALSE, FALSE, TRUE); INSERT INTO labelsToLists (labelId, listId) VALUES (${labelId}, ${listId[0].listid});`)
+            db.any(`INSERT INTO listsToUsers (listId, userId, owner, archive, pinned, editable, locked) VALUES (${listId[0].listid}, '${req.session.user.id}', TRUE, FALSE, FALSE, TRUE, FALSE); INSERT INTO labelsToLists (labelId, listId) VALUES (${labelId}, ${listId[0].listid});`)
                 .then(() => {
                     return res.redirect('/search?filterByLabel=true&labelId='+ labelId +'&add=success');
                 })
@@ -434,9 +434,9 @@ app.post('/emptyTrash', function(req, res) {
 app.post('/addList', function(req, res) {
     var title = (!req.body.title) ? '' : req.body.title;
 
-    db.any(`INSERT INTO lists (title, list, color, trash, editDateTime, createDateTime) VALUES ('${title.replace(/'/g, "''")}', '${req.body.list.replace(/'/g, "''")}', 'ffffff', FALSE, '${req.body.now}', '${req.body.now}') RETURNING listId;`)
+    db.any(`INSERT INTO lists (title, list, color, trash, editDateTime, createDateTime, lastModifiedByEmail) VALUES ('${title.replace(/'/g, "''")}', '${req.body.list.replace(/'/g, "''")}', 'ffffff', FALSE, '${req.body.now}', '${req.body.now}', '${req.session.user.email}') RETURNING listId;`)
         .then((listId) => {
-            db.any(`INSERT INTO listsToUsers (listId, userId, owner, archive, pinned, editable) VALUES (${listId[0].listid}, '${req.session.user.id}', TRUE, FALSE, FALSE, TRUE);`)
+            db.any(`INSERT INTO listsToUsers (listId, userId, owner, archive, pinned, editable, locked) VALUES (${listId[0].listid}, '${req.session.user.id}', TRUE, FALSE, FALSE, TRUE, FALSE);`)
                 .then(() => {
                     return res.redirect('/lists?add=success');
                 })
@@ -452,7 +452,7 @@ app.post('/addList', function(req, res) {
 });
 
 app.post('/changeListColor', function(req, res) {
-    db.any(`UPDATE lists SET color = '${req.body.color}', editDateTime = '${req.body.now}' WHERE listId = ${req.body.listId};`)
+    db.any(`UPDATE lists SET color = '${req.body.color}', editDateTime = '${req.body.now}', lastModifiedByEmail = '${req.session.user.email}' WHERE listId = ${req.body.listId};`)
         .then(() => {
             if(req.query.archived && req.query.archived == 'true') {
                 return res.redirect('/archive?changeColor=success');
@@ -514,7 +514,7 @@ app.post('/setColorSelected', function(req, res) {
 
             console.log(listIds);
             if(listIds.length == result.length) {
-                db.any(`UPDATE lists SET color = '${req.body.color}', editDateTime = '${req.body.now}' WHERE listId IN(${listIds});`)
+                db.any(`UPDATE lists SET color = '${req.body.color}', editDateTime = '${req.body.now}', lastModifiedByEmail = '${req.session.user.email}' WHERE listId IN(${listIds});`)
                     .then(() => {
                         return res.redirect('/lists?setcolorselected=success');
                     })
@@ -524,7 +524,7 @@ app.post('/setColorSelected', function(req, res) {
                     });
             }
             else if(listIds.length > 0 && listIds.length < result.length) {
-                db.any(`UPDATE lists SET color = '${req.body.color}', editDateTime = '${req.body.now}' WHERE listId IN(${listIds});`)
+                db.any(`UPDATE lists SET color = '${req.body.color}', editDateTime = '${req.body.now}', lastModifiedByEmail = '${req.session.user.email}' WHERE listId IN(${listIds});`)
                     .then(() => {
                         return res.redirect('/lists?setcolorselected=someuneditable');
                     })
@@ -587,7 +587,7 @@ app.get('/pinorder', function(req, res) {
 
 app.post('/deleteList', function(req, res) {
     console.log(req.body.now)
-    db.any(`UPDATE lists SET trash = TRUE WHERE listId = ${req.body.listId}; DELETE FROM listsToUsers WHERE userId != '${req.session.user.id}' AND listId = ${req.body.listId}; UPDATE lists SET editDateTime = '${req.body.now}' WHERE listId = ${req.body.listId};`)
+    db.any(`UPDATE lists SET trash = TRUE WHERE listId = ${req.body.listId}; DELETE FROM listsToUsers WHERE userId != '${req.session.user.id}' AND listId = ${req.body.listId}; UPDATE lists SET editDateTime = '${req.body.now}', lastModifiedByEmail = '${req.session.user.email}' WHERE listId = ${req.body.listId};`)
         .then(() => {
             if(req.query.archived && req.query.archived == 'true') {
                 return res.redirect('/archive?delete=success');
@@ -642,7 +642,7 @@ app.post('/deleteSelectedLists', function(req, res) {
 
         ///
 
-        db.any(`DELETE FROM listsToUsers WHERE listId IN(${listIdsToRemove}) AND userId = '${req.session.user.id}'; UPDATE lists SET editDateTime = '${req.body.now}' WHERE listId IN(${listIdsToRemove});`)
+        db.any(`DELETE FROM listsToUsers WHERE listId IN(${listIdsToRemove}) AND userId = '${req.session.user.id}'; UPDATE lists SET editDateTime = '${req.body.now}', lastModifiedByEmail = '${req.session.user.email}' WHERE listId IN(${listIdsToRemove});`)
             .then(() => {
                 db.any(`SELECT listId FROM listsToUsers WHERE listId IN(${listIdsToDelete}) GROUP BY listId HAVING COUNT(*) > 1;`)
                     .then((sharedListIdsRaw) => {
@@ -650,7 +650,7 @@ app.post('/deleteSelectedLists', function(req, res) {
                             return res.render('pages/deleteSelectedOwnShared', {sharedListIdsRaw, returnPage, listIds: listIdsToDelete});
                         }
                         else {
-                            db.any(`UPDATE lists SET trash = TRUE WHERE listId IN(${listIdsToDelete}); DELETE FROM listsToUsers WHERE userId != '${req.session.user.id}' AND listId IN (${listIdsToDelete}); UPDATE lists SET editDateTime = '${req.body.now}' WHERE listId IN(${listIdsToDelete});`)
+                            db.any(`UPDATE lists SET trash = TRUE WHERE listId IN(${listIdsToDelete}); DELETE FROM listsToUsers WHERE userId != '${req.session.user.id}' AND listId IN (${listIdsToDelete}); UPDATE lists SET editDateTime = '${req.body.now}', lastModifiedByEmail = '${req.session.user.email}' WHERE listId IN(${listIdsToDelete});`)
                                 .then(() => {
                                     return res.redirect('/lists?deleteSelected=success&count=' + (listIdsToRemove.length + listIdsToDelete.length));
 
@@ -697,7 +697,7 @@ app.post('/deleteSelectedLists', function(req, res) {
             });
         }
 
-        db.any(`UPDATE lists SET trash = TRUE WHERE listId IN(${listIds}); DELETE FROM listsToUsers WHERE userId != '${req.session.user.id}' AND listId IN (${listIds}); UPDATE lists SET editDateTime = '${req.body.now}' WHERE listId IN(${listIds});`)
+        db.any(`UPDATE lists SET trash = TRUE WHERE listId IN(${listIds}); DELETE FROM listsToUsers WHERE userId != '${req.session.user.id}' AND listId IN (${listIds}); UPDATE lists SET editDateTime = '${req.body.now}', lastModifiedByEmail = '${req.session.user.email}' WHERE listId IN(${listIds});`)
             .then(() => {
                 return res.redirect('/lists?deleteSelected=success&count=' + (listIds.length));
             })
@@ -741,7 +741,7 @@ app.post('/deleteSelectedLists', function(req, res) {
                                 return res.render('pages/deleteSelectedOwnShared', {sharedListIdsRaw, returnPage, listIds});
                             }
                             else {
-                                db.any(`UPDATE lists SET trash = TRUE WHERE listId IN(${listIds}); DELETE FROM listsToUsers WHERE userId != '${req.session.user.id}' AND listId IN (${listIds}); UPDATE lists SET editDateTime = '${req.body.now}' WHERE listId IN(${listIds});`)
+                                db.any(`UPDATE lists SET trash = TRUE WHERE listId IN(${listIds}); DELETE FROM listsToUsers WHERE userId != '${req.session.user.id}' AND listId IN (${listIds}); UPDATE lists SET editDateTime = '${req.body.now}', lastModifiedByEmail = '${req.session.user.email}' WHERE listId IN(${listIds});`)
                                     .then(() => {
                                         return res.redirect('/lists?deleteSelected=success&count=' + (listIds.length));
                                     })
@@ -780,14 +780,14 @@ app.post('/copy', function(req, res) {
                 labelIdsPure.push(labelIdsRaw[i].labelid);
             }
 
-            db.any(`INSERT INTO lists (title, list, color, trash, editDateTime, createDateTime) VALUES ('${req.body.title.replace(/'/g, "''")}', '${req.body.list.replace(/'/g, "''")}', '${req.body.color}', FALSE, '${req.body.now}', '${req.body.now}') RETURNING listId;`)
+            db.any(`INSERT INTO lists (title, list, color, trash, editDateTime, createDateTime, lastModifiedByEmail) VALUES ('${req.body.title.replace(/'/g, "''")}', '${req.body.list.replace(/'/g, "''")}', '${req.body.color}', FALSE, '${req.body.now}', '${req.body.now}', '${req.session.user.email}') RETURNING listId;`)
                 .then((listId) => {
                     var assignLabelsToListQuery = '';
                     for(var i = 0; i < labelIdsPure.length; i++) {
                         assignLabelsToListQuery += `INSERT INTO labelsToLists (labelId, listId) VALUES ('${labelIdsPure[i]}', '${listId[0].listid}');`;
                     }
 
-                    db.any(assignLabelsToListQuery + `INSERT INTO listsToUsers (listId, userId, owner, archive, pinned, editable) VALUES (${listId[0].listid}, '${req.session.user.id}', TRUE, FALSE, FALSE, TRUE);`)
+                    db.any(assignLabelsToListQuery + `INSERT INTO listsToUsers (listId, userId, owner, archive, pinned, editable, locked) VALUES (${listId[0].listid}, '${req.session.user.id}', TRUE, FALSE, FALSE, TRUE, FALSE);`)
                         .then(() => {
                             if(req.query.archived && req.query.archived == 'true') {
                                 return res.redirect('/lists?copyArchived=success');
@@ -971,9 +971,9 @@ app.post('/copySelected', function(req, res) {
                 let listIdToMatch = lists[i].listid;
 
                 var copyList = `INSERT INTO 
-                                lists (title, list, color, trash, editDateTime, createDateTime) 
+                                lists (title, list, color, trash, editDateTime, createDateTime, lastModifiedByEmail) 
                                 VALUES 
-                                ('${lists[i].title.replace(/'/g, "''")}', '${lists[i].list.replace(/'/g, "''")}', '${lists[i].color}', FALSE, '${now}', '${now}');`;
+                                ('${lists[i].title.replace(/'/g, "''")}', '${lists[i].list.replace(/'/g, "''")}', '${lists[i].color}', FALSE, '${now}', '${now}', '${req.session.user.email}');`;
 
 
                 var owner = 'false'
@@ -991,8 +991,8 @@ app.post('/copySelected', function(req, res) {
                     for(let j = 0; j < listsToUsers.length; j++) {
                         if(listsToUsers[j].listid == listIdToMatch) {
                             collabsToAdd += `INSERT INTO 
-                                            listsToUsers (listId, userId, owner, archive, pinned, editable) 
-                                            VALUES ('${nextListId}', '${listsToUsers[j].userid}', '${listsToUsers[j].owner}', '${listsToUsers[j].archive}', '${listsToUsers[j].pinned}', '${listsToUsers[j].editable}');`;
+                                            listsToUsers (listId, userId, owner, archive, pinned, editable, locked) 
+                                            VALUES ('${nextListId}', '${listsToUsers[j].userid}', '${listsToUsers[j].owner}', '${listsToUsers[j].archive}', '${listsToUsers[j].pinned}', '${listsToUsers[j].editable}', '${listsToUsers[j].locked}');`;
                         
                             if(listsToUsers[j].userid != userId) {
                                 let recipientEmail = '';
@@ -1016,8 +1016,8 @@ app.post('/copySelected', function(req, res) {
             
                         if(listsToUsers[j].listid == listIdToMatch && listsToUsers[j].userid == userId) {
                             collabsToAdd += `INSERT INTO 
-                                            listsToUsers (listId, userId, owner, archive, pinned, editable) 
-                                            VALUES ('${nextListId}', '${listsToUsers[j].userid}', TRUE, '${listsToUsers[j].archive}', '${listsToUsers[j].pinned}', '${listsToUsers[j].editable}');`;
+                                            listsToUsers (listId, userId, owner, archive, pinned, editable, locked) 
+                                            VALUES ('${nextListId}', '${listsToUsers[j].userid}', TRUE, '${listsToUsers[j].archive}', '${listsToUsers[j].pinned}', '${listsToUsers[j].editable}', '${listsToUsers[j].locked}');`;
                             break;
                         }
                     }
@@ -1081,18 +1081,44 @@ app.post('/permanentlyDeleteSelected', function(req, res) {
 });
 
 app.post('/updateList', function(req, res) {
-    db.any(`UPDATE lists SET title = '${req.body.title.replace(/'/g, "''")}', list = '${req.body.list.replace(/'/g, "''")}', editDateTime = '${req.body.now}' WHERE listId = ${req.body.listId};`)
-        .then(() => {
-            if(req.query.archived && req.query.archived == 'true') {
-                return res.redirect('/archive?update=success');
+    db.any(`SELECT * FROM lists WHERE listId = ${req.body.listId};`)
+        .then((listInfo) => {
+            if(listInfo[0].title == req.body.title && listInfo[0].list == req.body.list) {
+                return res.redirect('/lists?edit=success');
             }
+            else {
+                db.any(`UPDATE lists SET title = '${req.body.title.replace(/'/g, "''")}', list = '${req.body.list.replace(/'/g, "''")}', editDateTime = '${req.body.now}', lastModifiedByEmail = '${req.session.user.email}' WHERE listId = ${req.body.listId};`)
+                    .then(() => {
+                        if(req.query.archived && req.query.archived == 'true') {
+                            return res.redirect('/archive?edit=success');
+                        }
 
-            return res.redirect('/lists?update=success');
+                        return res.redirect('/lists?edit=success');
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                        return res.redirect('/lists?edit=error');
+                    });  
+            }
         })
         .catch((error) => {
             console.log(error);
-            return res.redirect('/lists?update=error');
+            return res.redirect('/lists?edit=error');
         });  
+
+
+    // db.any(`UPDATE lists SET title = '${req.body.title.replace(/'/g, "''")}', list = '${req.body.list.replace(/'/g, "''")}', editDateTime = '${req.body.now}', lastModifiedByEmail = '${req.session.user.email}' WHERE listId = ${req.body.listId};`)
+    //     .then(() => {
+    //         if(req.query.archived && req.query.archived == 'true') {
+    //             return res.redirect('/archive?update=success');
+    //         }
+
+    //         return res.redirect('/lists?update=success');
+    //     })
+    //     .catch((error) => {
+    //         console.log(error);
+    //         return res.redirect('/lists?update=error');
+    //     });  
 });
 
 app.get('/trash', function(req, res) {
@@ -1186,6 +1212,148 @@ app.post('/removeAllCollaborators', function(req, res) {
             return res.redirect('/lists?removeallcollaborators=error');
         });
 });
+
+
+
+app.post('/lockUnlockModal', function(req, res) {
+    db.any(`SELECT * FROM users WHERE userId = '${req.session.user.id}';`)
+        .then((user) => {
+            var hasPassword = false;
+            console.log(user)
+            if(user[0].listpassword !== null) {
+                hasPassword = true;
+            }
+
+            var locked = (req.body.locked == 'false') ? false: true;
+
+            return res.render('pages/lockUnlock', {hasPassword, locked, listid: req.body.listId});
+        })
+        .catch((error) => {
+            console.log(error);
+            return res.redirect('/lists?lockorunlock=error');
+        });
+});
+
+
+app.post('/changeListPassword', function(req, res) {
+    console.log(req.body.codeCorrect);
+    console.log(req.body.code);
+    if(req.body.code !== req.body.codeCorrect) {
+        return res.redirect('/lists?changelistpassword=incorrectcode');
+    }
+    else {
+        db.any(`UPDATE users SET listPassword = '${req.body.newPassword}' WHERE userId = '${req.session.user.id}';`)
+            .then(() => {
+                return res.redirect('/lists?changelistpassword=success');
+            })
+            .catch((error) => {
+                console.log(error);
+                return res.redirect('/lists?changelistpassword=error');
+            });
+    }
+});
+
+app.get('/forgotListPassword', function(req, res) {
+    const resetCode = Math.floor(100000 + Math.random() * 900000);
+    sendListPasswordResetEmail(req.session.user.email, resetCode);
+    console.log(resetCode);
+    return res.render('pages/forgotListPassword', {resetCode});
+});
+
+
+
+app.post('/lock', function(req, res) {    
+    if(req.body.firstPassword) {
+        db.any(`UPDATE users SET listPassword = '${req.body.firstPassword}' WHERE userId = '${req.session.user.id}';`)
+            .then(() => {
+                db.any(`UPDATE listsToUsers SET locked = TRUE WHERE userId = '${req.session.user.id}' AND listId = '${req.body.listId}';`)
+                    .then(() => {
+                        return res.redirect('/lists?lock=success');
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                        return res.redirect('/lists?lock=error');
+                    });
+            })
+            .catch((error) => {
+                console.log(error);
+                return res.redirect('/lists?lock=error');
+            });
+    }
+    else if(req.body.password) {
+        db.any(`SELECT listPassword FROM users WHERE userId = '${req.session.user.id}';`)
+            .then((password) => {
+                if(password[0].listpassword == req.body.password) {
+                    db.any(`UPDATE listsToUsers SET locked = TRUE WHERE userId = '${req.session.user.id}' AND listId = '${req.body.listId}';`)
+                        .then(() => {
+                            return res.redirect('/lists?lock=success');
+                        })
+                        .catch((error) => {
+                            console.log(error);
+                            return res.redirect('/lists?lock=error');
+                        });
+                }
+                else {
+                    return res.redirect('/lists?lock=incorrectpassword');
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+                return res.redirect('/lists?lock=error');
+            });
+    }
+    else {
+        return res.redirect('/lists?lock=nopasswordentered');
+    }
+});
+
+
+
+app.post('/unlock', function(req, res) {
+    if(req.body.firstPassword) {
+        db.any(`UPDATE users SET listPassword = '${req.body.firstPassword}' WHERE userId = '${req.session.user.id}';`)
+            .then(() => {
+                db.any(`UPDATE listsToUsers SET locked = FALSE WHERE userId = '${req.session.user.id}' AND listId = '${req.body.listId}';`)
+                    .then(() => {
+                        return res.redirect('/lists?lock=success');
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                        return res.redirect('/lists?lock=error');
+                    });
+            })
+            .catch((error) => {
+                console.log(error);
+                return res.redirect('/lists?lock=error');
+            });
+    }
+    else if(req.body.password) {
+        db.any(`SELECT listPassword FROM users WHERE userId = '${req.session.user.id}';`)
+            .then((password) => {
+                if(password[0].listpassword == req.body.password) {
+                    db.any(`UPDATE listsToUsers SET locked = FALSE WHERE userId = '${req.session.user.id}' AND listId = '${req.body.listId}';`)
+                        .then(() => {
+                            return res.redirect('/lists?lock=success');
+                        })
+                        .catch((error) => {
+                            console.log(error);
+                            return res.redirect('/lists?lock=error');
+                        });
+                }
+                else {
+                    return res.redirect('/lists?lock=incorrectpassword');
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+                return res.redirect('/lists?lock=error');
+            });
+    }
+    else {
+        return res.redirect('/lists?lock=nopasswordentered');
+    }
+});
+
 
 
 
@@ -1314,7 +1482,7 @@ app.post('/changeListView', function(req, res) {
 });
 
 app.post('/removeCollaborator', function(req, res) {
-    db.any(`DELETE FROM listsToUsers WHERE listId = '${req.body.listId}' AND userId = '${req.body.userId}';UPDATE lists SET editDateTime = '${req.body.now}' WHERE listId = '${req.body.listId}';`)
+    db.any(`DELETE FROM listsToUsers WHERE listId = '${req.body.listId}' AND userId = '${req.body.userId}'; UPDATE lists SET editDateTime = '${req.body.now}', lastModifiedByEmail = '${req.session.user.email}' WHERE listId = '${req.body.listId}';`)
         .then(() => {
             return res.redirect('/lists?removeCollaborator=success');
         })
@@ -1361,6 +1529,35 @@ app.post('/deleteLabel', function(req, res) {
         .catch((error) => {
             console.log(error);
             return res.redirect('/labels?deleteLabel=error');
+        });
+})
+
+
+
+
+app.post('/sendCopy', function(req, res) {
+    db.any(`SELECT * FROM lists WHERE listId = '${req.body.listId}';`)
+        .then((list) => {
+            db.any(`INSERT INTO lists (title, list, color, trash, editDateTime, createDateTime, lastModifiedByEmail) VALUES ('${list[0].title.replace(/'/g, "''")}', '${list[0].list.replace(/'/g, "''")}', '${list[0].color}', FALSE, '${req.body.now}', '${req.body.now}', '${req.session.user.email}') RETURNING listId;`)
+                .then((listId) => {
+                    db.any(`INSERT INTO listsToUsers (listId, userId, owner, archive, pinned, editable, locked) VALUES (${listId[0].listid}, '${req.body.recipientId}', TRUE, FALSE, FALSE, TRUE, FALSE);`)
+                        .then(() => {
+                            sendCopyEmail(req.body.email, req.session.user.email, req.session.user.displayName, list[0].title, list[0].list);
+                            return res.redirect('/lists?sendcopy=success');
+                        })
+                        .catch((error) => {
+                            console.log(error);
+                            return res.redirect('/lists?sendcopy=error');
+                        });
+                })
+                .catch((error) => {
+                    console.log(error);
+                    return res.redirect('/lists?sendcopy=error');
+                });
+        })
+        .catch((error) => {
+            console.log(error);
+            return res.redirect('/lists?sendcopy=error');
         });
 })
 
@@ -1541,7 +1738,7 @@ app.post('/addCollaborator', function(req, res) {
                 return res.redirect('/lists?addCollaborator=error&max=true');
             }
             else {
-                db.any(`INSERT INTO listsToUsers (listId, userId, owner, archive, pinned, editable) SELECT '${req.body.listId}', '${req.body.collaboratorUserId}', FALSE, FALSE, FALSE, TRUE WHERE NOT EXISTS (SELECT 1 FROM listsToUsers WHERE listId = '${req.body.listId}' AND userId = '${req.body.collaboratorUserId}'); UPDATE lists SET editDateTime = '${req.body.now}' WHERE listId = '${req.body.listId}';`)
+                db.any(`INSERT INTO listsToUsers (listId, userId, owner, archive, pinned, editable, locked) SELECT '${req.body.listId}', '${req.body.collaboratorUserId}', FALSE, FALSE, FALSE, TRUE, FALSE WHERE NOT EXISTS (SELECT 1 FROM listsToUsers WHERE listId = '${req.body.listId}' AND userId = '${req.body.collaboratorUserId}'); UPDATE lists SET editDateTime = '${req.body.now}', lastModifiedByEmail = '${req.session.user.email}' WHERE listId = '${req.body.listId}';`)
                     .then(() => {
                         db.any(`SELECT title, list FROM lists WHERE listId = '${req.body.listId}';`)
                             .then((list) => {
@@ -1592,6 +1789,94 @@ function sendCollaborationEmail(emailTo, emailFrom, nameFrom, title, list, copy)
         subject = nameFrom + ' copied a list you have access to: "' + listInfo + '"';
         html = 'Hello!<br><br><b>' + nameFrom + '</b> (' + emailFrom + ')' + ' has copied a list you have access to: "<b>' + listInfo + '</b>".<br><br>You now have access to the new copy as well, with your original labels preserved.<br><br>Log in to your lists account to collaborate on it with them!';
     }
+
+    let transporter = nodemailer.createTransport({
+        service: 'gmail',
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: 'true',
+        auth: {
+          user: process.env.EMAIL,
+          pass: process.env.EMAIL_PWD_MAC
+        },
+        tls: {
+          rejectUnauthorized: false
+        }
+      });
+
+      let mailOptions = {
+        from: 'lists.communications@gmail.com',
+        to: emailTo,
+        subject: subject,
+        html: html
+      };
+
+      transporter.sendMail(mailOptions, (error, info) => {
+        if(error) {
+          return console.log(error);
+        }
+        console.log('Message sent: %s', info.messageId);
+        console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+        transporter.close();
+      });
+}
+
+
+function sendCopyEmail(emailTo, emailFrom, nameFrom, title, list) {
+    var listInfo = '';
+    if(title) {
+        listInfo = title.substring(0,10);
+        if(title.length > 10) {
+            listInfo += '...';
+        }
+    }
+    else if(list) {
+        listInfo = list.replace(/<\/?[^>]+(>|$)/g, "").substring(0,10);
+        if(list.length > 10) {
+            listInfo += '...';
+        }
+    }
+
+    var subject =  nameFrom + ' sent a copy of their list "' + listInfo + '" to you';
+    var html = 'Hello!<br><br><b>' + nameFrom + '</b> (' + emailFrom + ')' + ' has sent you a copy of their list "<b>' + listInfo + '</b>".<br><br>Log in to your lists account to see!';
+
+    let transporter = nodemailer.createTransport({
+        service: 'gmail',
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: 'true',
+        auth: {
+          user: process.env.EMAIL,
+          pass: process.env.EMAIL_PWD_MAC
+        },
+        tls: {
+          rejectUnauthorized: false
+        }
+      });
+
+      let mailOptions = {
+        from: 'lists.communications@gmail.com',
+        to: emailTo,
+        subject: subject,
+        html: html
+      };
+
+      transporter.sendMail(mailOptions, (error, info) => {
+        if(error) {
+          return console.log(error);
+        }
+        console.log('Message sent: %s', info.messageId);
+        console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+        transporter.close();
+      });
+}
+
+
+
+
+function sendListPasswordResetEmail(emailTo, code) {
+    var subject =  'Your list password reset code';
+    var html = 'Use code <b>' + code + '</b> to change your list password.<br>If you did not request this code, ignore this message.';
 
     let transporter = nodemailer.createTransport({
         service: 'gmail',

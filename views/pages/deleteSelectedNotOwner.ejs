@@ -11,7 +11,7 @@
                     </h4>
                     <hr>
 
-                    <h5>
+                    <p>
                         You do not own <%= unownedListIds.length %> of the <%= numberOfSelectedLists %> selected lists. 
                         <br><br>
                         <% if(ownedListIds.length > 0) { %>
@@ -19,7 +19,7 @@
                         <% } else { %>
                             Remove yourself from the <%= unownedListIds.length %> list(s) you do not own?
                         <% } %>
-                    </h5>
+                    </p>
 
                     <div style="padding-top:20px">
                         <a href="/<%= returnPage %>">

@@ -3,7 +3,8 @@ CREATE TABLE users (
     email TEXT NOT NULL,
     fullname TEXT NOT NULL,
     profilePhotoUrl TEXT NOT NULL,
-    listViewType TEXT NOT NULL
+    listViewType TEXT NOT NULL,
+    listPassword TEXT
 );
 
 CREATE TABLE lists (
@@ -14,7 +15,7 @@ CREATE TABLE lists (
     trash BOOLEAN NOT NULL,
     editDateTime VARCHAR(19) NOT NULL,
     createDateTime VARCHAR(19) NOT NULL,
-    lastModifiedByUserId TEXT
+    lastModifiedByEmail TEXT NOT NULL
 );
 
 CREATE TABLE listsToUsers (
@@ -23,7 +24,8 @@ CREATE TABLE listsToUsers (
     owner BOOLEAN NOT NULL,
     archive BOOLEAN NOT NULL,
     pinned BOOLEAN NOT NULL,
-    editable BOOLEAN NOT NULL
+    editable BOOLEAN NOT NULL,
+    locked BOOLEAN NOT NULL
 );
 
 CREATE TABLE labels (
