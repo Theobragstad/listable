@@ -40,7 +40,7 @@
 - [ ] Audio
 - [ ] Drawing
 - [ ] Share selected
-- [ ] Fster tooltips
+- [ ] Faster tooltips
 - [ ] Pin selected
 - [ ] Restore selected
 - [ ] Permanent delete sel
