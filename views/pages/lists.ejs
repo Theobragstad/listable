@@ -99,6 +99,26 @@
         </button>
       </form>
 
+<!-- NEW -->
+      <form action="/pinSelected" method="POST">
+        <button id="pinSelected" name="listIds" title="Pin selected" class="btn rounded-10 zoom" style="background-color:white;position:absolute;bottom:9px;left:100px;padding: 0px;line-height: .25;width:20px;display:none">
+          <img src="/img/star.png" style="width:20px" onmouseover="hover(this, 'starYellow')" onmouseout="unhover(this, 'star')">
+        </button>
+      </form>
+
+      
+        <form action="/unpinSelected" method="POST">
+          <input class="form-control" id="pinnedListIds" name="" value="<%=pinnedListIds%>" hidden>
+          <button id="unpinSelected" name="listIds" title="Unpin selected" class="btn rounded-10 zoom" style="background-color:white;position:absolute;bottom:9px;left:150px;padding: 0px;line-height: .25;width:20px;display:none">
+            <img src="/img/starYellow.png" style="width:20px" onmouseover="hover(this, 'star')" onmouseout="unhover(this, 'starYellow')">
+          </button>
+        </form>
+
+
+          <button id="shareSelection" title="Share selection" type="button" class="btn rounded-10 zoom" data-id="" data-bs-toggle="modal" data-bs-target="#addCollaboratorToMultipleListsModal" href="#addCollaboratorToMultipleListsModal" data-toggle="modal" style="display:none;border-color:white;background-color:white;position:absolute;left:126px;bottom:10px;padding: 0px;line-height: .25;width:22px">
+            <img src="/img/addCollaborator.png" style="width:15px" onmouseover="hover(this, 'addCollaboratorBlue')" onmouseout="unhover(this, 'addCollaborator')">
+          </button>
+
       <button id="setColorSelected" name="listIds" title="Set color of selected" type="button" class="btn rounded-10 zoom" data-bs-toggle="modal" data-bs-target="#setColorSelectedModal" style="display:none;background-color:white;position:absolute;bottom:9px;left:48px;padding: 0px;line-height: .25;width:20px">
         <img src="/img/palette.png" style="width:20px" onmouseover="hover(this, 'paletteColors')" onmouseout="unhover(this, 'palette')">
       </button>
@@ -214,6 +234,31 @@
       </div>
     </div>
   </div>
+
+
+  <div class="modal fade" id="addCollaboratorToMultipleListsModal" tabindex="-1" aria-labelledby="addCollaboratorToMultipleListsModal" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content mx-auto text-center justify-content-center" style="width:550px">
+        <div class="logo" style="padding-top:10px">
+          <h6>Share selection</h6>
+        </div>
+        <div style="padding-top:10px;padding-bottom:5px;padding:10px">
+          <form action="/shareSelectionSearch" method="POST">
+            <input class="form-control" type="text" name="q" placeholder="Search users..." oninvalid="this.setCustomValidity('Enter a name or email')" oninput="setCustomValidity('')" required>
+            <input id="listIdsToCollaborate" class="form-control" name="listIdsToCollaborate" type="text" value="" hidden>
+            <div style="padding-top:10px;">
+              <button class="btn rounded-pill" style="border-color: #03a9f4;background-color: #b3e5fc;color:#03a9f4;font-size:12px">
+                Search
+              </button>
+            </div>
+          </form>
+        </div>   
+            </div>
+
+      </div>
+    </div>
+    
+  </div>
 </main>
 
 
@@ -222,7 +267,8 @@
 
 
   tinymce.init({
-    selector: 'textarea',
+    // selector: 'textarea',
+    selector: 'textarea:not(.feedbackForm)',
     height: 600,
     plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount  ',
     toolbar: 'blocks fontfamily fontsize | bold italic underline strikethrough forecolor backcolor | link image media table | spellcheckdialog | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat',
@@ -320,7 +366,23 @@ function setListCount(n) {
 }
 
 
-function changeImage(element, img1, img2) {
+function changeImageForSelectButton(element, img1, img2) {
+
+  
+
+  if(element.getAttribute('src') == '/img/'+img1+'.png') {
+    element.setAttribute('src', '/img/'+img2+'.png');
+    element.parentNode.parentNode.style.display = 'block';
+  }
+  else {
+    element.setAttribute('src', '/img/'+img1+'.png');
+    element.parentNode.parentNode.style.display = 'none';
+  }
+
+  countSelectedLists();
+}
+
+function changeImage(element, img1, img2) {  
   if(element.getAttribute('src') == '/img/'+img1+'.png') {
     element.setAttribute('src', '/img/'+img2+'.png');
   }
@@ -343,7 +405,17 @@ function countSelectedLists() {
       n++;
       // console.log(elements[i].parentElement.value);
       selectedListIds.push(elements[i].parentElement.value);
+
+      // WTFFF
+      elements[i].parentNode.parentNode.style.display = "block !important";
+      //elements[i].parentNode.parentNode.classList.add("selectButton");
     }
+
+    //wtfff
+    // if(elements[i].src == window.location.origin+'/img/colors/white.png') {
+    //   // elements[i].parentNode.parentNode.style.display = 'none';
+    //   elements[i].parentNode.parentNode.classList.add("selectButton");
+    // }
   }
 
   // console.log('num selected: '+n);
@@ -374,6 +446,22 @@ document.getElementById('archiveSelected').value = selectedListIds;
 
 
 
+document.getElementById('pinSelected').style.display = 'block';
+document.getElementById('pinSelected').value = selectedListIds;
+
+
+
+var pinnedListIds = document.getElementById('pinnedListIds').value.split(',');
+
+if(selectedListIds.some(r=> pinnedListIds.indexOf(r) >= 0)) {
+  document.getElementById('unpinSelected').style.display = 'block';
+  document.getElementById('unpinSelected').value = selectedListIds;
+}
+
+
+document.getElementById('shareSelection').style.display = 'block';
+document.getElementById('listIdsToCollaborate').value = selectedListIds;
+
 //////
 // document.getElementById('delSelectedLists').setAttribute('data-id' , selectedListIds); 
 
@@ -403,8 +491,11 @@ document.getElementById('unselectAll').style.display = 'block';
     document.getElementById('archiveSelected').style.display = 'none';
 
 
-    
+    document.getElementById('pinSelected').style.display = 'none';
 
+    document.getElementById('unpinSelected').style.display = 'none';
+
+    document.getElementById('shareSelection').style.display = 'none';
 
     document.getElementById('unselectAll').style.display = 'none';
     
@@ -422,6 +513,10 @@ function unselectAll() {
 
   for(var i = 0; i < selected.length; i++) {
     selected[i].src = '/img/colors/white.png';
+    // wtff
+    selected[i].parentNode.parentNode.style.display = 'none';
+    //selected[i].parentNode.parentNode.style.opacity = "0%";
+    //selected[i].parentNode.parentNode.classList.add("selectButton");
   }
 
   countSelectedLists();
@@ -538,6 +633,7 @@ function setInnerHtml(element, text) {
       elements[i].src = '/img/colors/ffffffSelected.png';
     }
     selectedListIds.push(elements[i].parentElement.value);
+    elements[i].parentNode.parentNode.style.display = 'block';
 
   } 
 
@@ -565,6 +661,24 @@ document.getElementById('setColorSelected').setAttribute('data-id' , selectedLis
 document.getElementById('archiveSelected').style.display = 'block';
 document.getElementById('archiveSelected').value = selectedListIds;
 
+
+document.getElementById('pinSelected').style.display = 'block';
+document.getElementById('pinSelected').value = selectedListIds;
+
+
+
+
+
+var pinnedListIds = document.getElementById('pinnedListIds').value.split(',');
+
+
+if(selectedListIds.some(r=> pinnedListIds.indexOf(r) >= 0)) {
+  document.getElementById('unpinSelected').style.display = 'block';
+  document.getElementById('unpinSelected').value = selectedListIds;
+}
+
+document.getElementById('shareSelection').style.display = 'block';
+document.getElementById('listIdsToCollaborate').value = selectedListIds;
 
 //////
 // document.getElementById('delSelectedLists').setAttribute('data-id' , selectedListIds); 
@@ -992,6 +1106,9 @@ function saveQuery() {
     // highlightResults('result', 'I am');
     highlightResults('result', localStorage.getItem("q"));
   }
+
+
+
 
 
 

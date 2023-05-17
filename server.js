@@ -408,6 +408,21 @@ app.get('/search', function(req, res) {
         });
 });
 
+
+
+
+app.get('/a', function(req, res) {
+    return res.render('pages/animation');
+  
+});
+
+
+
+
+
+
+
+
 app.post('/emptyTrash', function(req, res) {
     db.any(`DELETE FROM labelsToLists WHERE listId IN(SELECT listId FROM lists WHERE trash = TRUE AND listId IN(SELECT listId FROM listsToUsers WHERE userId = '${req.session.user.id}')); DELETE FROM listsToUsers WHERE userId = '${req.session.user.id}' AND listId IN(SELECT listId FROM lists WHERE trash = TRUE) RETURNING listId;`)
         .then((ids) => {
@@ -1454,6 +1469,42 @@ app.post('/archiveSelected', function(req, res) {
         }); 
 });
 
+
+app.post('/pinSelected', function(req, res) {
+    var array = req.body.listIds.split(',');
+    var result = array.map(function (x) { 
+        return parseInt(x, 10); 
+    });
+
+
+    db.any(`UPDATE listsToUsers SET pinned = TRUE WHERE listId IN(${result}) AND userId = '${req.session.user.id}';`)
+        .then(() => {
+            return res.redirect('/lists?pinSelected=success');
+        })
+        .catch((error) => {
+            console.log(error);
+            return res.redirect('/lists?pinSelected=error');
+        }); 
+});
+
+
+app.post('/unpinSelected', function(req, res) {
+    var array = req.body.listIds.split(',');
+    var result = array.map(function (x) { 
+        return parseInt(x, 10); 
+    });
+
+
+    db.any(`UPDATE listsToUsers SET pinned = FALSE WHERE listId IN(${result}) AND userId = '${req.session.user.id}';`)
+        .then(() => {
+            return res.redirect('/lists?unpinSelected=success');
+        })
+        .catch((error) => {
+            console.log(error);
+            return res.redirect('/lists?unpinSelected=error');
+        }); 
+});
+
 app.post('/changeListView', function(req, res) {
     db.any(`SELECT listViewType FROM users WHERE userId = '${req.session.user.id}';`)
         .then((type) => {
@@ -1587,18 +1638,62 @@ app.post('/updateLabel', function(req, res) {
 
 app.post('/searchUsers', function(req, res) {
     var q = req.body.q;
-
     var searchQuery = `SELECT * FROM users WHERE userId != '${req.session.user.id}' AND userID NOT IN(SELECT userID FROM listsToUsers WHERE listId = '${req.body.listIdToCollaborate}') AND (email LIKE '%${q}%' OR LOWER(email) LIKE '%${q}%' OR fullname LIKE '%${q}%' OR LOWER(fullname) LIKE '%${q}%');`;
 
     db.any(searchQuery)
         .then((users) => {
             return res.render('pages/addCollaborator', {users, listid: req.body.listIdToCollaborate, error: false, message: 'results for ' + q});
+            
         })
         .catch((error) => {
             console.log(error);
             return res.render('pages/addCollaborator', {users: [], listid: req.body.listIdToCollaborate, error: true, message: 'error searching users'});
         });
+
+    if(req.query.shareSelection && req.query.shareSelection == 'true') {
+        var listIdsToCollaborateRaw = req.body.listIdsToCollaborate.split(',');
+        var listIdsToCollaborateClean = listIdsToCollaborateRaw.map(function (x) { 
+            return parseInt(x, 10); 
+        });
+
+        searchQuery = `SELECT * FROM users WHERE userId != '${req.session.user.id}' AND userID NOT IN(SELECT userID FROM listsToUsers WHERE listId IN (${listIdsToCollaborateClean})) AND (email LIKE '%${q}%' OR LOWER(email) LIKE '%${q}%' OR fullname LIKE '%${q}%' OR LOWER(fullname) LIKE '%${q}%');`;
+        
+        db.any(searchQuery)
+            .then((users) => {
+                return res.render('pages/addCollaborator', {users, listid: listIdsToCollaborateClean, error: false, message: 'results for ' + q});
+                
+            })
+            .catch((error) => {
+                console.log(error);
+                return res.render('pages/addCollaborator', {users: [], listid: listIdsToCollaborateClean, error: true, message: 'error searching users'});
+            });
+    }
 });
+
+
+app.post('/shareSelectionSearch', function(req, res) {
+    var q = req.body.q;
+
+    var listIdsToCollaborateRaw = req.body.listIdsToCollaborate.split(',');
+    var listIdsToCollaborateClean = listIdsToCollaborateRaw.map(function (x) { 
+        return parseInt(x, 10); 
+    });
+
+    var searchQuery = `SELECT * FROM users WHERE userId != '${req.session.user.id}' AND userID NOT IN(SELECT userID FROM listsToUsers WHERE listId IN (${listIdsToCollaborateClean})) AND (email LIKE '%${q}%' OR LOWER(email) LIKE '%${q}%' OR fullname LIKE '%${q}%' OR LOWER(fullname) LIKE '%${q}%');`;
+
+    db.any(searchQuery)
+        .then((users) => {
+            return res.render('pages/shareSelection', {users, listids: listIdsToCollaborateClean, error: false, message: 'results for ' + q});
+        })
+        .catch((error) => {
+            console.log(error);
+            return res.render('pages/shareSelection', {users: [], listids: listIdsToCollaborateClean, error: true, message: 'error searching users'});
+        });
+});
+
+
+
+
 
 app.get('/labelsModal', function(req, res) {
     db.any(`SELECT * FROM labels WHERE labelId IN(SELECT labelId FROM labelsToUsers WHERE userID = '${req.session.user.id}') AND labelID IN(SELECT labels.labelId AS "numberOfLists" FROM labels LEFT JOIN labelsToLists ON labels.labelId = labelsToLists.labelId GROUP BY labels.labelId ORDER BY COUNT(labelsToLists.labelId) DESC, label ASC);`)
@@ -1763,6 +1858,90 @@ app.post('/addCollaborator', function(req, res) {
 });
 
 
+app.post('/sendFeedback', function(req, res) {
+    let transporter = nodemailer.createTransport({
+        service: 'gmail',
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: 'true',
+        auth: {
+          user: process.env.EMAIL,
+          pass: process.env.EMAIL_PWD_MAC
+        },
+        tls: {
+          rejectUnauthorized: false
+        }
+    });
+
+    let mailOptions = {
+        from: req.session.user.email,
+        to: 'lists.communications@gmail.com',
+        subject: 'Feedback from ' + req.user.name.givenName,
+        html: '<h5>From ' + req.session.user.email + '</h5><br>' + req.body.feedback
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+        if(error) {
+            return console.log(error);
+        }
+
+        console.log('Message sent: %s', info.messageId);
+        console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+        transporter.close();
+    });
+
+    return res.redirect('/lists?sendFeedback=success');
+});
+
+app.post('/shareSelection', function(req, res) {
+    var listIdsToCollaborateRaw = req.body.listIds.split(',');
+    var listIdsToCollaborateClean = listIdsToCollaborateRaw.map(function (x) { 
+        return parseInt(x, 10); 
+    });
+
+    var listsToUserQuery = '';
+    for(var i = 0; i < listIdsToCollaborateClean.length; i++) {
+        listsToUserQuery += `INSERT INTO listsToUsers (listId, userId, owner, archive, pinned, editable, locked) SELECT '${listIdsToCollaborateClean[i]}', '${req.body.collaboratorUserId}', FALSE, FALSE, FALSE, TRUE, FALSE WHERE NOT EXISTS (SELECT 1 FROM listsToUsers WHERE listId = '${listIdsToCollaborateClean[i]}' AND userId = '${req.body.collaboratorUserId}'); UPDATE lists SET editDateTime = '${req.body.now}', lastModifiedByEmail = '${req.session.user.email}' WHERE listId = '${listIdsToCollaborateClean[i]}';`;
+    }
+
+    
+
+    var countQuery = `SELECT listId, COUNT(userId) FROM listsToUsers WHERE listId IN (${listIdsToCollaborateClean}) GROUP BY listId;`;
+
+    db.any(countQuery)
+        .then((rows) => {
+            if(rows.length > 0 && rows[0].count >= 10) {
+                return res.redirect('/lists?shareSelection=error&max=true');
+            }
+            else {
+                db.any(listsToUserQuery)
+                    .then(() => {
+                        db.any(`SELECT title, list FROM lists WHERE listId IN(${listIdsToCollaborateClean});`)
+                            .then((lists) => {
+                                for(var i =  0; i < lists.length; i++) {
+                                    sendCollaborationEmail(req.body.email, req.session.user.email, req.session.user.displayName, lists[i].title, lists[i].list, 'false');
+                                }
+                                
+                                return res.redirect('/lists?shareSelection=success');
+                            })
+                            .catch((error) => {
+                                console.log(error);
+                                return res.redirect('/lists?shareSelection=error');
+                            });
+                        })
+                    .catch((error) => {
+                        console.log(error);
+                        return res.redirect('/lists?shareSelection=error');
+                    });
+            }
+        })
+        .catch((error) => {
+            console.log(error);
+            return res.redirect('/lists?shareSelection=error');
+        });
+});
+
+
 // End routing
 
 // Functions
@@ -1783,11 +1962,11 @@ function sendCollaborationEmail(emailTo, emailFrom, nameFrom, title, list, copy)
     }
 
     var subject =  nameFrom + ' shared their list "' + listInfo + '" with you';
-    var html = 'Hello!<br><br><b>' + nameFrom + '</b> (' + emailFrom + ')' + ' has shared their list "<b>' + listInfo + '</b>" with you.<br><br>Log in to your lists account to collaborate on it with them!';
+    var html = nameFrom + ' (' + emailFrom + ')' + ' shared their list "' + listInfo + '" with you. Log in to collaborate on it.';
 
     if(copy == 'true') {
-        subject = nameFrom + ' copied a list you have access to: "' + listInfo + '"';
-        html = 'Hello!<br><br><b>' + nameFrom + '</b> (' + emailFrom + ')' + ' has copied a list you have access to: "<b>' + listInfo + '</b>".<br><br>You now have access to the new copy as well, with your original labels preserved.<br><br>Log in to your lists account to collaborate on it with them!';
+        subject = nameFrom + ' copied a list you have access to';
+        html = nameFrom + ' (' + emailFrom + ')' + ' copied a list you have access to ("' + listInfo + '"). You now have access to the new copy as well, with your original labels preserved. Log in to collaborate on it.';
     }
 
     let transporter = nodemailer.createTransport({
@@ -1808,7 +1987,12 @@ function sendCollaborationEmail(emailTo, emailFrom, nameFrom, title, list, copy)
         from: 'lists.communications@gmail.com',
         to: emailTo,
         subject: subject,
-        html: html
+        attachments: [{
+            filename: 'emailLogo.png',
+            path: __dirname + '/resources/img/emailLogo.png',
+            cid: 'emailLogo'
+        }],
+        html: html + `<br><br><br><p><img src = 'cid:emailLogo' style='display:block;margin-left:auto;margin-right:auto;width:125px'></img></p>`
       };
 
       transporter.sendMail(mailOptions, (error, info) => {
@@ -1838,7 +2022,7 @@ function sendCopyEmail(emailTo, emailFrom, nameFrom, title, list) {
     }
 
     var subject =  nameFrom + ' sent a copy of their list "' + listInfo + '" to you';
-    var html = 'Hello!<br><br><b>' + nameFrom + '</b> (' + emailFrom + ')' + ' has sent you a copy of their list "<b>' + listInfo + '</b>".<br><br>Log in to your lists account to see!';
+    var html = nameFrom + ' (' + emailFrom + ')' + ' sent you a copy of their list "' + listInfo + '". Log in to see.';
 
     let transporter = nodemailer.createTransport({
         service: 'gmail',
@@ -1858,7 +2042,12 @@ function sendCopyEmail(emailTo, emailFrom, nameFrom, title, list) {
         from: 'lists.communications@gmail.com',
         to: emailTo,
         subject: subject,
-        html: html
+        attachments: [{
+            filename: 'emailLogo.png',
+            path: __dirname + '/resources/img/emailLogo.png',
+            cid: 'emailLogo'
+        }],
+        html: html + `<br><br><br><p><img src = 'cid:emailLogo' style='display:block;margin-left:auto;margin-right:auto;width:125px'></img></p>`
       };
 
       transporter.sendMail(mailOptions, (error, info) => {
@@ -1876,7 +2065,7 @@ function sendCopyEmail(emailTo, emailFrom, nameFrom, title, list) {
 
 function sendListPasswordResetEmail(emailTo, code) {
     var subject =  'Your list password reset code';
-    var html = 'Use code <b>' + code + '</b> to change your list password.<br>If you did not request this code, ignore this message.';
+    var html = 'Use code ' + code + ' to change your list password.<br>If you did not request this code, ignore this message.';
 
     let transporter = nodemailer.createTransport({
         service: 'gmail',
@@ -1896,7 +2085,12 @@ function sendListPasswordResetEmail(emailTo, code) {
         from: 'lists.communications@gmail.com',
         to: emailTo,
         subject: subject,
-        html: html
+        attachments: [{
+            filename: 'emailLogo.png',
+            path: __dirname + '/resources/img/emailLogo.png',
+            cid: 'emailLogo'
+        }],
+        html: html + `<br><br><br><p><img src = 'cid:emailLogo' style='display:block;margin-left:auto;margin-right:auto;width:125px'></img></p>`
       };
 
       transporter.sendMail(mailOptions, (error, info) => {

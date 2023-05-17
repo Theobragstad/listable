@@ -1,4 +1,6 @@
 
+
+
 .modal .modal-content {
     transform: scale(0.5);
     transition: all 0.4s;
@@ -160,12 +162,10 @@ a{
 
 
   /* Style rules for dark mode */
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
     body {
       background-color: #171717;
-      
-      /* filter: brightness(50%); */
-      /* color: white; */
+    
     }
     img {
       opacity: .75;
@@ -196,12 +196,12 @@ a{
     .modal-content {
       background-color: #171717;
       color:white;
-    }
+    } */
 
     /* div.col.card.card-body.m-2 {
        filter: brightness(50%);
     } */
-  }
+  /* } */
 
 
 
@@ -265,32 +265,63 @@ mark.a0 {
   z-index:2;
 }
   
-.list:hover .buttonSet {
+.list:hover .buttonSet{
   display: block;
   
 }
 
 
-.list:hover .buttonSet ~ .hideButton{
-  opacity: 0;
+
+.selectButton {
+  display: none;
+  z-index:2;
+}
+  
+.list:hover .selectButton{
+  display: block !important;
   
 }
 
 
-.list .hide{
+/* 
+.list:hover .buttonSet ~ .hideButton{
+  opacity: 0;
+  
+} */
+
+
+/* .list .hide{
   display:none;
 }
 
 .list:hover .hide {
   display:block;
-}
+} */
+
+
+/*  */
 
 
 
+/*  */
 
 
 /* .hideButton:hover{
   opacity: 0;
 } */
 
-
+button:hover::after, a:hover::after
+{
+    content: attr(data-title);
+    font-size: 8px;
+    display: inline;
+  position:absolute;
+  top: 25px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  background-color:#8c979a ;
+  color:white;
+  border-radius: 10%;
+display:block
+}

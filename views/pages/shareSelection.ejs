@@ -23,7 +23,7 @@
 
 
                 <!-- <a href="/lists"> -->
-                  <button type="button" data-id="<%= listid %>" data-bs-toggle="modal" data-bs-target="#addCollaborator<%= listid%>" href="#addCollaborator<%= listid%>" data-toggle="modal" title="Search again" class="btn rounded-10 zoom" style="position:absolute;left:170px;top:10px;border-color:#000000;background-color:#ececec;font-size:12px;padding: 0;line-height: 1.25;width:30px">←</button>
+                  <button type="button" data-id="<%= listids %>" data-bs-toggle="modal" data-bs-target="#addCollaborator<%= listids%>" href="#addCollaborator<%= listids%>" data-toggle="modal" title="Search again" class="btn rounded-10 zoom" style="position:absolute;left:170px;top:10px;border-color:#000000;background-color:#ececec;font-size:12px;padding: 0;line-height: 1.25;width:30px">←</button>
                 <!-- </a> -->
 
 
@@ -43,10 +43,10 @@
                 <div class="row" style="padding-bottom:5px;">
                 <% users.forEach(function(user) { %>
                     <div class="col-10" style="padding-bottom:5px">
-                        <form action="/addCollaborator" method="POST">
+                        <form action="/shareSelection" method="POST">
                           <input class="timeInput" class="form-control" name="now" hidden>
                             <input class="form-control" name="collaboratorUserId" type="text" value="<%= user.userid %>" hidden>
-                              <input class="form-control" name="listId" type="text" value="<%= listid %>" hidden>
+                              <input class="form-control" name="listIds" type="text" value="<%= listids %>" hidden>
                             <input class="form-control" name="email" type="text" value="<%= user.email %>" hidden>
                     <button class="btn rounded-pill zoomExtraSmall" style="font-weight:bold;font-size:12px;background-color:#e6d4ff;">
                       <img src="<%= user.profilephotourl %>" style="width:20px;border-radius: 50%;">&nbsp;&nbsp;&nbsp;&nbsp;<%= user.fullname %> < <%= user.email %> >
@@ -60,7 +60,7 @@
               <form action="/sendCopy" method="POST">
                 <input class="form-control" name="recipientId" type="text" value="<%= user.userid %>" hidden>
                 <input class="form-control" name="email" type="text" value="<%= user.email %>" hidden>
-                <input class="form-control" name="listId" type="text" value="<%= listid %>" hidden>
+                <input class="form-control" name="listIds" type="text" value="<%= listids %>" hidden>
                 <input class="timeInput" class="form-control" name="now" hidden>
                 <button title="Send a copy without sharing" class="btn zoom">
                   <img src="/img/send.png" style="width:20px">
@@ -183,7 +183,7 @@
   </div> -->
 
 
-  <div  data-bs-backdrop="static" data-bs-keyboard="false" class="modal fade" id="addCollaborator<%= listid%>" tabindex="-1" aria-labelledby="addCollaborator" aria-hidden="true">
+  <div  data-bs-backdrop="static" data-bs-keyboard="false" class="modal fade" id="addCollaborator<%= listids%>" tabindex="-1" aria-labelledby="addCollaborator" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content mx-auto text-center justify-content-center" style="width:500px">
         <div style="padding-top:10px">
@@ -192,7 +192,7 @@
         <div style="padding-top:10px;padding-bottom:5px;padding:10px">
           <form action="/searchUsers" method="POST">
             <input class="form-control" type="text" name="q" placeholder="search users..." oninvalid="this.setCustomValidity('Enter a name or email')" oninput="setCustomValidity('')" required>
-            <input class="form-control" name="listIdToCollaborate" type="text" value="<%= listid %>" hidden>   <!-- IDK -->
+            <input class="form-control" name="listIdsToCollaborate" type="text" value="<%= listids %>" hidden>   <!-- IDK -->
             <div style="padding-top:10px;">
               <button class="btn rounded-pill" style="border-color: #03a9f4;background-color: #b3e5fc;color:#03a9f4;font-size:12px">Search</button>
             </div>

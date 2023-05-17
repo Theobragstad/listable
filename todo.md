@@ -1,23 +1,23 @@
 ## To do
 - [ ] View layouts- grid uneven, list uneven, etc  
-- [ ] Path names, hide
 - [ ] Color in editor
-- [ ] Commands not working now (cmd)
+- [ ] Commands not working now when in editor (cmd)
 - [ ] Drag drop lists, for custom ordering, persist in database
-- [ ] Messages
 - [ ] Images
-- [ ] Turn off auto dark mode
 - [ ] Shared user cannot permanently delete, cannot restore
 - [ ] Dark mode: all white->black, black->white
 - [ ] Tinymce rules, settings, paid?
 - [ ] Formatting
 - [ ] Highlight results
 - [ ] Edit archive shared
+- [ ] Remove collaborators
 - [ ] Undo
 - [ ] Autosave
+- [ ] Action messages for all
+- [ ] Emails, formatting
 - [ ] CSS formatting
 - [ ] JS scripts
-- [ ] Select all button
+- [ ] Spacing of elements, cross computer support
 - [ ] Image paddings
 - [ ] JS replaces, handle apostrophe
 - [ ] Test edit create times long term
@@ -29,55 +29,46 @@
 - [ ] Padding, overflow
 - [ ] Change redirects-dont change pages. stay on same page after action
 - [ ] Actions
+- [ ] View, edit, own (transfer) list
+- [ ] Editors can/cannot change permissions/share, viewers can/cannot download/print/copy
 - [ ] Confirmation modals
 - [ ] Unarchive selected
-- [ ] Remove multiple collaborators
-- [ ] Remove collabs from multiple lists
 - [ ] Add/remove label selected
 - [ ] Text size setting
-- [ ] Quick note- types choice buttons
 - [ ] Download/export
-- [ ] Audio
-- [ ] Drawing
-- [ ] Share selected
-- [ ] Faster tooltips
-- [ ] Pin selected
-- [ ] Restore selected
-- [ ] Permanent delete sel
+- [ ] Restore selected (from trash)
+- [ ] Permanent delete selected (only from trash)
 - [ ] Empty trash should remove everything
-- [ ] Lock multiple, unlock (selection)
 - [ ] Match pages
-- [ ] Time zone
+- [ ] Dark theme
+- [ ] Help
+- [ ] Keyboard shortcuts
+- [ ] Deploy
+- [ ] Mobile app/small screen optimization
+- [ ] Reminders
+- [ ] Time zones handling
 - [ ] Cleanup
 - [ ] Multi actions from all pages
-- [ ] Checklists  
-- [ ] Media
-- [ ] Powerpaste
 - [ ] Encrypt lists, passwords
+- [ ] Small bugs
+- [ ] Things not appearing
 - [ ] Sort searches
 - [ ] Can edit copy of view only
 - [ ] Check all, uncheck all, move checked to bottom, delete checked
 - [ ] Date format
 - [ ] Search by: shared notes, labeled notes, pinned, date created, edited, more
-- [ ] Separate pinned/collapse pinned
 - [ ] Keyboard shortcuts
 - [ ] Folders
-- [ ] App/mobile optimization
 - [ ] Order alphabetically if time same
 - [ ] Scrollbar gone
 - [ ] What updates edit time
+- [ ] Edit time error
 - [ ] Collabs order
 - [ ] Search results with lots of results/users
-- [ ] Darken menu opacity
 - [ ] Change urls to make them cleaner
-- [ ] First time setting lock password: reenter password to verify identity
 - [ ] Forgot list password only appears if one has been set
 - [ ] Edit permissions feature is broken
 - [ ] Search results algorithm, highlighting
-- [ ] View and edit history
-- [ ] Text editor features: checklists, bullets, numbers, etc
-- [ ] Links, markdown
-- [ ] Voice notes
-- [ ] Image/photo notes
-- [ ] Notifications
+- [ ] Text editor features: checklists, bullets, numbers, links, markdown, images, checklists, powerpaste, media, etc
 - [ ] Buttons
+- [ ] Tooltips

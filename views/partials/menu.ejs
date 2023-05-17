@@ -1,7 +1,7 @@
 <div class="sticky-top menu" style="z-index:2;">
     <a href="/lists">
       <div class="logo" id="logo" style="position:absolute; top:10px; left:10px">
-        <img id="brain" class="zoomSmall" src="/img/brain.svg" style="width:60px;">
+        <img id="brain" class="" src="/img/brain.svg" style="width:60px;">
         <span id="logoName" style="padding-left:4px; font-weight: bold;color:#f289ca;font-size:28px">
           lists
         </span>
@@ -12,12 +12,12 @@
     <!-- <div class="col" style="padding-top:9px;padding-right:50px"> -->
       <!-- <div style="padding-bottom:0px"> -->
 
-      <button onclick="goToTop()" id="upArrow" title="Go to top" class="btn zoom rounded-10" style="position:absolute;top:55px;left:4px;padding:0px;background-color: white;line-height: .25;width:20px">
+      <button onclick="goToTop()" id="upArrow" data-title="Go to top" class="btn zoom rounded-10" style="position:absolute;top:55px;left:4px;padding:0px;background-color: white;line-height: .25;width:20px">
         <img src="/img/upArrow.png" style="width:100%" onmouseover="hover(this, 'upArrowPink')" onmouseout="unhover(this, 'upArrow')">
       </button>
       <!-- </div> -->
       <!-- <div style="padding-top:0px"> -->
-      <button onclick="goToBottom()" id="downArrow" title="Go to bottom" class="btn zoom rounded-10" style="position:absolute;top:75px;left:4px;padding:0px;background-color: white;line-height: .25;width:20px">
+      <button onclick="goToBottom()" id="downArrow" data-title="Go to bottom" class="btn zoom rounded-10" style="position:absolute;top:75px;left:4px;padding:0px;background-color: white;line-height: .25;width:20px">
         <img src="/img/downArrow.png" style="width:100%" onmouseover="hover(this, 'downArrowPink')" onmouseout="unhover(this, 'downArrow')">
       </button>
     <!-- </div> -->
@@ -32,7 +32,7 @@
 
             <div class="col" style="padding-top:9px">
             <a href="/lists" style="text-decoration:none">
-                <button title="Go to lists" class="btn rounded-10 zoom" style="border-color:#f289ca;background-color:#ffe6ee;padding: 0;line-height: 1.35;width:30px">
+                <button data-title="Lists" class="btn rounded-10 zoom" style="border-color:#f289ca;background-color:#ffe6ee;padding: 0;line-height: 1.35;width:30px">
                   <img src="/img/list.png" style="width:20px" onmouseover="hover(this, 'listPink')" onmouseout="unhover(this, 'list')">
                 </button>
             </a>
@@ -40,7 +40,7 @@
 
         <div class="col" style="padding-top:9px">
             <a href="/archive" style="text-decoration:none">
-                <button title="Go to archive" class="btn rounded-10 zoom" style="border-color:#f289ca;background-color:#ffe6ee;padding: 0;line-height: 1.25;width:30px">
+                <button data-title="Archive" class="btn rounded-10 zoom" style="border-color:#f289ca;background-color:#ffe6ee;padding: 0;line-height: 1.25;width:30px">
                   <img src="/img/archive.png" style="width:20px" onmouseover="hover(this, 'archiveGreen')" onmouseout="unhover(this, 'archive')">
                 </button>
             </a>
@@ -49,7 +49,7 @@
 
             <div class="col" style="padding-top:9px">
             <a href="/trash"  style="text-decoration:none">
-                <button title="Go to trash" class="btn rounded-10 zoom" style="border-color:#f289ca;background-color:#ffe6ee;padding: 0;line-height: 1.25;width:30px">
+                <button data-title="Trash" class="btn rounded-10 zoom" style="border-color:#f289ca;background-color:#ffe6ee;padding: 0;line-height: 1.25;width:30px">
                   <img src="/img/trash.png" style="width:20px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')">
                 </button>
             </a>
@@ -60,7 +60,7 @@
             <div class="col" style="padding-top:9px;padding-right: 0px;">
                   <ul class="nav navbar-nav" style="width:80px;display: block;">
                     <li class="dropdown">
-                      <a title="Go to labels" class="dropdown-toggle btn rounded-10 zoom" href="/labels" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="border-color:#f289ca;background-color:#ffe6ee;padding: 0px;line-height: 1.35;width:45px">
+                      <a data-title="Labels" class="dropdown-toggle btn rounded-10 zoom" href="/labels" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="border-color:#f289ca;background-color:#ffe6ee;padding: 0px;line-height: 1.35;width:45px">
                         <img src="/img/label.png" style="width:20px" onmouseover="hover(this, 'labelPink')" onmouseout="unhover(this, 'label')">
                         <span class="caret"></span>
                       </a>
@@ -83,16 +83,24 @@
                   </div>
                
            
-            
-        
+                
  
                   <div class="col" style="padding-right: 5px;padding-top: 5px;padding-left:0px;">
-            <button data-bs-toggle="modal" data-bs-target="#tipsModal" onmouseover="setTextColor(this, '#f289ca')" onmouseout="setTextColor(this, 'black')" title="Tips & Help" class="btn rounded-10 zoomSmall" style="border-radius:50%;color:black;background-color:#ffe6ee;border-color:#f289ca;padding: 5px;line-height: .5;font-size: 12px;font-weight: bold;">?</button>
+            <button data-bs-toggle="modal" data-bs-target="#tipsModal" onmouseover="setTextColor(this, '#f289ca')" onmouseout="setTextColor(this, 'black')" data-title="Help" class="btn rounded-10 zoomSmall" style="border-radius:50%;color:black;background-color:#ffe6ee;border-color:#f289ca;padding: 5px;line-height: .5;font-size: 12px;font-weight: bold;">?</button>
 </div>
+
+
+<!-- <div class="col" style="position:absolute;top:-6px;left:195px">
+  <button data-bs-toggle="modal" data-bs-target="#tipsModal" onmouseover="setTextColor(this, '#f289ca')" onmouseout="setTextColor(this, 'black')" data-title="Tips & Help" class="btn rounded-10 zoomSmall" style="border-radius:50%;color:black;background-color:#ffe6ee;border-color:#f289ca;padding: 5px;line-height: .5;font-size: 12px;font-weight: bold;">?</button>
+</div> 
+
+<div class="col" style="position:absolute;top:14px;left:195px">
+  <button data-bs-toggle="modal" data-bs-target="#tipsModal" onmouseover="setTextColor(this, '#f289ca')" onmouseout="setTextColor(this, 'black')" data-title="Tips & Help" class="btn rounded-10 zoomSmall" style="border-radius:50%;color:black;background-color:#ffe6ee;border-color:#f289ca;padding: 5px;line-height: .5;font-size: 12px;font-weight: bold;">?</button>
+</div> -->
 
 <div class="col" style="padding-right: 0px;padding-left: 0px;">
             <button class="btn rounded-10 name " data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-custom-class="small-tooltip" data-bs-title="<%= user.email %>" style="border-color:#f289ca;background-color:#ffe6ee;font-size:12px">
-                <span style="text-overflow:ellipsis;overflow:hidden;max-width:135px;white-space: nowrap;display: block;">
+                <span data-bs-toggle="modal" data-bs-target="#settingsModal" style="text-overflow:ellipsis;overflow:hidden;max-width:135px;white-space: nowrap;display: block;">
                 <img src="<%= user.profilePhoto %>" style="width:20px;border-radius: 50%;">&nbsp;&nbsp;
                 <%= user.givenName %></span>
             </button>
@@ -100,7 +108,7 @@
 
         <div class="col" style="padding-left: 5px;padding-top:1px">
 
-            <a onmouseover="hover(document.getElementById('logoutArrow'), 'leftArrowPink')" onmouseout="hover(document.getElementById('logoutArrow'), 'leftArrowBlack')" title="Log out" href="/logout" class="btn rounded-10 logout" style="height:33.25px;border-color:#000000;background-color:#ececec;font-size:12px">
+            <a onmouseover="hover(document.getElementById('logoutArrow'), 'leftArrowPink')" onmouseout="hover(document.getElementById('logoutArrow'), 'leftArrowBlack')" data-title="Log out" href="/logout" class="btn rounded-10 logout" style="height:33.25px;border-color:#000000;background-color:#ececec;font-size:12px">
                 <img id="logoutArrow" src="/img/leftArrowBlack.png" style="width:15px">
             </a>
         </div>
@@ -121,10 +129,10 @@
   
   <div class="modal modal-lg fade" id="tipsModal" tabindex="-1" aria-labelledby="tipsModal" aria-hidden="true">
     <div class="modal-dialog" >
-      <div class="modal-content mx-auto" style="padding:10px;background-color: #ffe6ee; border:#f289ca 3px solid;">
+      <div class="modal-content mx-auto" style="padding:10px; border:#f289ca 3px solid;">
         <div class="logo text-center" style="color:#f289ca;font-size:22px;">Tips & Help</div>
         <hr>
-        <div class="logo" style="font-size:16px">
+        <div class="" style="font-size:16px">
           <ul>
             <li>Do actions on multiple lists at once:
             <ul>
@@ -170,6 +178,76 @@
     </div>
   </div>
   
+
+  <div class="modal modal-sm fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModal" aria-hidden="true">
+    <div class="modal-dialog" >
+      <div class="modal-content mx-auto" style="padding:10px; border:#ffe6ee 3px solid;">
+        <div class="logo text-center" style="color:#f289ca;font-size:22px;">Settings</div>
+        <div class="" style="">
+          <br>
+          <div>
+             
+            <form>
+              <h5>Theme</h5>
+              <label class="radio-inline">
+                <input type="radio" name="optradio" checked> System   
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="optradio" style="margin-left: 10px"> Dark
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="optradio" style="margin-left: 10px"> Light
+              </label>
+            </form>
+          </div>
+          <br>
+          <div>
+            <form>
+              <h5>Text size</h5>
+              <label class="radio-inline">
+                <input type="radio" name="optradio"> Smaller
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="optradio" style="margin-left: 10px" checked> Default
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="optradio" style="margin-left: 10px"> Bigger
+              </label>
+            </form>
+          </div>
+          <br>
+          <div>
+            <button class="btn rounded-pill" style="color:#03a9f4;" data-bs-toggle="modal" data-bs-target="#sendFeedbackModal">Feedback</button>
+          </div>
+        </div>
+    </div>
+    </div>
+  </div>
+
+
+  <form action="/sendFeedback" method="POST">
+    <div class="modal fade" id="sendFeedbackModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <h1 class="modal-title fs-3">Send feedback</h1>
+                    <button type="reset" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                    <div class="modal-body">
+                      <div class="form-floating mb-3">
+                        <input type="text" class="form-control" name="email" id="email" value="<%= user.email %>" readonly>
+                        <label for="name">Your email</label>
+                      </div>
+                      <textarea class="feedbackForm form-control" name="feedback" id="feedback" maxlength="1000" rows="5" style="height:100%;" required></textarea>
+                    </div>
+                <div class="modal-footer">
+                    <button type="reset" class="btn rounded-pill" style="background-color:#dedee3; color:#9c9cac" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn rounded-pill" style="background-color:#e8fcec; color:#17d475">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
   
   <style>
     
@@ -182,6 +260,15 @@
       overflow-y: auto;
       max-height: calc(100vh - 150px);
     }
+
+
+    grad {
+  font-size: 8px;
+  background: -webkit-linear-gradient(white, black);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
   
   </style>
   

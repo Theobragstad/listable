@@ -14,40 +14,40 @@
 
 
     <div class="col-1.5">
-    <div>
-      <% if(editable && !locked) { %>
-        <button title="Select list" id="" value=<%=list.listid %> class="btn rounded-10 zoom" style="position:relative;left:11px;top:29px;z-index: 1;line-height: .25;width:15px;padding: 0px;">
-          <img class="listSelector" src="/img/colors/white.png" style="width:15px" onclick="changeImage(this, 'colors/white', 'colors/ffffffSelected')">
-
-          <% } else { %>
-            <button disabled title="Select list" id="" value=<%=list.listid %> class="btn rounded-10 zoom" style="border-color:white;position:relative;left:11px;top:29px;z-index: 1;line-height: .25;width:15px;padding: 0px;">
-              <img class="" src="/img/colors/white.png" style="width:15px" onclick="changeImage(this, 'colors/white', 'colors/ffffffSelected')">
-
-              <% } %>
-      </button>
-    </div>
+    
     
 
     <% if(editable && !(pinnedListIds.includes(list.listid)) && !locked) { %>
       <div title="Edit list" data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid %>" data-toggle="modal" id="<%= list.listid %>" class="list col card card-body m-2" style="max-width:600px;min-width:260px;background-color:#<%= list.color %>;" color="<%= list.color %>">
     <% } else if(editable && pinnedListIds.includes(list.listid) && !locked) { %>
-      <div title="Edit list" data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid %>" data-toggle="modal" id="<%= list.listid %>" class="list col card card-body m-2" style="border:#FDFD96 3px solid;max-width:600px;min-width:260px;background-color:#<%= list.color %>;" color="<%= list.color %>">
+      <div title="Edit list" data-bs-toggle="modal" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid %>" data-toggle="modal" id="<%= list.listid %>" class="list col card card-body m-2" style="border:black 1px solid;max-width:600px;min-width:260px;background-color:#<%= list.color %>;" color="<%= list.color %>">
     <% } else if(!(pinnedListIds.includes(list.listid)) && locked) { %>
       <div title="This list is locked." data-bs-toggle="null" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid %>" data-toggle="" id="<%= list.listid %>" class="list col card card-body m-2" style="max-width:600px;min-width:260px;background-color:#<%= list.color %>;" color="<%= list.color %>">
     <% } else if(pinnedListIds.includes(list.listid) && locked) { %>
-      <div title="This list is locked." data-bs-toggle="null" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid %>" data-toggle="" id="<%= list.listid %>" class="list col card card-body m-2" style="border:#FDFD96 3px solid;max-width:600px;min-width:260px;background-color:#<%= list.color %>;" color="<%= list.color %>">
+      <div title="This list is locked." data-bs-toggle="null" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid %>" data-toggle="" id="<%= list.listid %>" class="list col card card-body m-2" style="border:black 1px solid;max-width:600px;min-width:260px;background-color:#<%= list.color %>;" color="<%= list.color %>">
     <% } else if(!editable && pinnedListIds.includes(list.listid) && !locked) { %>
-      <div title="This list is view-only." data-bs-toggle="null" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid %>" data-toggle="" id="<%= list.listid %>" class="list col card card-body m-2" style="border:#FDFD96 3px solid;max-width:600px;min-width:260px;background-color:#<%= list.color %>;" color="<%= list.color %>">
+      <div title="This list is view-only." data-bs-toggle="null" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid %>" data-toggle="" id="<%= list.listid %>" class="list col card card-body m-2" style="border:black 1px solid;max-width:600px;min-width:260px;background-color:#<%= list.color %>;" color="<%= list.color %>">
     <% } else if(!editable && !(pinnedListIds.includes(list.listid)) && !locked) { %>
       <div title="This list is view-only." data-bs-toggle="null" data-bs-target="#editList<%= list.listid%>" type="button" href="#editList<%= list.listid %>" data-toggle="" id="<%= list.listid %>" class="list col card card-body m-2" style="max-width:600px;min-width:260px;background-color:#<%= list.color %>;" color="<%= list.color %>">
     <% } %>
 
 
+    <div class="selectButton" style="position: absolute;top:-41px;left:-16px;z-index:10">
+      <% if(editable && !locked) { %>
+        <button title="Select list" id="" value=<%=list.listid %> class="no-modal btn rounded-10 zoom" style="position:relative;left:11px;top:29px;z-index: 1;line-height: .25;width:15px;padding: 0px;">
+          <img class="listSelector" src="/img/colors/white.png" style="width:15px" onmouseover="stopModals()" onmouseout="startModals()" onclick="changeImageForSelectButton(this, 'colors/white', 'colors/ffffffSelected')">
 
+          <% } else { %>
+            <button disabled title="Select list" id="" value=<%=list.listid %> class="btn rounded-10 zoom" style="border-color:white;position:relative;left:11px;top:29px;z-index: 1;line-height: .25;width:15px;padding: 0px;">
+              <img class="listSelector" src="/img/colors/white.png" style="width:15px" onclick="changeImageForSelectButton(this, 'colors/white', 'colors/ffffffSelected')">
+
+              <% } %>
+      </button>
+    </div>
 
 
       <div class="buttonSet row" style="font-weight:bold;padding-left:10px;">
-            
+        
           
         <% var canDelete = false; %>
         <% for(var i=0; i < collaborators.length; i++) { %>
@@ -75,9 +75,19 @@
         <% if(canDelete) { %>
           <div>
             <% if(n > 1) { %>
-              <button data-bs-toggle="modal" data-bs-target="#confirmDeleteShared<%= list.listid %>" href="#confirmDeleteShared<%= list.listid %>" data-toggle="modal" title="Delete shared list" class="btn rounded-10 zoom" style="position:absolute;right:10px;background-color:#ffe5ec;padding: 0px;line-height: .25;width:20px">
+
+              <% if(!locked) { %>
+                <button data-bs-toggle="modal" data-bs-target="#confirmDeleteShared<%= list.listid %>" href="#confirmDeleteShared<%= list.listid %>" data-toggle="modal" title="Delete shared list" class="btn rounded-10 zoom" style="position:absolute;right:10px;background-color:#ffe5ec;padding: 0px;line-height: .25;width:20px">
+
+              <% } else { %>
+                <button disabled data-bs-toggle="modal" data-bs-target="#confirmDeleteShared<%= list.listid %>" href="#confirmDeleteShared<%= list.listid %>" data-toggle="modal" title="Delete shared list" class="btn rounded-10 zoom" style="position:absolute;right:10px;background-color:#ffe5ec;padding: 0px;line-height: .25;width:20px">
+
+              <% } %>
                 <img id="confirmDeleteShared" src="/img/trash.png" data-bs-dismiss="" style="width:15px" onmouseover="hover(this, 'trashPink')" onmouseout="unhover(this, 'trash')">
               </button>
+
+
+
             <% } else { %>
               <form action="/deleteList" method="POST">
                 <input class="timeInput" class="form-control" name="now" hidden>
@@ -161,10 +171,21 @@
         <% } %>
   
         <div class="col">
+          <% var collaboratorCount = 0 %>
+          <% collaborators.forEach(function(collaborator) { %>
+            <% if(collaborator.listid == list.listid && user.email !== collaborator.email) { %>
+              <% collaboratorCount++; %>
+            <% } %>
+          <% }) %>
+          <% var lengthStatement = 'Add collaborator' %>
+          <% if(collaboratorCount == 1) lengthStatement = '1 collaborator. Add more...' %>
+          <% if(collaboratorCount > 1) lengthStatement = collaboratorCount + ' collaborators. Add more...' %>
+
+
           <% if(editable && !locked) { %>
-            <button title="Add collaborator" type="button" class="btn rounded-10 zoom" data-id="<%= list.listid %>" data-bs-toggle="modal" data-bs-target="#addCollaborator<%= list.listid %>" href="#addCollaborator<%= list.listid %>" data-toggle="modal" style="border-color:white;background-color:white;position:absolute;right:140px;padding: 2px;line-height: .25;width:20px">
+            <button title="<%= lengthStatement %>" type="button" class="btn rounded-10 zoom" data-id="<%= list.listid %>" data-bs-toggle="modal" data-bs-target="#addCollaborator<%= list.listid %>" href="#addCollaborator<%= list.listid %>" data-toggle="modal" style="border-color:white;background-color:white;position:absolute;right:140px;padding: 2px;line-height: .25;width:20px">
           <% } else { %>
-            <button disabled title="Add collaborator" type="button" class="btn rounded-10 zoom" data-id="<%= list.listid %>" data-bs-toggle="modal" data-bs-target="#addCollaborator<%= list.listid %>" href="#addCollaborator<%= list.listid %>" data-toggle="modal" style="border-color:white;background-color:white;position:absolute;right:140px;padding: 2px;line-height: .25;width:20px">
+            <button disabled title="<%= lengthStatement %>" type="button" class="btn rounded-10 zoom" data-id="<%= list.listid %>" data-bs-toggle="modal" data-bs-target="#addCollaborator<%= list.listid %>" href="#addCollaborator<%= list.listid %>" data-toggle="modal" style="border-color:white;background-color:white;position:absolute;right:140px;padding: 2px;line-height: .25;width:20px">
           <% } %>
             <img src="/img/addCollaborator.png" style="width:15px" onmouseover="hover(this, 'addCollaboratorBlue')" onmouseout="unhover(this, 'addCollaborator')">
           </button>
@@ -392,6 +413,7 @@
           <% }) %>
         </div>
       </div>
+
     </div>
 </div>
     </div>
