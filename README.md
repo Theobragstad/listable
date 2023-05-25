@@ -12,7 +12,7 @@ TinyMCE text editor
 Nodemailer for messaging  
 
 
-Some of the primary features include:  
+Features include  
 - Google signin
 - Create and edit lists and notes
 - Delete and archive
