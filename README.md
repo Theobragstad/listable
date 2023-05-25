@@ -1,42 +1,34 @@
 # **lists**
 
-## **lists is a full-featured list/note/to-do web app!** 
-## **Save and keep track of everything you want to remember**.
-### All with a productivity-focused UI that is clean, appealing, intuitive, fast, detail-oriented, and enjoyable to use! 
+lists is a full-featured list/note/to-do web app
+Save and keep track of everything you want to remember.
+Productivity-focused UI: clean, appealing, intuitive, fast, detail-oriented. 
+
+PostgreSQL  
+JavaScript, Node.js, Express, Docker    
+EJS, HTML, CSS, Bootstrap     
+Google OAuth2 API, Passport.js for login
+TinyMCE text editor  
+Nodemailer for messaging  
 
 
-It uses:  
-**PostgreSQL**   
-**JavaScript**, **Node.js**, **Express**   
-**EJS**, **HTML**, **CSS**, **Bootstrap**  
-
-And uses the **Google OAuth2 API** with the **Passport.js** module for user authentication.  
-It also uses the **TinyMCE** text editor, and the **Nodemailer** module.  
-**Docker** is used to containerize the app.  
-
-Check it out to explore all the features!
-
-### **Some of the primary features include:**
-- Log in with your Google account
-- Create and edit lists and notes in a text editor
-- Delete and archive lists
-- Change list background colors
+Some of the primary features include:  
+- Google signin
+- Create and edit lists and notes
+- Delete and archive
+- Change background colors
 - Create and assign labels to lists
-- Search lists
+- Search
 - Share lists to collaborate with other users
     - Users are notified via email when a list is shared with them
 - Select lists to perform actions on multiple lists at once
 - Copy lists
-- Keep track of your lists with built-in edit and create times
-- Automatic dark mode  
-- Clean, appealing, intuitive, fast, and detail-oriented UI to help users be more productive
-- And many more!
+- Keep track of your lists with edit and create times
+- And many more
 
-## **How to run**:  
-- Make sure you have Docker Desktop downloaded and running
+How to run locally:  
+- Docker Desktop downloaded and running
 - Clone or download this repository
-- Navigate to the project folder in the terminal
-- Run 'docker compose up' in the terminal
-- Go to localhost:3000 on a browser to begin!
-
-    - (Note that to use the collaboration features that require other users, you will need to register another account through an alternate Google account first, as the app is not deployed and therefore the user base is limited to local sessions.)
+- Navigate to the project folder in a terminal
+- Run 'docker compose up'
+- Go to localhost:3000 on a browser
