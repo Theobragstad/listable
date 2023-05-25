@@ -9,7 +9,7 @@ Clean, appealing, intuitive, fast, detail-oriented
 PostgreSQL  
 JavaScript, Node.js, Express, Docker    
 EJS, HTML, CSS, Bootstrap     
-Google OAuth2 API, Passport.js for login
+Google OAuth2 API, Passport.js for login  
 TinyMCE text editor  
 Nodemailer for messaging  
 <br><br>
