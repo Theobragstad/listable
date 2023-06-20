@@ -14,9 +14,9 @@
 
 <body>
   
-  <iframe width="300" height="200" frameborder="0" scrolling="no" allowfullscreen src="https://arcg.is/XSrLS"></iframe>
+  <!-- <iframe width="300" height="200" frameborder="0" scrolling="no" allowfullscreen src="https://arcg.is/XSrLS"></iframe> -->
   
-  <!-- <div style="position: absolute;left:400px;top:200px;z-index:0">HELLO
+   <div style="position: absolute;left:400px;top:200px;z-index:0">HELLO
     HELLO
     HELLO
     HELLO
@@ -43,7 +43,7 @@
     HELLOHELLOHELLOHELLOHELLOHELLOHELLOHELLOHELLO
     HELLO
   </div>
- -->
+
 
     <style>
         body {
@@ -59,98 +59,98 @@
 
   
  
-// let scene, camera, renderer, controls, sphere;
+let scene, camera, renderer, controls, sphere;
 
-//     function init(){
-//       scene = new THREE.Scene();
-//       scene.background = new THREE.Color("#ffffff");
-//       camera = new THREE.PerspectiveCamera(
-//       75, 
-//       window.innerWidth / window.innerHeight,
-//       .9,
-//       1000
+    function init(){
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color("#ffffff");
+      camera = new THREE.PerspectiveCamera(
+      75, 
+      window.innerWidth / window.innerHeight,
+      .9,
+      1000
       
-//     );
+    );
     
-//       renderer = new THREE.WebGLRenderer({antialias: true});
-//       renderer.setSize(window.innerWidth, window.innerHeight);
-//       document.body.appendChild(renderer.domElement);
-//       controls = new THREE.OrbitControls( camera, renderer.domElement );
-//       controls.autoRotate = false;
+      renderer = new THREE.WebGLRenderer({antialias: true});
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+      controls = new THREE.OrbitControls( camera, renderer.domElement );
+      controls.autoRotate = false;
       
-//       controls.minDistance = 5;
-//       controls.maxDistance = 5;
+      controls.minDistance = 5;
+      controls.maxDistance = 5;
 
-//       var light = new THREE.DirectionalLight(0xff9fe8, 1.2);
-//       light.position.set(0, 0, 100);
-//       scene.add(light);
+      var light = new THREE.DirectionalLight(0xff9fe8, 1.2);
+      light.position.set(0, 0, 100);
+      scene.add(light);
       
-//       const color1 = new THREE.Color("#ff9fe8");
-//       var sphereGeometry = new THREE.SphereGeometry(1, 128, 128);
-//       var sphereMaterial = new THREE.MeshLambertMaterial({color: color1});
-//       // const material = new THREE.MeshBasicMaterial({color: color1});
-//      sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+      const color1 = new THREE.Color("#ff9fe8");
+      var sphereGeometry = new THREE.SphereGeometry(1, 128, 128);
+      var sphereMaterial = new THREE.MeshLambertMaterial({color: color1});
+      const material = new THREE.MeshBasicMaterial({color: color1});
+     sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
 
-//       scene.add(sphere);
+      scene.add(sphere);
       
       
 
       
-//     //   const geometry = new THREE.BoxGeometry( 2, 2, 2);
-//     //   const color1 = new THREE.Color("#09143c");
-//     //   const material = new THREE.MeshBasicMaterial({color: color1});
+      const geometry = new THREE.BoxGeometry( 2, 2, 2);
+      const color1 = new THREE.Color("#09143c");
+      const material = new THREE.MeshBasicMaterial({color: color1});
       
       
-//     //   cube = new THREE.Mesh(geometry, material);
-//     //   scene.add(cube);
-//       camera.position.z = 5;
-//     }
+      cube = new THREE.Mesh(geometry, material);
+      scene.add(cube);
+      camera.position.z = 5;
+    }
     
-//     function onWindowResize(){
-//       camera.aspect = window.innerWidth / window.innerHeight;
-//       camera.updateProjectionMatrix();
-//       renderer.setSize(window.innerWidth, window.innerHeight);
-//     }
+    function onWindowResize(){
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
     
-//     //window.addEventListener('resize', onWindowResize, false);
+    window.addEventListener('resize', onWindowResize, false);
     
-//     function update(){
+    function update(){
       
-//       var time = performance.now() * 0.001;
-//           for (var i=0; i < sphere.geometry.vertices.length; i++){
-//           var p = sphere.geometry.vertices[i];
-//           p.normalize().multiplyScalar(1 + 0.3 * noise.perlin3(p.x + time, p.y, p.z));
-//         }
-//         sphere.geometry.verticesNeedUpdate = true;
-//         sphere.geometry.computeVertexNormals();
-//         sphere.geometry.normalsNeedUpdate = true;
-//         if(Date.now() % 10 == 0) {
-//           var hex = "0x" + "000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);});        
-//           sphere.material.color.setHex(hex);
-//         }
-//         sphere.position.set( 100, 200, 300 );
-
-
-      
-
+      var time = performance.now() * 0.001;
+          for (var i=0; i < sphere.geometry.vertices.length; i++){
+          var p = sphere.geometry.vertices[i];
+          p.normalize().multiplyScalar(1 + 0.3 * noise.perlin3(p.x + time, p.y, p.z));
+        }
+        sphere.geometry.verticesNeedUpdate = true;
+        sphere.geometry.computeVertexNormals();
+        sphere.geometry.normalsNeedUpdate = true;
+        if(Date.now() % 10 == 0) {
+          var hex = "0x" + "000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);});        
+          sphere.material.color.setHex(hex);
+        }
+        sphere.position.set( 100, 200, 300 );
 
 
       
-//     }
+
+
+
+      
+    }
     
-//     function animate(){
-//       requestAnimationFrame(animate);
-//       controls.update();
-//       update();
-//       // cube.rotation.x += 0.01;
-//       // cube.rotation.y += 0.01;
-//       renderer.render(scene, camera);
-//     }
+    function animate(){
+      requestAnimationFrame(animate);
+      controls.update();
+      update();
+      cube.rotation.x += 0.01;
+      cube.rotation.y += 0.01;
+      renderer.render(scene, camera);
+    }
     
    
-//     init();
+    init();
     
-//     animate();
+    animate();
     
     </script>
     <footer class="text-center text-muted w-100 mt-auto fixed" style= "position: relative; bottom: 0px">

@@ -1679,6 +1679,7 @@ app.post('/shareSelectionSearch', function(req, res) {
         return parseInt(x, 10); 
     });
 
+    console.log(listIdsToCollaborateClean);
     var searchQuery = `SELECT * FROM users WHERE userId != '${req.session.user.id}' AND userID NOT IN(SELECT userID FROM listsToUsers WHERE listId IN (${listIdsToCollaborateClean})) AND (email LIKE '%${q}%' OR LOWER(email) LIKE '%${q}%' OR fullname LIKE '%${q}%' OR LOWER(fullname) LIKE '%${q}%');`;
 
     db.any(searchQuery)
@@ -1962,11 +1963,11 @@ function sendCollaborationEmail(emailTo, emailFrom, nameFrom, title, list, copy)
     }
 
     var subject =  nameFrom + ' shared their list "' + listInfo + '" with you';
-    var html = nameFrom + ' (' + emailFrom + ')' + ' shared their list "' + listInfo + '" with you. Log in to collaborate on it.';
+    var html = '<p style="text-align:center;margin-left:auto;margin-right:auto;width:300px">' + nameFrom + ' (' + emailFrom + ')' + ' shared their list "' + listInfo + '" with you. Log in to collaborate on it.</p>';
 
     if(copy == 'true') {
         subject = nameFrom + ' copied a list you have access to';
-        html = nameFrom + ' (' + emailFrom + ')' + ' copied a list you have access to ("' + listInfo + '"). You now have access to the new copy as well, with your original labels preserved. Log in to collaborate on it.';
+        html = '<p style="text-align:center;margin-left:auto;margin-right:auto;width:300px">' + nameFrom + ' (' + emailFrom + ')' + ' copied a list you have access to ("' + listInfo + '"). You now have access to the new copy as well, with your original labels preserved. Log in to collaborate on it.</p>';
     }
 
     let transporter = nodemailer.createTransport({
@@ -2022,7 +2023,7 @@ function sendCopyEmail(emailTo, emailFrom, nameFrom, title, list) {
     }
 
     var subject =  nameFrom + ' sent a copy of their list "' + listInfo + '" to you';
-    var html = nameFrom + ' (' + emailFrom + ')' + ' sent you a copy of their list "' + listInfo + '". Log in to see.';
+    var html = '<p style="text-align:center;margin-left:auto;margin-right:auto;width:300px">' + nameFrom + ' (' + emailFrom + ')' + ' sent you a copy of their list "' + listInfo + '". Log in to see.</p>';
 
     let transporter = nodemailer.createTransport({
         service: 'gmail',
@@ -2065,7 +2066,7 @@ function sendCopyEmail(emailTo, emailFrom, nameFrom, title, list) {
 
 function sendListPasswordResetEmail(emailTo, code) {
     var subject =  'Your list password reset code';
-    var html = 'Use code ' + code + ' to change your list password.<br>If you did not request this code, ignore this message.';
+    var html = '<p style="text-align:center;margin-left:auto;margin-right:auto;width:300px">Use code ' + code + ' to change your list password.<br>If you did not request this code, ignore this message.</p>';
 
     let transporter = nodemailer.createTransport({
         service: 'gmail',

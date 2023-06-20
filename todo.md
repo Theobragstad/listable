@@ -7,11 +7,21 @@
 - [ ] Shared user cannot permanently delete, cannot restore
 - [ ] Dark mode: all white->black, black->white
 - [ ] Tinymce rules, settings, paid?
+- [ ] After adding list with label, route to that label's page
 - [ ] Formatting
 - [ ] Highlight results
 - [ ] Edit archive shared
+- [ ] Cannot select when not owner (or can select, but cannot perform certain actions.)
 - [ ] Remove collaborators
 - [ ] Undo
+- [ ] Label selected
+- [ ] Delete list have access to
+- [ ] Remove from selected
+- [ ] Remove myself from modal page too
+- [ ] Lock selected
+- [ ] Notify if removed (myself or by someone else)
+- [ ] Remove all collabs of selected
+- [ ] Copy selected
 - [ ] Autosave
 - [ ] Action messages for all
 - [ ] Emails, formatting
