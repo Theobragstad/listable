@@ -1,26 +1,17 @@
 #### lists
 
-lists is a full-featured list/note/to-do web app  
+<img src="resources/img/brain.png" width="50px"/>lists is a full-featured list/note/to-do web app  
 Save and keep track of everything you want to remember  
-Productivity-focused UI  
-Clean, appealing, intuitive, fast, detail-oriented   
+Productivity-focused UI / clean, appealing, intuitive, fast   
 <br><br>
 
-PostgreSQL  
-JavaScript, Node.js, Express, Docker    
-EJS, HTML, CSS, Bootstrap     
-Google OAuth2 API, Passport.js for login  
-TinyMCE text editor  
-Nodemailer for messaging  
-<br><br>
-
-Features include  
-- Google signin
+Features include:  
+- Google sign in
 - Create and edit lists and notes
-- Delete and archive
-- Change background colors
+- Delete and archive lists
+- Change list background colors
 - Create and assign labels to lists
-- Search
+- Search your notes
 - Share lists to collaborate with other users
 - Select lists to perform actions on multiple lists at once
 - Copy lists
@@ -29,7 +20,7 @@ Features include
 <br><br>
 
 How to run locally:  
-- Docker Desktop downloaded and running
+- Make sure Docker Desktop is downloaded and running
 - Clone or download this repository
 - Navigate to the project folder in a terminal
 - Run 'docker compose up'
