@@ -4,6 +4,7 @@
 - [ ] Commands not working now when in editor (cmd)
 - [ ] Drag drop lists, for custom ordering, persist in database
 - [ ] Images
+- [ ] Error checking
 - [ ] Shared user cannot permanently delete, cannot restore
 - [ ] Dark mode: all white->black, black->white
 - [ ] Tinymce rules, settings, paid?
