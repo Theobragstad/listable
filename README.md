@@ -1,7 +1,7 @@
 #### listable
 
 <img src="resources/img/brain.png" width="50px"/>  
-listable is a full-featured list/note/to-do web app that allows you to save and keep track of everything you want to remember, all with a productivity-focused UI that is clean, appealing, intuitive, and fast
+listable is a full-featured list/note/to-do web app that allows you to save and keep track of everything you want to remember, all with a productivity-focused UI that is clean, appealing, intuitive, and fast.
 <br><br>
 
 Primary features include:  
@@ -14,7 +14,7 @@ Primary features include:
 - Share lists to collaborate with other users
 - Select lists to perform actions on multiple lists at once
 - Copy lists
-- Keep track of your work with edit and create times
+- Keep track of your work with edit and create timestamps
 <br><br>
 
 The app is currently not deployed (as it is not completely finished), but you can try it locally:  
