@@ -17,7 +17,7 @@ Primary features include:
 - Keep track of your work with edit and create times
 <br><br>
 
-The app is currently not deployed, but you can try it locally:  
+The app is currently not deployed (as it is not completely finished), but you can try it locally:  
 - Make sure Docker Desktop is downloaded and running
 - Clone or download this repository
 - Navigate to the project folder in a terminal
