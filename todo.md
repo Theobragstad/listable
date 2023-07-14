@@ -1,5 +1,6 @@
 ## To do
-- [ ] View layouts- grid uneven, list uneven, etc  
+
+- [ ] View layouts- grid uneven, list uneven, etc
 - [ ] Color in editor
 - [ ] Commands not working now when in editor (cmd)
 - [ ] Drag drop lists, for custom ordering, persist in database
@@ -15,7 +16,9 @@
 - [ ] Cannot select when not owner (or can select, but cannot perform certain actions.)
 - [ ] Remove collaborators
 - [ ] Undo
+- [ ] Multiple css files (more specific scopes)
 - [ ] Label selected
+- [ ] Security improvements
 - [ ] Delete list have access to
 - [ ] Remove from selected
 - [ ] Remove myself from modal page too
@@ -58,7 +61,7 @@
 - [ ] Mobile app/small screen optimization
 - [ ] Reminders
 - [ ] Time zones handling
-- [ ] Cleanup
+- [ ] Cleanup code
 - [ ] Multi actions from all pages
 - [ ] Encrypt lists, passwords
 - [ ] Small bugs
@@ -82,4 +85,4 @@
 - [ ] Search results algorithm, highlighting
 - [ ] Text editor features: checklists, bullets, numbers, links, markdown, images, checklists, powerpaste, media, etc
 - [ ] Buttons
-- [ ] Tooltips
+- [ ] Tooltips fix
