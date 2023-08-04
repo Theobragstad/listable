@@ -12,6 +12,7 @@
 - [ ] After adding list with label, route to that label's page
 - [ ] Formatting
 - [ ] Highlight results
+- [ ] Todo chg color from inside list
 - [ ] Edit archive shared
 - [ ] Cannot select when not owner (or can select, but cannot perform certain actions.)
 - [ ] Remove collaborators
@@ -86,3 +87,4 @@
 - [ ] Text editor features: checklists, bullets, numbers, links, markdown, images, checklists, powerpaste, media, etc
 - [ ] Buttons
 - [ ] Tooltips fix
+- [ ] Links to modals in URL so open and share
