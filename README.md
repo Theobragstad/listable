@@ -1,6 +1,7 @@
+<img src="resources/img/brain.png" width="50px"/>  
+
 #### listable
 
-<img src="resources/img/brain.png" width="50px"/>  
 listable is a full-featured list/note/to-do web app that allows you to save and keep track of everything you want to remember, all with a productivity-focused UI that is clean, appealing, intuitive, and fast.
 <br><br>
 
