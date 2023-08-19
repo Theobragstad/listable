@@ -23,3 +23,7 @@ The app is currently not deployed (as it is not completely finished), but you ca
 - Navigate to the project folder in a terminal
 - Run 'docker compose up'
 - Go to localhost:3000 in a browser
+
+
+https://github.com/Theobragstad/listable/assets/48075045/4f9c840a-67cb-4707-978a-6522ed6be52f
+
