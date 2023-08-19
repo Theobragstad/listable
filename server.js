@@ -823,11 +823,11 @@ app.post("/pinList", function (req, res) {
     `UPDATE listsToUsers SET pinned = TRUE WHERE listId = '${req.body.listId}' AND userId = '${req.session.user.id}';`
   )
     .then(() => {
-      return res.redirect("/lists?pin=success");
+      return res.redirect(`/${req.body.sourcePage}?pin=success`);
     })
     .catch((error) => {
       console.log(error);
-      return res.redirect("/lists?pin=error");
+      return res.redirect(`/${req.body.sourcePage}?pin=error`);
     });
 });
 

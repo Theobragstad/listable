@@ -1,5 +1,6 @@
-<div class="sticky-top menu" style="z-index: 2">
-  <a href="/lists">
+<div class="sticky-top menu" style="z-index: 1;backdrop-filter: blur(100px);">
+  <a href="/lists" >
+
     <div
       class="logo"
       id="logo"
@@ -15,8 +16,7 @@
           font-size: 28px;
         "
       >
-        lists
-      </span>
+      listable      </span>
     </div>
   </a>
 
@@ -26,7 +26,7 @@
   <button
     onclick="goToTop()"
     id="upArrow"
-    data-title="Go to top"
+    title="Go to top"
     class="btn zoom rounded-10"
     style="
       position: absolute;
@@ -50,7 +50,7 @@
   <button
     onclick="goToBottom()"
     id="downArrow"
-    data-title="Go to bottom"
+    title="Go to bottom"
     class="btn zoom rounded-10"
     style="
       position: absolute;
@@ -78,9 +78,11 @@
 
   <div class="row g-3" style="position: absolute; right: 10px; top: 10px">
     <div class="col" style="padding-top: 9px">
-      <a href="/lists" style="text-decoration: none">
+      <a href="/lists" style="text-decoration: none"       title="Lists"
+      onmouseover="hover(this.children[0].children[0], 'listPink')"
+            onmouseout="unhover(this.children[0].children[0], 'list')"
+      >
         <button
-          data-title="Lists"
           class="btn rounded-10 zoom"
           style="
             border-color: #f289ca;
@@ -93,17 +95,16 @@
           <img
             src="/img/list.png"
             style="width: 20px"
-            onmouseover="hover(this, 'listPink')"
-            onmouseout="unhover(this, 'list')"
+            
           />
         </button>
       </a>
     </div>
 
     <div class="col" style="padding-top: 9px">
-      <a href="/archive" style="text-decoration: none">
+      <a href="/archive" style="text-decoration: none"  onmouseover="hover(this.children[0].children[0], 'archiveGreen')"
+      onmouseout="unhover(this.children[0].children[0], 'archive')">
         <button
-          data-title="Archive"
           class="btn rounded-10 zoom"
           style="
             border-color: #f289ca;
@@ -116,17 +117,16 @@
           <img
             src="/img/archive.png"
             style="width: 20px"
-            onmouseover="hover(this, 'archiveGreen')"
-            onmouseout="unhover(this, 'archive')"
+           
           />
         </button>
       </a>
     </div>
 
     <div class="col" style="padding-top: 9px">
-      <a href="/trash" style="text-decoration: none">
+      <a href="/trash" style="text-decoration: none"  onmouseover="hover(this.children[0].children[0], 'trashPink')"
+      onmouseout="unhover(this.children[0].children[0], 'trash')">
         <button
-          data-title="Trash"
           class="btn rounded-10 zoom"
           style="
             border-color: #f289ca;
@@ -139,8 +139,7 @@
           <img
             src="/img/trash.png"
             style="width: 20px"
-            onmouseover="hover(this, 'trashPink')"
-            onmouseout="unhover(this, 'trash')"
+           
           />
         </button>
       </a>
@@ -149,9 +148,10 @@
     <div class="col" style="padding-top: 9px; padding-right: 0px">
       <ul class="nav navbar-nav" style="width: 80px; display: block">
         <li class="dropdown">
-          <a
-            data-title="Labels"
-            class="dropdown-toggle btn rounded-10 zoom"
+          <a  onmouseover="hover(this.children[0], 'labelPink')"
+          onmouseout="unhover(this.children[0], 'label')"
+            class=" btn rounded-10"
+            title="Labels"
             href="/labels"
             data-toggle="dropdown"
             role="button"
@@ -168,12 +168,11 @@
             <img
               src="/img/label.png"
               style="width: 20px"
-              onmouseover="hover(this, 'labelPink')"
-              onmouseout="unhover(this, 'label')"
+             
             />
             <span class="caret"></span>
           </a>
-          <div class="dropdown-menu" style="width: 228px; padding-bottom: 0px">
+          <div class="dropdown-menu" style="width: 237px; padding-bottom: 0px">
             <% if(allLabels.length == 0) { %>
             <div style="font-weight: bold; font-size: 12px; padding-left: 5px">
               Labels appear here for quick access
@@ -201,7 +200,7 @@
                 hidden
               />
               <button
-                title="View lists with label"
+                title="View lists labelled <%= label.label.length > 10 ? label.label.substring(0,10) + "..." : label.label%>"
                 class="btn rounded-pill"
                 style="
                   border-color: #03a9f4;
@@ -229,10 +228,10 @@
     >
       <button
         data-bs-toggle="modal"
+        title="Tips & Help"
         data-bs-target="#tipsModal"
         onmouseover="setTextColor(this, '#f289ca')"
         onmouseout="setTextColor(this, 'black')"
-        data-title="Help"
         class="btn rounded-10 zoomSmall"
         style="
           border-radius: 50%;
@@ -291,11 +290,12 @@
 
     <div class="col" style="padding-left: 5px; padding-top: 1px">
       <a
+      title="Log out"
         onmouseover="hover(document.getElementById('logoutArrow'), 'leftArrowPink')"
-        onmouseout="hover(document.getElementById('logoutArrow'), 'leftArrowBlack')"
-        data-title="Log out"
+        onmouseout="unhover(document.getElementById('logoutArrow'), 'leftArrowBlack')"
         href="/logout"
-        class="btn rounded-10 logout"
+
+        class="btn rounded-10 "
         style="
           height: 33.25px;
           border-color: #000000;
@@ -323,20 +323,21 @@
   tabindex="-1"
   aria-labelledby="tipsModal"
   aria-hidden="true"
+
 >
   <div class="modal-dialog">
     <div
       class="modal-content mx-auto"
-      style="padding: 10px; border: #f289ca 3px solid"
+      style="padding: 10px; border: #f289ca 3px solid;"
     >
       <div class="logo text-center" style="color: #f289ca; font-size: 22px">
         Tips & Help
       </div>
       <hr />
-      <div class="" style="font-size: 16px">
+      <div class="" style="font-size: 13px">
         <ul>
           <li>
-            Do actions on multiple lists at once:
+            Perform actions on multiple lists at once:
             <ul>
               <li>
                 Click the white circle beside each list to select the ones you
@@ -361,7 +362,7 @@
             You can search for lists by many fields, including:
             <ul>
               <li>Title</li>
-              <li>List</li>
+              <li>List contents</li>
               <li>Collaborator:</li>
               <ul>
                 <li>Email</li>
@@ -370,9 +371,9 @@
               <li>Label</li>
               <li>Color</li>
               <li>
-                Lists are stored as HTML, so you can even search to filter by
+                Lists are stored as HTML, so you can also search to filter by
                 specific content types using their HTML tag, such as 'li' for
-                lists, 'strong' for bold text, and more!
+                lists, 'strong' for bold text, and more
               </li>
             </ul>
           </li>
@@ -392,9 +393,9 @@
           <li>
             Locking a list:
             <ul>
-              <li>Only locks it for yourself.</li>
+              <li>Only locks it for you.</li>
               <li>Hides everything except the title.</li>
-              <li>Disables all button actions.</li>
+              <li>Disables all actions.</li>
             </ul>
           </li>
         </ul>
@@ -403,7 +404,7 @@
           <a
             href="mailto:lists.communications@gmail.com"
             style="text-decoration: none"
-            >Contact</a
+            >lists.communications@gmail.com</a
           >
         </div>
       </div>

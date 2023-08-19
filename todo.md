@@ -1,7 +1,6 @@
 ## To do
 
 - [ ] View layouts- grid uneven, list uneven, etc
-- [ ] Color in editor
 - [ ] Commands not working now when in editor (cmd)
 - [ ] Drag drop lists, for custom ordering, persist in database
 - [ ] Images
@@ -12,8 +11,15 @@
 - [ ] After adding list with label, route to that label's page
 - [ ] Formatting
 - [ ] Highlight results
+- [ ] Match fonts
+- [ ] Don't drag images
+- [ ] Compile problems
 - [ ] Todo chg color from inside list
 - [ ] Edit archive shared
+- [ ] Cannot have 2 labels with same name
+- [ ] Pagination
+- [ ] Long names icon profile
+- [ ] Redirect to correct current page
 - [ ] Cannot select when not owner (or can select, but cannot perform certain actions.)
 - [ ] Remove collaborators
 - [ ] Undo
@@ -56,7 +62,6 @@
 - [ ] Empty trash should remove everything
 - [ ] Match pages
 - [ ] Dark theme
-- [ ] Help
 - [ ] Keyboard shortcuts
 - [ ] Deploy
 - [ ] Mobile app/small screen optimization
@@ -87,4 +92,5 @@
 - [ ] Text editor features: checklists, bullets, numbers, links, markdown, images, checklists, powerpaste, media, etc
 - [ ] Buttons
 - [ ] Tooltips fix
-- [ ] Links to modals in URL so open and share
+- [ ] Links to modals in URL so open and share (Links to notes)
+- [ ] Add messages for every action
