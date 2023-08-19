@@ -24,5 +24,8 @@ The app is currently not deployed (as it is not completely finished), but you ca
 - Go to localhost:3000 in a browser
 
 
-https://github.com/Theobragstad/listable/assets/48075045/4f9c840a-67cb-4707-978a-6522ed6be52f
+
+
+
+https://github.com/Theobragstad/listable/assets/48075045/65114060-76df-4669-8c82-904b4ca923af
 
