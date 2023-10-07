@@ -3,6 +3,10 @@
 listable is a full-featured list/note/to-do web app that allows you to save and keep track of everything you want to remember, all with a productivity-focused UI that is clean, appealing, intuitive, and fast.
 <br><br>
 
+https://github.com/Theobragstad/listable/assets/48075045/65114060-76df-4669-8c82-904b4ca923af
+
+
+
 Main features:  
 - Google sign in
 - Create and edit lists and notes
@@ -16,16 +20,9 @@ Main features:
 - Keep track of your work with edit and create timestamps
 <br><br>
 
-The app is currently not deployed (as it is not completely finished), but you can try it locally:  
+Try listable locally:  
 - Make sure Docker Desktop is downloaded and running
 - Clone or download this repository
 - Navigate to the project folder in a terminal
 - Run 'docker compose up'
 - Go to localhost:3000 in a browser
-
-
-
-
-
-https://github.com/Theobragstad/listable/assets/48075045/65114060-76df-4669-8c82-904b4ca923af
-
