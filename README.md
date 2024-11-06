@@ -19,8 +19,8 @@ ___
 - Keep track of your work with edit and create timestamps
 ___
 ### Try listable locally:  
-- You'll need a `.env` file. This is used for Google OAuth and other app features. You can contact me at `theobragstad2@gmail.com` for the credentials.
--   Alternatively, you can create your own `.env`, but at a minimum you'll need a Google OAuth client ID and client secret so you can login. You'll also need to update the URIs to match those used in the app. An empty `.env` is included in the repository.
+- You'll need a `.env` file. This is used for Google OAuth and other app features. You can contact me at `theobragstad2@gmail.com` for the credentials
+-   Alternatively, you can create your own `.env`, but at a minimum you'll need a Google OAuth client ID and client secret so you can login. You'll also need to update the URIs to match those used in the app. An empty `.env` is included in the repository
 - Make sure Docker Desktop is downloaded and running
 - Clone or download this repository
 - Navigate to the project folder in a terminal
